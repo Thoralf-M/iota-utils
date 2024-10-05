@@ -21,6 +21,7 @@
     "@iota/bcs": "link:../iota/sdk/bcs",
     "@iota/iota-sdk": "link:../iota/sdk/typescript",
     "@noble/hashes": "^1.5.0",
-    "@scure/bip39": "^1.4.0"
+    "@scure/bip39": "^1.4.0",
+    "svelte-json-tree-auto": "^0.1.0"
   }
 }

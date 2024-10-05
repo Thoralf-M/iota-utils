@@ -20,6 +20,9 @@ importers:
       '@scure/bip39':
         specifier: ^1.4.0
         version: 1.4.0
+      svelte-json-tree-auto:
+        specifier: ^0.1.0
+        version: 0.1.0
     devDependencies:
       '@sveltejs/vite-plugin-svelte':
         specifier: ^3.1.2
@@ -487,6 +490,9 @@ packages:
     peerDependencies:
       svelte: ^3.19.0 || ^4.0.0
 
+  svelte-json-tree-auto@0.1.0:
+    resolution: {integrity: sha512-XDUBTV/BNStd/9WJDndzxQ9KqhoNoZBxkOo1H1d29qKW+YxG6eRrt2Yp0Cv/6KLKDtFLhJ9huJpqpOSe4yMG0Q==}
+
   svelte@4.2.19:
     resolution: {integrity: sha512-IY1rnGr6izd10B0A8LqsBfmlT5OILVuZ7XsI0vdGPEvuonFV7NYEUK4dAkm9Zg2q0Um92kYjTpS1CAP3Nh/KWw==}
     engines: {node: '>=16'}
@@ -906,6 +912,8 @@ snapshots:
   svelte-hmr@0.16.0(svelte@4.2.19):
     dependencies:
       svelte: 4.2.19
+
+  svelte-json-tree-auto@0.1.0: {}
 
   svelte@4.2.19:
     dependencies:
