@@ -1,12 +1,12 @@
 <script lang="ts">
     import { Transaction } from "@iota/iota-sdk/transactions";
-    import { IotaClient } from "@iota/iota-sdk/client";
     import {
         getWallets,
         isWalletWithRequiredFeatureSet,
         type Wallet,
     } from "@iota/wallet-standard";
     import JSONTree from "svelte-json-tree-auto";
+    import { getClient } from "../Client.svelte";
 
     const features = {
         CONNECT: "standard:connect",
@@ -26,10 +26,6 @@
     let value = {};
 
     let iota_wallets: Wallet[] = [];
-
-    const client = new IotaClient({
-        url: "https://api.iota-rebased-alphanet.iota.cafe",
-    });
 
     try {
         iota_wallets = getWallets()
@@ -101,11 +97,13 @@
                     options: {
                         showEffects: true,
                         showObjectChanges: true,
+                        showBalanceChanges: true,
                     },
                 },
             );
             console.log(txResult);
             value = txResult;
+            let client = await getClient();
             // result = JSON.stringify(txResult, null, 2);
             client.waitForTransaction({ digest: txResult.digest }).then(() => {
                 console.log("tx block available via api");
@@ -119,6 +117,8 @@
 </script>
 
 <main>
+    WIP
+    <br />
     <span>
         address:
         <input bind:value={address} placeholder="address" size="67" />

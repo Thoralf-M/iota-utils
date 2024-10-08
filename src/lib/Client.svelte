@@ -1,26 +1,21 @@
 <script lang="ts" context="module">
-    // import { Client, initLogger } from "@iota/sdk-wasm/web";
+    import { IotaClient } from "@iota/iota-sdk/client";
     import { writable } from "svelte/store";
 
-    let nodeUrlStorage = localStorageStore("nodeUrl", "http://localhost:8050");
-    export let nodeUrl = "";
+    let nodeUrlStorage = localStorageStore("nodeUrl", "http://127.0.0.1:9000");
+    export let nodeUrl = "http://127.0.0.1:9000";
     nodeUrlStorage.subscribe((value) => {
         nodeUrl = value;
     });
 
-    let loggerInitialized = false;
     // Used to determine if the client should be initialized with a new node
     let previousInitializedNodeUrl = "";
     let client: any = undefined;
     export const getClient = async () => {
-        if (!loggerInitialized) {
-            // await initLogger();
-            loggerInitialized = true;
-        }
         if (client == undefined || nodeUrl != previousInitializedNodeUrl) {
-            // client = await Client.create({
-            //     nodes: [nodeUrl],
-            // });
+            client = new IotaClient({
+                url: nodeUrl,
+            });
             previousInitializedNodeUrl = nodeUrl;
         }
         return client;
@@ -40,5 +35,13 @@
         bind:value={nodeUrl}
         placeholder="node url"
         on:input={() => nodeUrlStorage.update((v) => (v = nodeUrl))}
+        list="urls"
     />
+    <datalist id="urls">
+        <option value={"http://127.0.0.1:9000"}>Localnet </option>
+        <option value={"https://api.hackanet.iota.cafe"}>Hackanet </option>
+        <option value={"https://api.iota-rebased-alphanet.iota.cafe"}
+            >Alphanet
+        </option>
+    </datalist>
 </main>

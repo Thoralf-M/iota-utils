@@ -1,0 +1,44 @@
+<script lang="ts">
+    import JSONTree from "svelte-json-tree-auto";
+    import { getClient } from "../Client.svelte";
+
+    let value = {};
+    const getLatestSystemState = async () => {
+        try {
+            let client = await getClient();
+            const systemState = await client.getLatestIotaSystemState();
+            console.log(systemState);
+            value = systemState;
+        } catch (err) {
+            value = err.toString();
+            console.error(err);
+        }
+    };
+    let showJsonTree = true;
+</script>
+
+<main>
+    <button on:click={() => getLatestSystemState()}>
+        get latest iota system state
+    </button>
+
+    <div class="value" hidden={Object.keys(value).length == 0}>
+        <button on:click={() => (showJsonTree = !showJsonTree)}>
+            toggle JSON tree
+        </button>
+        <div hidden={!showJsonTree}>
+            <JSONTree {value} />
+        </div>
+        <pre hidden={showJsonTree}>{JSON.stringify(value, null, 2)}</pre>
+    </div>
+</main>
+
+<style>
+    .value,
+    pre {
+        text-align: left;
+    }
+    button {
+        margin: 0.5rem;
+    }
+</style>
