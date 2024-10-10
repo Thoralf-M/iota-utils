@@ -5,91 +5,21 @@
         type CoinStruct,
         type PaginatedCoins,
     } from "@iota/iota-sdk/client";
-    import {
-        getWallets,
-        isWalletWithRequiredFeatureSet,
-        type Wallet,
-    } from "@iota/wallet-standard";
     import JSONTree from "svelte-json-tree-auto";
     import { getClient } from "../Client.svelte";
-
-    const features = {
-        CONNECT: "standard:connect",
-        EVENTS: "standard:events",
-        SIGN_AND_EXECUTE_TRANSACTION_BLOCK:
-            "iota:signAndExecuteTransactionBlock",
-        SIGN_MESSAGE: "iota:signMessage",
-        SIGN_PERSONAL_MESSAGE: "iota:signPersonalMessage",
-        SIGN_TRANSACTION_BLOCK: "iota:signTransactionBlock",
-    };
+    import { iota_wallets, iota_accounts } from "../WebWalletData.svelte";
 
     let objectCount = 1;
     let amountPerObject = 0;
     // Will be updated with the result
     let value = {};
 
-    let iota_wallets: Wallet[] = [];
-
-    try {
-        iota_wallets = getWallets()
-            .get()
-            .filter((wallet) => {
-                const raw_features = Object.values(features);
-                return isWalletWithRequiredFeatureSet(wallet, raw_features);
-            })
-            .map(
-                ({
-                    accounts,
-                    chains,
-                    features: {
-                        [features.CONNECT]: { connect },
-                        [features.EVENTS]: { on },
-                        [features.SIGN_AND_EXECUTE_TRANSACTION_BLOCK]: {
-                            signAndExecuteTransactionBlock,
-                        },
-                        [features.SIGN_MESSAGE]: { signMessage },
-                        [features.SIGN_PERSONAL_MESSAGE]: {
-                            signPersonalMessage,
-                        },
-                        [features.SIGN_TRANSACTION_BLOCK]: {
-                            signTransactionBlock,
-                        },
-                    },
-                    icon,
-                    name,
-                    version,
-                }) => ({
-                    accounts,
-                    chains,
-                    icon,
-                    name,
-                    version,
-                    connect,
-                    on,
-                    signAndExecuteTransactionBlock,
-                    signMessage,
-                    signPersonalMessage,
-                    signTransactionBlock,
-                    features,
-                }),
-            );
-
-        if (iota_wallets.length == 0) {
-            throw new Error("no web wallet found");
-        }
-        iota_wallets[0].on("change", console.log);
-        iota_wallets[0].connect();
-    } catch (err) {
-        value = err.toString();
-        console.error(err);
-    }
-
     const mergeAllIotaCoins = async () => {
         try {
             let client = await getClient();
             let coins = await getAllIotaCoins(
                 client,
-                iota_wallets[0].accounts[0].address,
+                $iota_accounts[0].address,
             );
             if (coins.length < 2) {
                 throw new Error("No coins to consolidate");
@@ -123,16 +53,17 @@
                 },
             ]);
 
-            let txResult = await iota_wallets[0].signAndExecuteTransactionBlock(
-                {
+            let txResult =
+                await $iota_wallets[0].signAndExecuteTransactionBlock({
                     transactionBlock: tx,
                     options: {
                         showEffects: true,
                         showObjectChanges: true,
                         showBalanceChanges: true,
                     },
-                },
-            );
+                    account:
+                        "0xfffff99ac1a34ac3d005780fb7728969e1f1a166c947fe7c5dc4fad060ba35ff",
+                });
             console.log(txResult);
             value = txResult;
             // result = JSON.stringify(txResult, null, 2);
@@ -157,18 +88,17 @@
                 };
             });
             // @ts-ignore
-            tx.transferObjects(coinArgs, iota_wallets[0].accounts[0].address);
+            tx.transferObjects(coinArgs, $iota_accounts[0].address);
 
-            let txResult = await iota_wallets[0].signAndExecuteTransactionBlock(
-                {
+            let txResult =
+                await $iota_wallets[0].signAndExecuteTransactionBlock({
                     transactionBlock: tx,
                     options: {
                         showEffects: true,
                         showObjectChanges: true,
                         showBalanceChanges: true,
                     },
-                },
-            );
+                });
             console.log(txResult);
             value = txResult;
             let client = await getClient();
@@ -186,7 +116,7 @@
             let client = await getClient();
             let coins = await getAllIotaCoins(
                 client,
-                iota_wallets[0].accounts[0].address,
+                $iota_accounts[0].address,
             );
             value = coins;
         } catch (err) {
@@ -239,7 +169,10 @@
     <br />
     <button on:click={() => splitIotaCoins()}>Split IOTA coins</button>
 
-    <div class="value" hidden={Object.keys(value).length == 0}>
+    <div
+        class="value"
+        hidden={Object.keys(value).length === 0 && value.constructor === Object}
+    >
         <button on:click={() => (showJsonTree = !showJsonTree)}>
             toggle JSON tree
         </button>

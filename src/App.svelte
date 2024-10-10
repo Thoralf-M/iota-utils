@@ -7,6 +7,8 @@
     import Tabs from "./lib/Tabs.svelte";
     import IotaSystemState from "./lib/pages/IotaSystemState.svelte";
     import SplitMergeCoins from "./lib/pages/SplitMergeCoins.svelte";
+    import WebWallet from "./lib/WebWallet.svelte";
+    import { activeAddress } from "./lib/WebWalletData.svelte";
 
     // List of tab items with labels, values and assigned components
     let items = [
@@ -26,7 +28,9 @@
     });
 </script>
 
+{$activeAddress}
 <Client />
+<WebWallet />
 <Tabs {items} />
 <a
     href="https://github.com/Thoralf-M/iota-utils"
