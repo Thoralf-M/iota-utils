@@ -9,8 +9,8 @@
     import { getClient } from "../Client.svelte";
     import { iota_wallets, iota_accounts } from "../WebWalletData.svelte";
 
-    let objectCount = 1;
-    let amountPerObject = 0;
+    let objectCount = "1";
+    let amountPerObject = "0";
     // Will be updated with the result
     let value = {};
 
@@ -78,8 +78,7 @@
     const splitIotaCoins = async () => {
         try {
             const tx = new Transaction();
-
-            const splitAmounts = new Array(objectCount).fill(amountPerObject);
+            const splitAmounts = new Array(parseInt(objectCount)).fill(parseInt(amountPerObject));
             const coins = tx.splitCoins(tx.gas, splitAmounts);
             let coinArgs = [...Array(splitAmounts.length).keys()].map((i) => {
                 return {
