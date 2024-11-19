@@ -1,31 +1,69 @@
 <script lang="ts">
-    import { requestIotaFromFaucetV0 } from "@iota/iota-sdk/faucet";
+    import {
+        requestIotaFromFaucetV0,
+        requestIotaFromFaucetV1,
+        getFaucetRequestStatus,
+    } from "@iota/iota-sdk/faucet";
     import JSONTree from "svelte-json-tree-auto";
 
     let address =
         "0x111111111504e9350e635d65cd38ccd2c029434c6a3a480d8947a9ba6a15b215";
-    let faucetUrl = "https://faucet.hackanet.iota.cafe/gas";
+    let faucetUrl = "https://faucet.testnet.iota.cafe/gas";
     let value = {};
+    let amountOfRequests = 1;
 
+    const requestFundsLoop = async () => {
+        for (let i = 0; i < amountOfRequests; i++) {
+            requestFunds();
+            // Just wait 50 ms and don't await on the requestFunds function to get more requests faster
+            await new Promise((resolve) => setTimeout(resolve, 100));
+        }
+    };
     const requestFunds = async () => {
         try {
             if (address.length != 64 && address.length != 66) {
                 throw new Error("address has an invalid length");
             }
-            const faucetResponse = await requestIotaFromFaucetV0({
-                host: faucetUrl,
-                recipient: address,
-            });
-            console.log(faucetResponse);
-            value = faucetResponse;
+            // Try batched request and switch to single request in case of an error
+            try {
+                var { error, task: taskId } = await requestIotaFromFaucetV1({
+                    host: faucetUrl,
+                    recipient: address,
+                });
+
+                if (error || !taskId) {
+                    throw new Error(error ?? "Failed, task id not found.");
+                }
+
+                console.log(taskId);
+
+                var {
+                    status: { status, transferred_gas_objects },
+                    error,
+                } = await getFaucetRequestStatus({
+                    host: faucetUrl,
+                    taskId,
+                });
+
+                console.log(status);
+                console.log(transferred_gas_objects);
+
+                value = transferred_gas_objects;
+            } catch (e) {
+                console.log(e);
+                const faucetResponse = await requestIotaFromFaucetV0({
+                    host: faucetUrl,
+                    recipient: address,
+                });
+                console.log(faucetResponse);
+                value = faucetResponse;
+            }
         } catch (err) {
             value = err.toString();
             console.error(err);
         }
     };
     let showJsonTree = true;
-
-    let localFaucetUrl = "http://127.0.0.1:9123/gas";
 </script>
 
 <main>
@@ -39,9 +77,15 @@
             placeholder="faucet URL, like http://127.0.0.1:9123/gas"
         />
         <datalist id="faucetUrls">
-            <option value={localFaucetUrl}>Localnet </option>
-            <option value={"https://faucet.hackanet.iota.cafe/gas"}
-                >Hackanet
+            <option value={"http://127.0.0.1:9123/gas"}>Localnet </option>
+            <option value={"https://faucet.testnet.iota.cafe/gas"}
+                >Testnet
+            </option>
+            <option value={"https://faucet.testnet.iota.cafe/gas"}
+                >Testnet
+            </option>
+            <option value={"https://faucet.devnet.iota.cafe/gas"}
+                >Devnet
             </option>
             <option value={"https://faucet.iota-rebased-alphanet.iota.cafe/gas"}
                 >Alphanet
@@ -54,8 +98,18 @@
         <input bind:value={address} placeholder="address" size="67" />
     </span>
     <br />
+    <span>
+        amount of requests:
+        <input
+            type="number"
+            bind:value={amountOfRequests}
+            placeholder="1"
+            size="4"
+        />
+    </span>
+    <br />
 
-    <button on:click={() => requestFunds()}> Request funds </button>
+    <button on:click={() => requestFundsLoop()}> Request funds </button>
 
     <div class="value" hidden={Object.keys(value).length == 0}>
         <button on:click={() => (showJsonTree = !showJsonTree)}>

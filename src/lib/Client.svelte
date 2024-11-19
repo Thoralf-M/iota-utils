@@ -2,8 +2,11 @@
     import { IotaClient } from "@iota/iota-sdk/client";
     import { writable } from "svelte/store";
 
-    let nodeUrlStorage = localStorageStore("nodeUrl", "http://127.0.0.1:9000");
-    export let nodeUrl = "http://127.0.0.1:9000";
+    let nodeUrlStorage = localStorageStore(
+        "nodeUrl",
+        "https://api.testnet.iota.cafe",
+    );
+    export let nodeUrl = "https://api.testnet.iota.cafe";
     nodeUrlStorage.subscribe((value) => {
         nodeUrl = value;
     });
@@ -39,7 +42,8 @@
     />
     <datalist id="urls">
         <option value={"http://127.0.0.1:9000"}>Localnet </option>
-        <option value={"https://api.hackanet.iota.cafe"}>Hackanet </option>
+        <option value={"https://api.testnet.iota.cafe"}>Testnet </option>
+        <option value={"https://api.devnet.iota.cafe"}>Devnet </option>
         <option value={"https://api.iota-rebased-alphanet.iota.cafe"}
             >Alphanet
         </option>
