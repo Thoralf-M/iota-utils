@@ -20,6 +20,7 @@
   "dependencies": {
     "@iota/bcs": "^0.2.1",
     "@iota/iota-sdk": "^0.3.1",
+    "@iota/wallet-standard": "^0.2.1",
     "@noble/hashes": "^1.5.0",
     "@scure/bip39": "^1.4.0",
     "svelte-json-tree-auto": "^0.1.0"

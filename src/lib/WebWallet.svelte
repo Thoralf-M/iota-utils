@@ -12,12 +12,9 @@
     const features = {
         CONNECT: "standard:connect",
         EVENTS: "standard:events",
-        // TODO: update to signAndExecuteTransaction soon
-        SIGN_AND_EXECUTE_TRANSACTION_BLOCK:
-            "iota:signAndExecuteTransactionBlock",
-        SIGN_MESSAGE: "iota:signMessage",
+        SIGN_AND_EXECUTE_TRANSACTION: "iota:signAndExecuteTransaction",
         SIGN_PERSONAL_MESSAGE: "iota:signPersonalMessage",
-        SIGN_TRANSACTION_BLOCK: "iota:signTransactionBlock",
+        SIGN_TRANSACTION: "iota:signTransaction",
     };
 
     try {
@@ -26,7 +23,16 @@
                 .get()
                 .filter((wallet) => {
                     const raw_features = Object.values(features);
-                    return isWalletWithRequiredFeatureSet(wallet, raw_features);
+                    // console.log(wallet);
+                    let isWalletWithRequired = isWalletWithRequiredFeatureSet(
+                        wallet,
+                        raw_features,
+                    );
+                    // console.log(
+                    //     "isWalletWithRequiredFeatureSet",
+                    //     isWalletWithRequired,
+                    // );
+                    return isWalletWithRequired;
                 })
                 .map(
                     ({
@@ -37,42 +43,44 @@
                             [features.CONNECT]: { connect },
                             // @ts-ignore
                             [features.EVENTS]: { on },
-                            [features.SIGN_AND_EXECUTE_TRANSACTION_BLOCK]: {
-                                // @ts-ignore
-                                signAndExecuteTransactionBlock,
+                            // @ts-ignore
+                            [features.SIGN_AND_EXECUTE_TRANSACTION]: {
+                                signAndExecuteTransaction,
                             },
                             // @ts-ignore
-                            [features.SIGN_MESSAGE]: { signMessage },
                             [features.SIGN_PERSONAL_MESSAGE]: {
-                                // @ts-ignore
                                 signPersonalMessage,
                             },
-                            [features.SIGN_TRANSACTION_BLOCK]: {
+                            // @ts-ignore
+                            [features.SIGN_TRANSACTION]: {
                                 // @ts-ignore
-                                signTransactionBlock,
+                                signTransaction,
                             },
                         },
                         icon,
                         name,
                         version,
-                    }) => ({
-                        accounts,
-                        chains,
-                        icon,
-                        name,
-                        version,
-                        connect,
-                        on,
-                        signAndExecuteTransactionBlock,
-                        signMessage,
-                        signPersonalMessage,
-                        signTransactionBlock,
-                        features,
-                    }),
+                    }) => {
+                        console.log("connect", connect);
+                        return {
+                            accounts,
+                            chains,
+                            icon,
+                            name,
+                            version,
+                            connect,
+                            on,
+                            signAndExecuteTransaction,
+                            signPersonalMessage,
+                            signTransaction,
+                            features,
+                        };
+                    },
                 ),
         );
 
         console.log(iota_wallets);
+        // @ts-ignore
         if (iota_wallets.length == 0) {
             throw new Error("no web wallet found");
         }
@@ -118,5 +126,7 @@
             </div>
         {/each}
     </div> -->
-    <button on:click={() => connectWallet()}> Connect web wallet </button>
+    <button on:click={() => connectWallet()}>
+        Connect web wallet (currently experimental)
+    </button>
 </main>

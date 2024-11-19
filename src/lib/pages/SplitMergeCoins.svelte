@@ -53,17 +53,16 @@
                 },
             ]);
 
-            let txResult =
-                await $iota_wallets[0].signAndExecuteTransactionBlock({
-                    transactionBlock: tx,
-                    options: {
-                        showEffects: true,
-                        showObjectChanges: true,
-                        showBalanceChanges: true,
-                    },
-                    account:
-                        "0xfffff99ac1a34ac3d005780fb7728969e1f1a166c947fe7c5dc4fad060ba35ff",
-                });
+            let txResult = await $iota_wallets[0].signAndExecuteTransaction({
+                transaction: tx,
+                options: {
+                    showEffects: true,
+                    showObjectChanges: true,
+                    showBalanceChanges: true,
+                },
+                account:
+                    "0xfffff99ac1a34ac3d005780fb7728969e1f1a166c947fe7c5dc4fad060ba35ff",
+            });
             console.log(txResult);
             value = txResult;
             // result = JSON.stringify(txResult, null, 2);
@@ -78,7 +77,9 @@
     const splitIotaCoins = async () => {
         try {
             const tx = new Transaction();
-            const splitAmounts = new Array(parseInt(objectCount)).fill(parseInt(amountPerObject));
+            const splitAmounts = new Array(parseInt(objectCount)).fill(
+                parseInt(amountPerObject),
+            );
             const coins = tx.splitCoins(tx.gas, splitAmounts);
             let coinArgs = [...Array(splitAmounts.length).keys()].map((i) => {
                 return {
@@ -89,15 +90,14 @@
             // @ts-ignore
             tx.transferObjects(coinArgs, $iota_accounts[0].address);
 
-            let txResult =
-                await $iota_wallets[0].signAndExecuteTransactionBlock({
-                    transactionBlock: tx,
-                    options: {
-                        showEffects: true,
-                        showObjectChanges: true,
-                        showBalanceChanges: true,
-                    },
-                });
+            let txResult = await $iota_wallets[0].signAndExecuteTransaction({
+                transaction: tx,
+                options: {
+                    showEffects: true,
+                    showObjectChanges: true,
+                    showBalanceChanges: true,
+                },
+            });
             console.log(txResult);
             value = txResult;
             let client = await getClient();
