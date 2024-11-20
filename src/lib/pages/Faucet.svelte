@@ -11,12 +11,15 @@
     let faucetUrl = "https://faucet.testnet.iota.cafe/gas";
     let value = {};
     let amountOfRequests = 1;
+    let msBetweenRequests = 1000;
 
     const requestFundsLoop = async () => {
         for (let i = 0; i < amountOfRequests; i++) {
             requestFunds();
-            // Just wait 50 ms and don't await on the requestFunds function to get more requests faster
-            await new Promise((resolve) => setTimeout(resolve, 100));
+            // Just wait some time and don't await on the requestFunds function to get more requests faster
+            await new Promise((resolve) =>
+                setTimeout(resolve, msBetweenRequests),
+            );
         }
     };
     const requestFunds = async () => {
@@ -104,6 +107,15 @@
             type="number"
             bind:value={amountOfRequests}
             placeholder="1"
+            size="4"
+        />
+    </span>
+    <span>
+        milliseconds between requests:
+        <input
+            type="number"
+            bind:value={msBetweenRequests}
+            placeholder="1000"
             size="4"
         />
     </span>
