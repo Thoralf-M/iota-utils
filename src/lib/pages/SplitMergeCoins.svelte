@@ -7,7 +7,11 @@
     } from "@iota/iota-sdk/client";
     import JSONTree from "svelte-json-tree-auto";
     import { getClient } from "../Client.svelte";
-    import { iota_wallets, iota_accounts } from "../WebWalletData.svelte";
+    import {
+        iota_wallets,
+        iota_accounts,
+        activeAddress,
+    } from "../WebWalletData.svelte";
 
     let objectCount = "1";
     let amountPerObject = "0";
@@ -60,8 +64,9 @@
                     showObjectChanges: true,
                     showBalanceChanges: true,
                 },
-                account:
-                    "0xfffff99ac1a34ac3d005780fb7728969e1f1a166c947fe7c5dc4fad060ba35ff",
+                account: $iota_accounts.filter(
+                    (account) => account.address == $activeAddress,
+                )[0],
             });
             console.log(txResult);
             value = txResult;
@@ -97,6 +102,9 @@
                     showObjectChanges: true,
                     showBalanceChanges: true,
                 },
+                account: $iota_accounts.filter(
+                    (account) => account.address == $activeAddress,
+                )[0],
             });
             console.log(txResult);
             value = txResult;
@@ -113,10 +121,7 @@
     const listAllIotaCoinObjects = async () => {
         try {
             let client = await getClient();
-            let coins = await getAllIotaCoins(
-                client,
-                $iota_accounts[0].address,
-            );
+            let coins = await getAllIotaCoins(client, $activeAddress);
             value = coins;
         } catch (err) {
             value = err.toString();

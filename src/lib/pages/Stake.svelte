@@ -2,7 +2,11 @@
     import { Transaction } from "@iota/iota-sdk/transactions";
     import JSONTree from "svelte-json-tree-auto";
     import { getClient } from "../Client.svelte";
-    import { iota_wallets } from "../WebWalletData.svelte";
+    import {
+        activeAddress,
+        iota_accounts,
+        iota_wallets,
+    } from "../WebWalletData.svelte";
     import {
         IOTA_SYSTEM_STATE_OBJECT_ID,
         isValidIotaAddress,
@@ -42,6 +46,9 @@
                     showObjectChanges: true,
                     showBalanceChanges: true,
                 },
+                account: $iota_accounts.filter(
+                    (account) => account.address == $activeAddress,
+                )[0],
             });
             console.log(txResult);
             value = txResult;

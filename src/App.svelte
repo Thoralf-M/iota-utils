@@ -2,10 +2,10 @@
     import Ed25519AddressGeneration from "./lib/pages/Ed25519AddressGeneration.svelte";
     import Converter from "./lib/pages/Converter.svelte";
     import Faucet from "./lib/pages/Faucet.svelte";
-    import PTB from "./lib/pages/ProgrammableTransactionBlock.svelte";
     import Client from "./lib/Client.svelte";
     import Tabs from "./lib/Tabs.svelte";
     import IotaSystemState from "./lib/pages/IotaSystemState.svelte";
+    import PublishData from "./lib/pages/PublishData.svelte";
     import SplitMergeCoins from "./lib/pages/SplitMergeCoins.svelte";
     import Stake from "./lib/pages/Stake.svelte";
     import WebWallet from "./lib/WebWallet.svelte";
@@ -19,7 +19,7 @@
         { label: "Converter", component: Converter },
         { label: "Faucet", component: Faucet },
         { label: "Iota System State", component: IotaSystemState },
-        { label: "PTB", component: PTB },
+        { label: "Publish Data", component: PublishData },
         { label: "Split Merge Coins", component: SplitMergeCoins },
         { label: "Stake", component: Stake },
     ].map((e, index) => {
