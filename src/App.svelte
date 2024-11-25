@@ -7,6 +7,7 @@
     import Tabs from "./lib/Tabs.svelte";
     import IotaSystemState from "./lib/pages/IotaSystemState.svelte";
     import SplitMergeCoins from "./lib/pages/SplitMergeCoins.svelte";
+    import Stake from "./lib/pages/Stake.svelte";
     import WebWallet from "./lib/WebWallet.svelte";
 
     // List of tab items with labels, values and assigned components
@@ -20,6 +21,7 @@
         { label: "Iota System State", component: IotaSystemState },
         { label: "PTB", component: PTB },
         { label: "Split Merge Coins", component: SplitMergeCoins },
+        { label: "Stake", component: Stake },
     ].map((e, index) => {
         // @ts-ignore
         e.value = index;

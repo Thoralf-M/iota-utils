@@ -3,23 +3,37 @@
     import JSONTree from "svelte-json-tree-auto";
     import { getClient } from "../Client.svelte";
     import { iota_wallets } from "../WebWalletData.svelte";
+    import {
+        IOTA_SYSTEM_STATE_OBJECT_ID,
+        isValidIotaAddress,
+    } from "@iota/iota-sdk/utils";
 
-    // let address =
-    // "0x111111111504e9350e635d65cd38ccd2c029434c6a3a480d8947a9ba6a15b215";
-    // let amount = "10";
-    let pureInputData = "some data";
+    let validatorAddress =
+        "0x111111111504e9350e635d65cd38ccd2c029434c6a3a480d8947a9ba6a15b215";
+    const minStakeAmount = 1000000000;
+    let amount = minStakeAmount;
     // Will be updated with the result
     let value = {};
 
-    const executeMoveCall = async () => {
+    const stake = async () => {
         try {
-            // if (!isValidIotaAddress(address)) {
-            //   throw new Error("invalid address");
-            // }
+            if (!isValidIotaAddress(validatorAddress)) {
+                throw new Error("invalid address");
+            }
             const tx = new Transaction();
-            tx.pure("string", pureInputData);
-            // const coin = tx.splitCoins(tx.gas, [parseInt(amount)]);
-            // tx.transferObjects([coin], address);
+            const stakeCoin = tx.splitCoins(tx.gas, [amount]);
+            tx.moveCall({
+                target: "0x3::iota_system::request_add_stake",
+                arguments: [
+                    tx.sharedObjectRef({
+                        objectId: IOTA_SYSTEM_STATE_OBJECT_ID,
+                        initialSharedVersion: 1,
+                        mutable: true,
+                    }),
+                    stakeCoin,
+                    tx.pure.address(validatorAddress),
+                ],
+            });
 
             let txResult = await $iota_wallets[0].signAndExecuteTransaction({
                 transaction: tx,
@@ -45,25 +59,28 @@
 </script>
 
 <main>
-    Send data
     <br />
-    <!-- <span>
-        address:
-        <input bind:value={address} placeholder="address" size="67" />
+    <span>
+        validator address:
+        <input
+            bind:value={validatorAddress}
+            placeholder="validator address 0x..."
+            size="67"
+        />
     </span>
     <br />
     <span>
-        amount:
-        <input bind:value={amount} placeholder="amount" size="60" />
-    </span> -->
-    <br />
-    <span>
-        pure input data:
-        <input bind:value={pureInputData} placeholder="string" size="60" />
+        amount (min 1 IOTA):
+        <input
+            type="number"
+            bind:value={amount}
+            placeholder="amount"
+            min="minStakeAmount"
+        />
     </span>
     <br />
 
-    <button on:click={() => executeMoveCall()}> execute move call </button>
+    <button on:click={() => stake()}> stake </button>
 
     <div class="value" hidden={Object.keys(value).length == 0}>
         <button on:click={() => (showJsonTree = !showJsonTree)}>

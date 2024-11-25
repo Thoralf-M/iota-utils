@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { isValidIotaAddress } from "@iota/iota-sdk/utils";
     import {
         requestIotaFromFaucetV0,
         requestIotaFromFaucetV1,
@@ -24,8 +25,8 @@
     };
     const requestFunds = async () => {
         try {
-            if (address.length != 64 && address.length != 66) {
-                throw new Error("address has an invalid length");
+            if (!isValidIotaAddress(address)) {
+                throw new Error("invalid address");
             }
             // Try batched request and switch to single request in case of an error
             try {

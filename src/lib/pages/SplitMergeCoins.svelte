@@ -155,7 +155,9 @@
     >
     <br />
 
-    <button on:click={() => mergeAllIotaCoins()}>Merge all IOTA coins</button>
+    <button on:click={() => mergeAllIotaCoins()}
+        >Merge all IOTA coins (max 2048 at once)</button
+    >
     <br />
     <span>
         object count:
@@ -166,7 +168,9 @@
         <input bind:value={amountPerObject} placeholder="0" />
     </span>
     <br />
-    <button on:click={() => splitIotaCoins()}>Split IOTA coins</button>
+    <button on:click={() => splitIotaCoins()}
+        >Split IOTA coins (max 2048)</button
+    >
 
     <div
         class="value"
