@@ -23,7 +23,7 @@
             let client = await getClient();
             let coins = await getAllIotaCoins(
                 client,
-                $iota_accounts[0].address,
+                $activeAddress,
             );
             if (coins.length < 2) {
                 throw new Error("No coins to consolidate");
