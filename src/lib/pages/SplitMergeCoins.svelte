@@ -93,7 +93,7 @@
                 };
             });
             // @ts-ignore
-            tx.transferObjects(coinArgs, $iota_accounts[0].address);
+            tx.transferObjects(coinArgs, $activeAddress);
 
             let txResult = await $iota_wallets[0].signAndExecuteTransaction({
                 transaction: tx,
