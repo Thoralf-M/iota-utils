@@ -23,6 +23,7 @@
     "@iota/wallet-standard": "^0.2.1",
     "@noble/hashes": "^1.5.0",
     "@scure/bip39": "^1.4.0",
+    "graphql": "link:@iota/iota-sdk/graphql",
     "svelte-json-tree-auto": "^0.1.0"
   }
 }

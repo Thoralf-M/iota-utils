@@ -3,23 +3,26 @@
     import JSONTree from "svelte-json-tree-auto";
     import { getClient } from "../Client.svelte";
     import {
-        activeAddress,
-    } from "../WebWalletData.svelte";
-    import {
         isValidIotaAddress,
         toHEX,
     } from "@iota/iota-sdk/utils";
+    import { type GraphQLQueryOptions, type GraphQLQueryResult, IotaGraphQLClient } from "@iota/iota-sdk/graphql";
+    import { graphql } from "@iota/iota-sdk/graphql/schemas/2024.11";
 
+    let GraphQLURL = "https://graphql.devnet.iota.cafe";
     let address =
         "0xbb9aae52e92a870876b44eab4582011070ceff28b87176529c6051f3e8e64a34";
     let domainName = "thoralf.iota";
     let IOTANS_PACKAGE_ID = "0x323b9fd87dcf0c5cbfdddeb43bf9834b4da5493246cfac2ae59e7b9b0fa62a99";
-    let IOTANS_OBJECT_ID = "0x61e87238b5fb84112389445f8fed701f1013d225edbe6ec57a80912b7e608e12";
+    let IOTANS_OBJECT_ID = "";
     // Will be updated with the result
     let value = {};
 
     const resolveAddress = async () => {
         try {
+            if (IOTANS_OBJECT_ID.length == 0){
+                await queryIotaNSObjectId()
+            }
             const tx = new Transaction();
             let domain = tx.moveCall({
                 target: `${IOTANS_PACKAGE_ID}::domain::new`,
@@ -85,6 +88,9 @@
             if (!isValidIotaAddress(address)) {
                 throw new Error("invalid address");
             }
+            if (IOTANS_OBJECT_ID.length == 0){
+                await queryIotaNSObjectId()
+            }
             const tx = new Transaction();
                 let registry = tx.moveCall({
                 target: `${IOTANS_PACKAGE_ID}::iotans::registry`,
@@ -134,11 +140,33 @@
             console.error(err);
         }
     };
+    async function queryIotaNSObjectId(){
+        const gqlClient = new IotaGraphQLClient({
+          url: "https://graphql.devnet.iota.cafe",
+        });
+    
+        const objectQuery = `{
+          objects(filter: {type: "0x323b9fd87dcf0c5cbfdddeb43bf9834b4da5493246cfac2ae59e7b9b0fa62a99::iotans::IotaNS"}) {
+            edges {
+              node {
+                address
+              }
+            }
+          }
+        }`;
+        let object: GraphQLQueryResult = await queryGraphQl(gqlClient, objectQuery, {})
+        // @ts-ignore
+        IOTANS_OBJECT_ID = object.data.objects.edges[0].node.address
+    }
+    async function queryGraphQl(gqlClient: IotaGraphQLClient, query: string, variables: Record<string, any>): Promise<GraphQLQueryResult> {
+      const options: GraphQLQueryOptions = { query: graphql(query), variables };
+      return gqlClient.query(options)
+    };
     let showJsonTree = true;
 </script>
 
 <main>
-    Default IDs are for the devnet https://api.devnet.iota.cafe
+    Default IDs are for the devnet https://api.devnet.iota.cafe with https://graphql.devnet.iota.cafe
     <br />
     <span>
         iotans package id:
@@ -149,10 +177,10 @@
         />
     </span>
     <span>
-        iotans object id:
+        GraphQL URL:
         <input
-            bind:value={IOTANS_OBJECT_ID}
-            placeholder="object id 0x..."
+            bind:value={GraphQLURL}
+            placeholder="http://127.0.0.1:8000"
             size="67"
         />
     </span>

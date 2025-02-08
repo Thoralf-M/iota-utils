@@ -23,6 +23,9 @@ importers:
       '@scure/bip39':
         specifier: ^1.4.0
         version: 1.4.0
+      graphql:
+        specifier: link:@iota/iota-sdk/graphql
+        version: link:@iota/iota-sdk/graphql
       svelte-json-tree-auto:
         specifier: ^0.1.0
         version: 0.1.0
