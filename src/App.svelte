@@ -8,6 +8,7 @@
     import PublishData from "./lib/pages/PublishData.svelte";
     import SplitMergeCoins from "./lib/pages/SplitMergeCoins.svelte";
     import Stake from "./lib/pages/Stake.svelte";
+    import Iotans from "./lib/pages/Iotans.svelte";
     import WebWallet from "./lib/WebWallet.svelte";
 
     // List of tab items with labels, values and assigned components
@@ -22,6 +23,7 @@
         { label: "Publish Data", component: PublishData },
         { label: "Split Merge Coins", component: SplitMergeCoins },
         { label: "Stake", component: Stake },
+        { label: "Iotans", component: Iotans },
     ].map((e, index) => {
         // @ts-ignore
         e.value = index;

@@ -14,7 +14,7 @@
     // Used to determine if the client should be initialized with a new node
     let previousInitializedNodeUrl = "";
     let client: any = undefined;
-    export const getClient = async () => {
+    export const getClient = async (): Promise<IotaClient> => {
         if (client == undefined || nodeUrl != previousInitializedNodeUrl) {
             client = new IotaClient({
                 url: nodeUrl,
