@@ -138,6 +138,7 @@
 </script>
 
 <main>
+    Default IDs are for the devnet https://api.devnet.iota.cafe
     <br />
     <span>
         iotans package id:
