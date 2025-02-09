@@ -64,7 +64,7 @@
                 console.log(faucetResponse);
                 value = faucetResponse;
             }
-        } catch (err) {
+        } catch (err: any) {
             value = err.toString();
             console.error(err);
         }

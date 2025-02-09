@@ -97,6 +97,7 @@
 
     const connectWallet = async () => {
         get_wallets();
+        // @ts-ignore
         let connectResult = await $iota_wallets[0].connect();
         $iota_accounts = connectResult.accounts;
         $activeAddress = connectResult.accounts[0].address;

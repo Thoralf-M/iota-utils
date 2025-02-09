@@ -78,7 +78,7 @@
             console.log(resolvedAddress);
             value = resolvedAddress;
             // result = JSON.stringify(txResult, null, 2);
-        } catch (err) {
+        } catch (err: any) {
             value = err.toString();
             console.error(err);
         }
@@ -135,7 +135,7 @@
             console.log(resolvedName);
             value = resolvedName;
             // result = JSON.stringify(txResult, null, 2);
-        } catch (err) {
+        } catch (err: any) {
             value = err.toString();
             console.error(err);
         }

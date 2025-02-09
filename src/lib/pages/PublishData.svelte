@@ -17,6 +17,7 @@
             const tx = new Transaction();
             tx.pure("string", pureInputData);
 
+            // @ts-ignore
             let txResult = await $iota_wallets[0].signAndExecuteTransaction({
                 transaction: tx,
                 options: {
@@ -35,7 +36,7 @@
             client.waitForTransaction({ digest: txResult.digest }).then(() => {
                 console.log("tx block available via api");
             });
-        } catch (err) {
+        } catch (err: any) {
             value = err.toString();
             console.error(err);
         }

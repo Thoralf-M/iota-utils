@@ -9,7 +9,7 @@
             const systemState = await client.getLatestIotaSystemState();
             console.log(systemState);
             value = systemState;
-        } catch (err) {
+        } catch (err: any) {
             value = err.toString();
             console.error(err);
         }

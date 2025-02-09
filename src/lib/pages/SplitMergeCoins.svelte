@@ -57,6 +57,7 @@
                 },
             ]);
 
+            // @ts-ignore
             let txResult = await $iota_wallets[0].signAndExecuteTransaction({
                 transaction: tx,
                 options: {
@@ -74,7 +75,7 @@
             client.waitForTransaction({ digest: txResult.digest }).then(() => {
                 console.log("tx block available via api");
             });
-        } catch (err) {
+        } catch (err: any) {
             value = err.toString();
             console.error(err);
         }
@@ -94,7 +95,8 @@
             });
             // @ts-ignore
             tx.transferObjects(coinArgs, $activeAddress);
-
+            
+            // @ts-ignore
             let txResult = await $iota_wallets[0].signAndExecuteTransaction({
                 transaction: tx,
                 options: {
@@ -113,7 +115,7 @@
             client.waitForTransaction({ digest: txResult.digest }).then(() => {
                 console.log("tx block available via api");
             });
-        } catch (err) {
+        } catch (err: any) {
             value = err.toString();
             console.error(err);
         }
@@ -123,7 +125,7 @@
             let client = await getClient();
             let coins = await getAllIotaCoins(client, $activeAddress);
             value = coins;
-        } catch (err) {
+        } catch (err: any) {
             value = err.toString();
             console.error(err);
         }
