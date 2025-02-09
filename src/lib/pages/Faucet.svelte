@@ -5,7 +5,7 @@
         requestIotaFromFaucetV1,
         getFaucetRequestStatus,
     } from "@iota/iota-sdk/faucet";
-    import JSONTree from "svelte-json-tree-auto";
+    import JSONTree from "svelte-json-tree";
 
     let address =
         "0x111111111504e9350e635d65cd38ccd2c029434c6a3a480d8947a9ba6a15b215";
@@ -30,10 +30,12 @@
             }
             // Try batched request and switch to single request in case of an error
             try {
-                var { error, task: taskId } = await requestIotaFromFaucetV1({
+                var response = await requestIotaFromFaucetV1({
                     host: faucetUrl,
                     recipient: address,
                 });
+                // @ts-ignore
+                let taskId = response.task?.taskId;
 
                 if (error || !taskId) {
                     throw new Error(error ?? "Failed, task id not found.");

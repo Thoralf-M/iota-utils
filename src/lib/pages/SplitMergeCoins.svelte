@@ -5,7 +5,7 @@
         type CoinStruct,
         type PaginatedCoins,
     } from "@iota/iota-sdk/client";
-    import JSONTree from "svelte-json-tree-auto";
+    import JSONTree from "svelte-json-tree";
     import { getClient } from "../Client.svelte";
     import {
         iota_wallets,

@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Transaction } from "@iota/iota-sdk/transactions";
-    import JSONTree from "svelte-json-tree-auto";
+    import JSONTree from "svelte-json-tree";
     import { getClient } from "../Client.svelte";
     import {
         isValidIotaAddress,
