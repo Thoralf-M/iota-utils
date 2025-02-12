@@ -11,8 +11,6 @@
     import { Secp256k1Keypair } from "@iota/iota-sdk/keypairs/secp256k1";
     import { Secp256r1Keypair } from "@iota/iota-sdk/keypairs/secp256r1";
     import { getClient } from "./Client.svelte";
-    import type { Transaction } from "@iota/iota-sdk/transactions";
-    import type { IotaTransactionBlockResponseOptions } from "@iota/iota-sdk/client";
 
     class PrivateKeyAccount {
         privKey: string;
@@ -62,14 +60,14 @@
 
     interface PrivateKeys {
         selected: string;
-        keys: string[];
+        bech32PrivateKeys: string[];
     }
 
     let privateKeys: PrivateKeys = JSON.parse(
         localStorage.getItem("privateKeys")!,
     ) || {
         selected: "",
-        keys: [],
+        bech32PrivateKeys: [],
     };
     // Init the first time if localstorage is selected
     if (selectedSigner == Signer.Localstorage) {
@@ -82,15 +80,16 @@
             privateKeys = JSON.parse(jsonPrivateKeysString);
             if (
                 !privateKeys.hasOwnProperty("selected") ||
-                !privateKeys.hasOwnProperty("keys")
+                !privateKeys.hasOwnProperty("bech32PrivateKeys")
             ) {
-                alert("Missing selected or keys properties");
+                alert(`Missing "selected" or "bech32PrivateKeys" keys`);
             } else {
                 updateAccountsWithPrivateKeys(privateKeys);
                 localStorage.setItem(
                     "privateKeys",
                     JSON.stringify(privateKeys),
                 );
+                jsonPrivateKeysString = JSON.stringify(privateKeys, null, 2);
             }
         } catch (e) {
             console.error("Invalid JSON", e);
@@ -98,23 +97,34 @@
     }
     function updateAccountsWithPrivateKeys(privateKeys: PrivateKeys) {
         $iota_accounts = [];
-        for (let privKey of privateKeys.keys) {
+        for (let privKey of privateKeys.bech32PrivateKeys) {
             // @ts-ignore
             $iota_accounts.push(new PrivateKeyAccount(privKey));
         }
 
-        if (privateKeys.selected == "") {
-            privateKeys.selected = $iota_accounts.find(
-                (a) => a.address == $activeAddress,
-                // @ts-ignore
-            )!.privKey;
+        if ($iota_accounts.length == 0) {
+            return;
         }
-        // This is a hack to get the signer working with the same interface as the web wallet, should be refactored
-        // @ts-ignore
-        $iota_wallets[0] = new PrivateKeyAccount(privateKeys.selected);
+        if (
+            typeof privateKeys.selected == undefined ||
+            privateKeys.selected == ""
+        ) {
+            if ($activeAddress.length != 66) {
+                // @ts-ignore
+                privateKeys.selected = $iota_accounts[0].privKey;
+            } else {
+                privateKeys.selected = $iota_accounts.find(
+                    (a) => a.address == $activeAddress,
+                    // @ts-ignore
+                )!.privKey;
+            }
+        }
         $activeAddress = keypairFromBech32PrivateKey(
             privateKeys.selected,
         ).toIotaAddress();
+        // This is a hack to get the signer working with the same interface as the web wallet, should be refactored
+        // @ts-ignore
+        $iota_wallets[0] = new PrivateKeyAccount(privateKeys.selected);
     }
 
     function keypairFromBech32PrivateKey(bech32privateKey: string): Keypair {
@@ -157,6 +167,9 @@ Signer:
                     (a) => a.address == $activeAddress,
                     // @ts-ignore
                 )!.privKey;
+                // This is a hack to get the signer working with the same interface as the web wallet, should be refactored
+                // @ts-ignore
+                $iota_wallets[0] = new PrivateKeyAccount(privateKeys.selected);
                 localStorage.setItem(
                     "privateKeys",
                     JSON.stringify(privateKeys),
