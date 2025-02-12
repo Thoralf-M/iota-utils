@@ -7,6 +7,7 @@
     import IotaSystemState from "./lib/pages/IotaSystemState.svelte";
     import PublishData from "./lib/pages/PublishData.svelte";
     import SplitMergeCoins from "./lib/pages/SplitMergeCoins.svelte";
+    import Signer from "./lib/Signer.svelte";
     import Stake from "./lib/pages/Stake.svelte";
     import Iotans from "./lib/pages/Iotans.svelte";
     import WebWallet from "./lib/WebWallet.svelte";
@@ -31,6 +32,7 @@
     });
 </script>
 
+<Signer />
 <Client />
 <WebWallet />
 <Tabs {items} />

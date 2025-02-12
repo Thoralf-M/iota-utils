@@ -11,7 +11,7 @@
         iota_wallets,
         iota_accounts,
         activeAddress,
-    } from "../WebWalletData.svelte";
+    } from "../SignerData.svelte";
 
     let objectCount = "1";
     let amountPerObject = "0";
@@ -21,10 +21,7 @@
     const mergeAllIotaCoins = async () => {
         try {
             let client = await getClient();
-            let coins = await getAllIotaCoins(
-                client,
-                $activeAddress,
-            );
+            let coins = await getAllIotaCoins(client, $activeAddress);
             if (coins.length < 2) {
                 throw new Error("No coins to consolidate");
             }
@@ -95,7 +92,7 @@
             });
             // @ts-ignore
             tx.transferObjects(coinArgs, $activeAddress);
-            
+
             // @ts-ignore
             let txResult = await $iota_wallets[0].signAndExecuteTransaction({
                 transaction: tx,

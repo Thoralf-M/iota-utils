@@ -6,7 +6,7 @@
         activeAddress,
         iota_accounts,
         iota_wallets,
-    } from "../WebWalletData.svelte";
+    } from "../SignerData.svelte";
     import {
         IOTA_SYSTEM_STATE_OBJECT_ID,
         isValidIotaAddress,

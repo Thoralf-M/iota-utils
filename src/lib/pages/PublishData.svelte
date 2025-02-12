@@ -6,7 +6,7 @@
         activeAddress,
         iota_accounts,
         iota_wallets,
-    } from "../WebWalletData.svelte";
+    } from "../SignerData.svelte";
 
     let pureInputData = "some data";
     // Will be updated with the result

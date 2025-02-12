@@ -7,7 +7,7 @@
         iota_wallets,
         iota_accounts,
         activeAddress,
-    } from "./WebWalletData.svelte";
+    } from "./SignerData.svelte";
 
     const features = {
         CONNECT: "standard:connect",
@@ -95,7 +95,7 @@
         return $iota_wallets[0];
     };
 
-    const connectWallet = async () => {
+    export const connectWallet = async () => {
         get_wallets();
         // @ts-ignore
         let connectResult = await $iota_wallets[0].connect();
@@ -105,18 +105,3 @@
         console.log($iota_accounts);
     };
 </script>
-
-<main>
-    Active web wallet address:
-    <select
-        bind:value={$activeAddress}
-        on:change={() => activeAddress.set($activeAddress)}
-    >
-        {#each $iota_accounts as account}
-            <option value={account.address}>
-                {account.address}
-            </option>
-        {/each}
-    </select>
-    <button on:click={() => connectWallet()}> Connect web wallet </button>
-</main>
