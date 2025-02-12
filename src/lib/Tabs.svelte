@@ -1,9 +1,10 @@
 <script lang="ts">
     export let items: any[] = [];
-    let activeTabs = [0];
+    let activeTabs = JSON.parse(localStorage.getItem("activeTabs") || "[0]");
 
     const handleClick = (tabValue: number) => () => {
         activeTabs[0] = tabValue;
+        localStorage.setItem("activeTabs", JSON.stringify(activeTabs));
         // Commented part could be used to have multiple tabs at once visible
         // if (activeTabs.includes(tabValue)) {
         //     activeTabs = activeTabs.filter((v) => v != tabValue);
