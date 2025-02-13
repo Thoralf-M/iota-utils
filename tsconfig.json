@@ -15,6 +15,10 @@
         "allowJs": true,
         "checkJs": true,
         "isolatedModules": true,
+        "typeRoots": [
+            "./node_modules/@types",
+            "./types"
+        ]
     },
     "include": [
         "src/**/*.ts",

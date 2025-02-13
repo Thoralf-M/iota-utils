@@ -42,6 +42,9 @@ importers:
       '@tsconfig/svelte':
         specifier: ^5.0.4
         version: 5.0.4
+      '@types/codemirror':
+        specifier: ^5.60.15
+        version: 5.60.15
       svelte:
         specifier: ^5.19.9
         version: 5.19.9
@@ -454,8 +457,14 @@ packages:
   '@tsconfig/svelte@5.0.4':
     resolution: {integrity: sha512-BV9NplVgLmSi4mwKzD8BD/NQ8erOY/nUE/GpgWe2ckx+wIQF5RyRirn/QsSSCPeulVpc3RA/iJt6DpfTIZps0Q==}
 
+  '@types/codemirror@5.60.15':
+    resolution: {integrity: sha512-dTOvwEQ+ouKJ/rE9LT1Ue2hmP6H1mZv5+CCnNWu2qtiOe2LQa9lCprEY20HxiDmV/Bxh+dXjywmy5aKvoGjULA==}
+
   '@types/estree@1.0.6':
     resolution: {integrity: sha512-AYnb1nQyY49te+VRAVgmzfcgjYS91mY5P0TKUDCLEM+gNnA+3T6rWITXRLYCpahpqSQbN5cE+gHpnPyXjHWxcw==}
+
+  '@types/tern@0.23.9':
+    resolution: {integrity: sha512-ypzHFE/wBzh+BlH6rrBgS5I/Z7RD21pGhZ2rltb/+ZrVM1awdZwjx7hE5XfuYgHWk9uvV5HLZN3SloevCAp3Bw==}
 
   '@wallet-standard/app@1.1.0':
     resolution: {integrity: sha512-3CijvrO9utx598kjr45hTbbeeykQrQfKmSnxeWOgU25TOEpvcipD/bYDQWIqUv1Oc6KK4YStokSMu/FBNecGUQ==}
@@ -1054,7 +1063,15 @@ snapshots:
 
   '@tsconfig/svelte@5.0.4': {}
 
+  '@types/codemirror@5.60.15':
+    dependencies:
+      '@types/tern': 0.23.9
+
   '@types/estree@1.0.6': {}
+
+  '@types/tern@0.23.9':
+    dependencies:
+      '@types/estree': 1.0.6
 
   '@wallet-standard/app@1.1.0':
     dependencies:

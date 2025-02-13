@@ -34,8 +34,8 @@
     });
 </script>
 
-<Signer />
 <Client />
+<Signer />
 <WebWallet />
 <Tabs {items} />
 <a

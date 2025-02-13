@@ -11,6 +11,7 @@
     import { Secp256k1Keypair } from "@iota/iota-sdk/keypairs/secp256k1";
     import { Secp256r1Keypair } from "@iota/iota-sdk/keypairs/secp256r1";
     import { getClient } from "./Client.svelte";
+    import { showSettings } from "./Client.svelte";
 
     class PrivateKeyAccount {
         privKey: string;
@@ -38,9 +39,10 @@
         WebWallet = "WebWallet",
         Localstorage = "Localstorage",
     }
-    let selectedSigner: Signer =
-        (localStorage.getItem("selectedSigner")! as Signer) || Signer.WebWallet;
-    function updateSelectedSignerAndAccounts() {
+    let selectedSigner: Signer = $state(
+        (localStorage.getItem("selectedSigner")! as Signer) || Signer.WebWallet,
+    );
+    function updateSelectedSignerAccounts() {
         localStorage.setItem("selectedSigner", selectedSigner);
         if (selectedSigner == Signer.Localstorage) {
             updateAccountsWithPrivateKeys(privateKeys);
@@ -77,7 +79,7 @@
         updateAccountsWithPrivateKeys(privateKeys);
     }
 
-    let jsonPrivateKeysString = JSON.stringify(privateKeys, null, 2);
+    let jsonPrivateKeysString = $state(JSON.stringify(privateKeys, null, 2));
     function handlePrivateKeysChange() {
         try {
             privateKeys = JSON.parse(jsonPrivateKeysString);
@@ -159,18 +161,20 @@
 
 <WebWallet bind:this={webWalletComponent} />
 
-Signer:
-<select
-    bind:value={selectedSigner}
-    onchange={() => updateSelectedSignerAndAccounts()}
->
-    {#each Object.values(Signer) as signer}
-        <option value={signer}>{signer}</option>
-    {/each}
-</select>
-
 <p>
-    Active address:
+    Signer:
+    <select
+        bind:value={selectedSigner}
+        onchange={() => updateSelectedSignerAccounts()}
+    >
+        {#each Object.values(Signer) as signer}
+            <option value={signer}>{signer}</option>
+        {/each}
+    </select>
+    {#if selectedSigner == Signer.WebWallet}
+        <button onclick={() => connectWallet()}> Connect wallet </button>
+    {/if}
+
     <select
         bind:value={$activeAddress}
         onchange={() => {
@@ -200,13 +204,11 @@ Signer:
     <button
         onclick={() => {
             navigator.clipboard.writeText($activeAddress);
-        }}>Copy address</button
+        }}>Copy active address</button
     >
 </p>
 
-{#if selectedSigner == Signer.WebWallet}
-    <button onclick={() => connectWallet()}> Connect web wallet </button>
-{:else}
+{#if selectedSigner == Signer.Localstorage && $showSettings}
     <textarea
         bind:value={jsonPrivateKeysString}
         oninput={handlePrivateKeysChange}

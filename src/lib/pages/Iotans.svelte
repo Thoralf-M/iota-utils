@@ -1,34 +1,34 @@
 <script lang="ts">
     import { Transaction } from "@iota/iota-sdk/transactions";
     import JSONTree from "svelte-json-tree";
-    import { getClient } from "../Client.svelte";
+    import { getClient, getSelectedNetwork } from "../Client.svelte";
+    import { isValidIotaAddress, toHEX } from "@iota/iota-sdk/utils";
     import {
-        isValidIotaAddress,
-        toHEX,
-    } from "@iota/iota-sdk/utils";
-    import { type GraphQLQueryOptions, type GraphQLQueryResult, IotaGraphQLClient } from "@iota/iota-sdk/graphql";
+        type GraphQLQueryOptions,
+        type GraphQLQueryResult,
+        IotaGraphQLClient,
+    } from "@iota/iota-sdk/graphql";
     import { graphql } from "@iota/iota-sdk/graphql/schemas/2024.11";
 
     let GraphQLURL = "https://graphql.devnet.iota.cafe";
     let address =
         "0xbb9aae52e92a870876b44eab4582011070ceff28b87176529c6051f3e8e64a34";
     let domainName = "thoralf.iota";
-    let IOTANS_PACKAGE_ID = "0x323b9fd87dcf0c5cbfdddeb43bf9834b4da5493246cfac2ae59e7b9b0fa62a99";
+    let IOTANS_PACKAGE_ID =
+        "0x323b9fd87dcf0c5cbfdddeb43bf9834b4da5493246cfac2ae59e7b9b0fa62a99";
     let IOTANS_OBJECT_ID = "";
     // Will be updated with the result
     let value = {};
 
     const resolveAddress = async () => {
         try {
-            if (IOTANS_OBJECT_ID.length == 0){
-                await queryIotaNSObjectId()
+            if (IOTANS_OBJECT_ID.length == 0) {
+                await queryIotaNSObjectId();
             }
             const tx = new Transaction();
             let domain = tx.moveCall({
                 target: `${IOTANS_PACKAGE_ID}::domain::new`,
-                arguments: [
-                    tx.pure.string(domainName),
-                ],
+                arguments: [tx.pure.string(domainName)],
             });
             let registry = tx.moveCall({
                 target: `${IOTANS_PACKAGE_ID}::iotans::registry`,
@@ -43,38 +43,38 @@
             });
             let nameRecordOption = tx.moveCall({
                 target: `${IOTANS_PACKAGE_ID}::registry::lookup`,
-                arguments: [
-                    registry, domain,
-                ],
+                arguments: [registry, domain],
             });
             let nameRecord = tx.moveCall({
                 target: `0x1::option::borrow`,
-                typeArguments: [`${IOTANS_PACKAGE_ID}::name_record::NameRecord`],
-                arguments: [
-                    nameRecordOption,
+                typeArguments: [
+                    `${IOTANS_PACKAGE_ID}::name_record::NameRecord`,
                 ],
+                arguments: [nameRecordOption],
             });
             let targetAddressOption = tx.moveCall({
                 target: `${IOTANS_PACKAGE_ID}::name_record::target_address`,
-                arguments: [
-                    nameRecord,
-                ],
+                arguments: [nameRecord],
             });
-           tx.moveCall({
+            tx.moveCall({
                 target: `0x1::option::borrow`,
                 typeArguments: [`address`],
-                arguments: [
-                    targetAddressOption,
-                ],
+                arguments: [targetAddressOption],
             });
 
             let client = await getClient();
             let txResult = await client.devInspectTransactionBlock({
-                sender:  "0x0000000000000000000000000000000000000000000000000000000000000000",
+                sender: "0x0000000000000000000000000000000000000000000000000000000000000000",
                 transactionBlock: tx,
-            })
+            });
             console.log(txResult);
-            let resolvedAddress = "0x"+toHEX(new Uint8Array(txResult.results?.pop()?.returnValues?.[0][0]!))
+            let resolvedAddress =
+                "0x" +
+                toHEX(
+                    new Uint8Array(
+                        txResult.results?.pop()?.returnValues?.[0][0]!,
+                    ),
+                );
             console.log(resolvedAddress);
             value = resolvedAddress;
             // result = JSON.stringify(txResult, null, 2);
@@ -88,11 +88,11 @@
             if (!isValidIotaAddress(address)) {
                 throw new Error("invalid address");
             }
-            if (IOTANS_OBJECT_ID.length == 0){
-                await queryIotaNSObjectId()
+            if (IOTANS_OBJECT_ID.length == 0) {
+                await queryIotaNSObjectId();
             }
             const tx = new Transaction();
-                let registry = tx.moveCall({
+            let registry = tx.moveCall({
                 target: `${IOTANS_PACKAGE_ID}::iotans::registry`,
                 typeArguments: [`${IOTANS_PACKAGE_ID}::registry::Registry`],
                 arguments: [
@@ -105,33 +105,31 @@
             });
             let domainOption = tx.moveCall({
                 target: `${IOTANS_PACKAGE_ID}::registry::reverse_lookup`,
-                arguments: [
-                    registry, tx.pure.address(address),
-                ],
+                arguments: [registry, tx.pure.address(address)],
             });
             let domain = tx.moveCall({
                 target: `0x1::option::borrow`,
                 typeArguments: [`${IOTANS_PACKAGE_ID}::domain::Domain`],
-                arguments: [
-                    domainOption,
-                ],
+                arguments: [domainOption],
             });
             tx.moveCall({
                 target: `${IOTANS_PACKAGE_ID}::domain::to_string`,
-                arguments: [
-                    domain,
-                ],
+                arguments: [domain],
             });
 
             let client = await getClient();
             let txResult = await client.devInspectTransactionBlock({
-                sender:  "0x0000000000000000000000000000000000000000000000000000000000000000",
+                sender: "0x0000000000000000000000000000000000000000000000000000000000000000",
                 transactionBlock: tx,
-            })
+            });
             console.log(txResult);
             // .slice(1) to remove the length prefix
-            let nameBytes = txResult.results?.pop()?.returnValues?.[0][0]!.slice(1)!
-            let resolvedName = new TextDecoder().decode(new Uint8Array(nameBytes))
+            let nameBytes = txResult.results
+                ?.pop()
+                ?.returnValues?.[0][0]!.slice(1)!;
+            let resolvedName = new TextDecoder().decode(
+                new Uint8Array(nameBytes),
+            );
             console.log(resolvedName);
             value = resolvedName;
             // result = JSON.stringify(txResult, null, 2);
@@ -140,11 +138,11 @@
             console.error(err);
         }
     };
-    async function queryIotaNSObjectId(){
+    async function queryIotaNSObjectId() {
         const gqlClient = new IotaGraphQLClient({
-          url: "https://graphql.devnet.iota.cafe",
+            url: getSelectedNetwork().graphql,
         });
-    
+
         const objectQuery = `{
           objects(filter: {type: "0x323b9fd87dcf0c5cbfdddeb43bf9834b4da5493246cfac2ae59e7b9b0fa62a99::iotans::IotaNS"}) {
             edges {
@@ -154,19 +152,30 @@
             }
           }
         }`;
-        let object: GraphQLQueryResult = await queryGraphQl(gqlClient, objectQuery, {})
+        let object: GraphQLQueryResult = await queryGraphQl(
+            gqlClient,
+            objectQuery,
+            {},
+        );
         // @ts-ignore
-        IOTANS_OBJECT_ID = object.data.objects.edges[0].node.address
+        IOTANS_OBJECT_ID = object.data.objects.edges[0].node.address;
     }
-    async function queryGraphQl(gqlClient: IotaGraphQLClient, query: string, variables: Record<string, any>): Promise<GraphQLQueryResult> {
-      const options: GraphQLQueryOptions = { query: graphql(query), variables };
-      return gqlClient.query(options)
-    };
+    async function queryGraphQl(
+        gqlClient: IotaGraphQLClient,
+        query: string,
+        variables: Record<string, any>,
+    ): Promise<GraphQLQueryResult> {
+        const options: GraphQLQueryOptions = {
+            query: graphql(query),
+            variables,
+        };
+        return gqlClient.query(options);
+    }
     let showJsonTree = true;
 </script>
 
 <main>
-    Default IDs are for the devnet https://api.devnet.iota.cafe with https://graphql.devnet.iota.cafe
+    Default IDs are for the devnet
     <br />
     <span>
         iotans package id:
@@ -176,30 +185,15 @@
             size="67"
         />
     </span>
-    <span>
-        GraphQL URL:
-        <input
-            bind:value={GraphQLURL}
-            placeholder="http://127.0.0.1:8000"
-            size="67"
-        />
-    </span>
     <br />
     <span>
         address:
-        <input
-            bind:value={address}
-            placeholder="address 0x..."
-            size="67"
-        />
+        <input bind:value={address} placeholder="address 0x..." size="67" />
     </span>
     <br />
     <span>
         domain name:
-        <input
-            bind:value={domainName}
-            placeholder="name.iota"
-        />
+        <input bind:value={domainName} placeholder="name.iota" />
     </span>
     <br />
 
