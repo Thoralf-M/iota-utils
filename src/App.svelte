@@ -11,6 +11,7 @@
     import Stake from "./lib/pages/Stake.svelte";
     import Iotans from "./lib/pages/Iotans.svelte";
     import WebWallet from "./lib/WebWallet.svelte";
+    import ProgrammableTransactionBlock from "./lib/pages/ProgrammableTransactionBlock.svelte";
 
     // List of tab items with labels, values and assigned components
     let items = [
@@ -22,6 +23,7 @@
         { label: "Faucet", component: Faucet },
         { label: "Iota System State", component: IotaSystemState },
         { label: "Publish Data", component: PublishData },
+        { label: "PTB", component: ProgrammableTransactionBlock },
         { label: "Split Merge Coins", component: SplitMergeCoins },
         { label: "Stake", component: Stake },
         { label: "Iotans", component: Iotans },
