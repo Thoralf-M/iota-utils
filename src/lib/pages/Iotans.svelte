@@ -10,7 +10,6 @@
     } from "@iota/iota-sdk/graphql";
     import { graphql } from "@iota/iota-sdk/graphql/schemas/2024.11";
 
-    let GraphQLURL = "https://graphql.devnet.iota.cafe";
     let address =
         "0xbb9aae52e92a870876b44eab4582011070ceff28b87176529c6051f3e8e64a34";
     let domainName = "thoralf.iota";
@@ -144,7 +143,7 @@
         });
 
         const objectQuery = `{
-          objects(filter: {type: "0x323b9fd87dcf0c5cbfdddeb43bf9834b4da5493246cfac2ae59e7b9b0fa62a99::iotans::IotaNS"}) {
+          objects(filter: {type: "${IOTANS_PACKAGE_ID}::iotans::IotaNS"}) {
             edges {
               node {
                 address
@@ -171,7 +170,160 @@
         };
         return gqlClient.query(options);
     }
-    let showJsonTree = true;
+    async function getRegisteredNames() {
+        try {
+            const gqlClient = new IotaGraphQLClient({
+                url: getSelectedNetwork().graphql,
+            });
+
+            let dynamicFields = await queryDynamicFields();
+            let registration =
+                // @ts-ignore
+                dynamicFields.data.owner.dynamicFields.nodes.find(
+                    (v: any) =>
+                        v.name.type.repr ==
+                        `${IOTANS_PACKAGE_ID}::iotans::RegistryKey<${IOTANS_PACKAGE_ID}::registry::Registry>`,
+                );
+            let registryId = registration.value.json.registry.id;
+
+            let query = `query ($address: IotaAddress) {
+                owner(address: $address) {
+                    dynamicFields {
+                        nodes {
+                            name {
+                                json
+                            }
+                            value {
+                                ... on MoveValue {
+                                    json
+                                }
+                            }
+                        }
+                    }
+                }
+            }`;
+
+            let object: GraphQLQueryResult = await queryGraphQl(
+                gqlClient,
+                query,
+                {
+                    address: registryId,
+                },
+            );
+
+            let res = {};
+            // @ts-ignore
+            res.total = object.data.owner.dynamicFields.nodes.length;
+            // @ts-ignore
+            res.names = object.data.owner.dynamicFields.nodes.map((v) =>
+                v.name.json.labels.reverse().join("."),
+            );
+            // @ts-ignore
+            res.registrations = object.data.owner.dynamicFields.nodes;
+            value = res;
+        } catch (err: any) {
+            value = err.toString();
+            console.error(err);
+        }
+    }
+    async function getReverseRegisteredAddresses() {
+        try {
+            const gqlClient = new IotaGraphQLClient({
+                url: getSelectedNetwork().graphql,
+            });
+
+            let dynamicFields = await queryDynamicFields();
+            let registration =
+                // @ts-ignore
+                dynamicFields.data.owner.dynamicFields.nodes.find(
+                    (v: any) =>
+                        v.name.type.repr ==
+                        `${IOTANS_PACKAGE_ID}::iotans::RegistryKey<${IOTANS_PACKAGE_ID}::registry::Registry>`,
+                );
+            let reverseRegistryId = registration.value.json.reverse_registry.id;
+
+            let query = `query ($address: IotaAddress) {
+                owner(address: $address) {
+                    dynamicFields {
+                        nodes {
+                            name {
+                                json
+                            }
+                            value {
+                                ... on MoveValue {
+                                    json
+                                }
+                            }
+                        }
+                    }
+                }
+            }`;
+
+            let object: GraphQLQueryResult = await queryGraphQl(
+                gqlClient,
+                query,
+                {
+                    address: reverseRegistryId,
+                },
+            );
+
+            let res = {};
+            // @ts-ignore
+            res.total = object.data.owner.dynamicFields.nodes.length;
+            // @ts-ignore
+            res.reverseRegistry = object.data.owner.dynamicFields.nodes.map(
+                (v: any) => {
+                    return {
+                        address: v.name.json,
+                        name: v.value.json.labels.reverse().join("."),
+                    };
+                },
+            );
+            value = res;
+        } catch (err: any) {
+            value = err.toString();
+            console.error(err);
+        }
+    }
+    async function getDynamicFields() {
+        try {
+            value = await queryDynamicFields();
+        } catch (err: any) {
+            value = err.toString();
+            console.error(err);
+        }
+    }
+    async function queryDynamicFields(): Promise<GraphQLQueryResult> {
+        const gqlClient = new IotaGraphQLClient({
+            url: getSelectedNetwork().graphql,
+        });
+
+        if (IOTANS_OBJECT_ID.length == 0) {
+            await queryIotaNSObjectId();
+        }
+
+        const objectQuery = `query ($address: IotaAddress!) {
+                owner(address: $address) {
+                    dynamicFields {
+                    nodes {
+                        name { type {
+                                repr
+                        } }
+                        value {
+                        ... on MoveValue {
+                            json
+                        }
+                        }
+                    }
+                    }
+                }
+            }`;
+        let dynamicFields: any = await queryGraphQl(gqlClient, objectQuery, {
+            address: IOTANS_OBJECT_ID,
+        });
+        return dynamicFields;
+    }
+    let showJsonTree = false;
 </script>
 
 <main>
@@ -181,6 +333,9 @@
         iotans package id:
         <input
             bind:value={IOTANS_PACKAGE_ID}
+            onchange={() => {
+                IOTANS_OBJECT_ID = "";
+            }}
             placeholder="package id 0x..."
             size="67"
         />
@@ -197,11 +352,21 @@
     </span>
     <br />
 
-    <button on:click={() => resolveAddress()}> resolve address </button>
-    <button on:click={() => resolveName()}> resolve name </button>
+    {#if IOTANS_OBJECT_ID.length != 0}
+        IOTANS Object ID: {IOTANS_OBJECT_ID}
+        <br />
+    {/if}
+
+    <button onclick={resolveAddress}> resolve address </button>
+    <button onclick={resolveName}> resolve name </button>
+    <button onclick={getRegisteredNames}> get registered names </button>
+    <button onclick={getReverseRegisteredAddresses}>
+        get reverse registered addresses
+    </button>
+    <button onclick={getDynamicFields}> get dynamic fields </button>
 
     <div class="value" hidden={Object.keys(value).length == 0}>
-        <button on:click={() => (showJsonTree = !showJsonTree)}>
+        <button onclick={() => (showJsonTree = !showJsonTree)}>
             toggle JSON tree
         </button>
         <div hidden={!showJsonTree}>
