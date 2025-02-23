@@ -152,8 +152,8 @@
     let showJsonTree = $state(true);
 
     let activeCode = $state(
-        codeSnippets.snippets.find((e) => e.name == codeSnippets.selected)!
-            .code,
+        codeSnippets.snippets.find((e) => e.name == codeSnippets.selected)
+            ?.code || "",
     );
 
     async function buildTransaction(): Promise<Transaction | undefined> {
@@ -197,39 +197,63 @@
         });
     }
     function addCodeSnippet() {
-        // TODO: check for existing name and then error/add number?
-        let newName = inputCodeSnippetName || codeSnippets.snippets.length;
-        deleteCodeSnippet();
+        if (inputCodeSnippetName.length == 0) {
+            inputCodeSnippetName = codeSnippets.snippets.length.toString();
+        }
+        let existingIndex = codeSnippets.snippets.findIndex(
+            (e) => e.name == inputCodeSnippetName,
+        );
+        if (existingIndex > -1) {
+            value = "Name already exists";
+            throw "Name already exists";
+        }
         codeSnippets.snippets.push({
-            name: newName,
+            name: inputCodeSnippetName,
             code: codeEditorView.state.doc.toString(),
         });
-        codeSnippets.selected = newName;
+        codeSnippets.selected = inputCodeSnippetName;
         inputCodeSnippetName = "";
         saveCodeSnippetsToLocalstorage();
     }
     function renameCodeSnippet() {
         if (inputCodeSnippetName.length == 0) {
             alert!("insert a new name first");
+        } else {
+            let existingIndex = codeSnippets.snippets.findIndex(
+                (e) => e.name == inputCodeSnippetName,
+            );
+            if (existingIndex > -1) {
+                value = "Name already exists";
+                throw "Name already exists";
+            }
+            let index = codeSnippets.snippets.findIndex(
+                (e) => e.name == codeSnippets.selected,
+            );
+            codeSnippets.snippets[index].name = inputCodeSnippetName;
+            codeSnippets.selected = inputCodeSnippetName;
+            inputCodeSnippetName = "";
+            saveCodeSnippetsToLocalstorage();
         }
-        let index = codeSnippets.snippets.findIndex(
-            (e) => e.name == codeSnippets.selected,
-        );
-        codeSnippets.snippets[index].name = inputCodeSnippetName;
-        codeSnippets.selected = inputCodeSnippetName;
-        inputCodeSnippetName = "";
-        saveCodeSnippetsToLocalstorage();
     }
     function deleteCodeSnippet() {
         if (inputCodeSnippetName.length == 0) {
             alert!("insert a name to delete first");
-        }
-        let index = codeSnippets.snippets.findIndex(
-            (e) => e.name == inputCodeSnippetName,
-        );
-        if (index > -1) {
-            codeSnippets.snippets.splice(index, 1);
-            saveCodeSnippetsToLocalstorage();
+        } else {
+            if (codeSnippets.snippets.length == 1) {
+                value = "at least one code snippet is required";
+                throw new Error("at least one code snippet is required");
+            }
+            let index = codeSnippets.snippets.findIndex(
+                (e) => e.name == inputCodeSnippetName,
+            );
+            if (index > -1) {
+                codeSnippets.snippets.splice(index, 1);
+                saveCodeSnippetsToLocalstorage();
+                if (inputCodeSnippetName == codeSnippets.selected) {
+                    codeSnippets.selected =
+                        codeSnippets.snippets[0].name || "default";
+                }
+            }
         }
     }
 </script>
