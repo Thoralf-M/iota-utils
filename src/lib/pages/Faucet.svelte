@@ -5,7 +5,7 @@
         requestIotaFromFaucetV1,
         getFaucetRequestStatus,
     } from "@iota/iota-sdk/faucet";
-    import JSONTree from "svelte-json-tree";
+    import JSONTree from "@sveltejs/svelte-json-tree";
 
     let address =
         "0x111111111504e9350e635d65cd38ccd2c029434c6a3a480d8947a9ba6a15b215";

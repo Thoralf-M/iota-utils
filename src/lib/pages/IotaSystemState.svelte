@@ -1,5 +1,5 @@
 <script lang="ts">
-    import JSONTree from "svelte-json-tree";
+    import JSONTree from "@sveltejs/svelte-json-tree";
     import { getClient } from "../Client.svelte";
 
     let value = {};

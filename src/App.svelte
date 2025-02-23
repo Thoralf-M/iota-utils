@@ -23,7 +23,7 @@
         { label: "Faucet", component: Faucet },
         { label: "Iota System State", component: IotaSystemState },
         { label: "Publish Data", component: PublishData },
-        { label: "PTB", component: ProgrammableTransactionBlock },
+        { label: "PTB Code", component: ProgrammableTransactionBlock },
         { label: "Split Merge Coins", component: SplitMergeCoins },
         { label: "Stake", component: Stake },
         { label: "Iotans", component: Iotans },

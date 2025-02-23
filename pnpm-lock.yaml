@@ -8,12 +8,12 @@ importers:
 
   .:
     dependencies:
+      '@babel/runtime':
+        specifier: ^7.26.9
+        version: 7.26.9
       '@codemirror/lang-javascript':
         specifier: ^6.2.3
         version: 6.2.3
-      '@codemirror/language':
-        specifier: ^6.10.8
-        version: 6.10.8
       '@iota/bcs':
         specifier: ^0.2.1
         version: 0.2.1
@@ -23,18 +23,24 @@ importers:
       '@iota/wallet-standard':
         specifier: ^0.2.1
         version: 0.2.1(typescript@5.6.3)
+      '@lezer/highlight':
+        specifier: ^1.2.1
+        version: 1.2.1
       '@noble/hashes':
         specifier: ^1.5.0
         version: 1.5.0
       '@scure/bip39':
         specifier: ^1.4.0
         version: 1.4.0
+      '@sveltejs/svelte-json-tree':
+        specifier: ^2.2.1
+        version: 2.2.1(svelte@5.19.9)
+      '@uiw/codemirror-theme-github':
+        specifier: ^4.23.8
+        version: 4.23.8(@codemirror/language@6.10.8)(@codemirror/state@6.5.2)(@codemirror/view@6.36.3)
       codemirror:
         specifier: ^6.0.1
         version: 6.0.1
-      svelte-json-tree:
-        specifier: ^2.2.0
-        version: 2.2.0(svelte@5.19.9)
     devDependencies:
       '@sveltejs/vite-plugin-svelte':
         specifier: ^5.0.3
@@ -78,6 +84,10 @@ packages:
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
     engines: {node: '>=6.0.0'}
 
+  '@babel/runtime@7.26.9':
+    resolution: {integrity: sha512-aA63XwOkcl4xxQa3HjPMqOP6LiK0ZDv3mUPYEFXkpHbaFjtGggE1A61FjFzJnB+p7/oy2gA8E+rcBNl/zC1tMg==}
+    engines: {node: '>=6.9.0'}
+
   '@codemirror/autocomplete@6.18.6':
     resolution: {integrity: sha512-PHHBXFomUs5DF+9tCOM/UoW6XQ4R44lLNNhRaW9PKPTU0D7lIjRg3ElxaJnTwsl/oHiR93WSXDBrekhoUGCPtg==}
 
@@ -99,8 +109,8 @@ packages:
   '@codemirror/state@6.5.2':
     resolution: {integrity: sha512-FVqsPqtPWKVVL3dPSxy8wEF/ymIEuVzF1PK3VbUgrxXpJUSHQWWZz4JMToquRxnkw+36LTamCZG2iua2Ptq0fA==}
 
-  '@codemirror/view@6.36.2':
-    resolution: {integrity: sha512-DZ6ONbs8qdJK0fdN7AB82CgI6tYXf4HWk1wSVa0+9bhVznCuuvhQtX8bFBoy3dv8rZSQqUd8GvhVAcielcidrA==}
+  '@codemirror/view@6.36.3':
+    resolution: {integrity: sha512-N2bilM47QWC8Hnx0rMdDxO2x2ImJ1FvZWXubwKgjeoOrWwEiFrtpA7SFHcuZ+o2Ze2VzbkgbzWVj4+V18LVkeg==}
 
   '@esbuild/aix-ppc64@0.24.2':
     resolution: {integrity: sha512-thpVCb/rhxE/BnMLQ7GReQLLN8q9qbHmI55F4489/ByVg2aQaQ6kbcLb6FHkocZzQhxc4gx0sCk0tJkKBFzDhA==}
@@ -439,6 +449,12 @@ packages:
   '@suchipi/femver@1.0.0':
     resolution: {integrity: sha512-bprE8+K5V+DPX7q2e2K57ImqNBdfGHDIWaGI5xHxZoxbKOuQZn4wzPiUxOAHnsUr3w3xHrWXwN7gnG/iIuEMIg==}
 
+  '@sveltejs/svelte-json-tree@2.2.1':
+    resolution: {integrity: sha512-M8l23/R3y1fI2+RaOzfUzmkysTWWsw/NClUgGpvydl9vXRonPN1/btQQievaNyeWNfUj12tjPfh5yTrXWpaKkg==}
+    engines: {pnpm: ^9.0.0}
+    peerDependencies:
+      svelte: ^4.0.0 || ^5.0.0
+
   '@sveltejs/vite-plugin-svelte-inspector@4.0.1':
     resolution: {integrity: sha512-J/Nmb2Q2y7mck2hyCX4ckVHcR5tu2J+MtBEQqpDrrgELZ2uvraQcK/ioCV61AqkdXFgriksOKIceDcQmqnGhVw==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22}
@@ -465,6 +481,16 @@ packages:
 
   '@types/tern@0.23.9':
     resolution: {integrity: sha512-ypzHFE/wBzh+BlH6rrBgS5I/Z7RD21pGhZ2rltb/+ZrVM1awdZwjx7hE5XfuYgHWk9uvV5HLZN3SloevCAp3Bw==}
+
+  '@uiw/codemirror-theme-github@4.23.8':
+    resolution: {integrity: sha512-+LVpFdF6RMjDsTo+HkJYBWkEGy2AgcZJVCDku+yWme/shEtV/FulpGwHeb+NrArAFNyXjUXSVMPhLq3+syOLhw==}
+
+  '@uiw/codemirror-themes@4.23.8':
+    resolution: {integrity: sha512-PZmJBZxWMuZ48p/2D5aRPl8zTlBq1d/+NeRqyyH6P6k6yWDF6h71m0Dt+fjslgPE7KmWXux2hbejXXXoRLZO9Q==}
+    peerDependencies:
+      '@codemirror/language': '>=6.0.0'
+      '@codemirror/state': '>=6.0.0'
+      '@codemirror/view': '>=6.0.0'
 
   '@wallet-standard/app@1.1.0':
     resolution: {integrity: sha512-3CijvrO9utx598kjr45hTbbeeykQrQfKmSnxeWOgU25TOEpvcipD/bYDQWIqUv1Oc6KK4YStokSMu/FBNecGUQ==}
@@ -613,6 +639,9 @@ packages:
     resolution: {integrity: sha512-yDMz9g+VaZkqBYS/ozoBJwaBhTbZo3UNYQHNRw1D3UFQB8oHB4uS/tAODO+ZLjGWmUbKnIlOWO+aaIiAxrUWHA==}
     engines: {node: '>= 14.16.0'}
 
+  regenerator-runtime@0.14.1:
+    resolution: {integrity: sha512-dYnhHh0nJoMfnkZs6GmmhFknAGRrLznOu5nc9ML+EJxGvrx6H7teuevqVqCuPcPK//3eDrrjQhehXVx9cnkGdw==}
+
   rollup@4.34.6:
     resolution: {integrity: sha512-wc2cBWqJgkU3Iz5oztRkQbfVkbxoz5EhnCGOrnJvnLnQ7O0WhQUYyv18qQI79O8L7DdHrrlJNeCHd4VGpnaXKQ==}
     engines: {node: '>=18.0.0', npm: '>=8.0.0'}
@@ -636,11 +665,6 @@ packages:
     peerDependencies:
       svelte: ^4.0.0 || ^5.0.0-next.0
       typescript: '>=5.0.0'
-
-  svelte-json-tree@2.2.0:
-    resolution: {integrity: sha512-zcfepTrJ6xhpdgRZEujmiFh+ainRw7HO4Bsoh8PMAsm7fkgUPtnrZi3An8tmCFY8jajYhMrauHsd1S1XTeuiCw==}
-    peerDependencies:
-      svelte: ^4.0.0
 
   svelte@5.19.9:
     resolution: {integrity: sha512-860s752/ZZxHIsii31ELkdKBOCeAuDsfb/AGUXJyQyzUVLRSt4oqEw/BV5+2+mNg8mbqmD3OK+vMvwWMPM6f8A==}
@@ -728,18 +752,22 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.5
       '@jridgewell/trace-mapping': 0.3.25
 
+  '@babel/runtime@7.26.9':
+    dependencies:
+      regenerator-runtime: 0.14.1
+
   '@codemirror/autocomplete@6.18.6':
     dependencies:
       '@codemirror/language': 6.10.8
       '@codemirror/state': 6.5.2
-      '@codemirror/view': 6.36.2
+      '@codemirror/view': 6.36.3
       '@lezer/common': 1.2.3
 
   '@codemirror/commands@6.8.0':
     dependencies:
       '@codemirror/language': 6.10.8
       '@codemirror/state': 6.5.2
-      '@codemirror/view': 6.36.2
+      '@codemirror/view': 6.36.3
       '@lezer/common': 1.2.3
 
   '@codemirror/lang-javascript@6.2.3':
@@ -748,14 +776,14 @@ snapshots:
       '@codemirror/language': 6.10.8
       '@codemirror/lint': 6.8.4
       '@codemirror/state': 6.5.2
-      '@codemirror/view': 6.36.2
+      '@codemirror/view': 6.36.3
       '@lezer/common': 1.2.3
       '@lezer/javascript': 1.4.21
 
   '@codemirror/language@6.10.8':
     dependencies:
       '@codemirror/state': 6.5.2
-      '@codemirror/view': 6.36.2
+      '@codemirror/view': 6.36.3
       '@lezer/common': 1.2.3
       '@lezer/highlight': 1.2.1
       '@lezer/lr': 1.4.2
@@ -764,20 +792,20 @@ snapshots:
   '@codemirror/lint@6.8.4':
     dependencies:
       '@codemirror/state': 6.5.2
-      '@codemirror/view': 6.36.2
+      '@codemirror/view': 6.36.3
       crelt: 1.0.6
 
   '@codemirror/search@6.5.9':
     dependencies:
       '@codemirror/state': 6.5.2
-      '@codemirror/view': 6.36.2
+      '@codemirror/view': 6.36.3
       crelt: 1.0.6
 
   '@codemirror/state@6.5.2':
     dependencies:
       '@marijn/find-cluster-break': 1.0.2
 
-  '@codemirror/view@6.36.2':
+  '@codemirror/view@6.36.3':
     dependencies:
       '@codemirror/state': 6.5.2
       style-mod: 4.1.2
@@ -1039,6 +1067,10 @@ snapshots:
 
   '@suchipi/femver@1.0.0': {}
 
+  '@sveltejs/svelte-json-tree@2.2.1(svelte@5.19.9)':
+    dependencies:
+      svelte: 5.19.9
+
   '@sveltejs/vite-plugin-svelte-inspector@4.0.1(@sveltejs/vite-plugin-svelte@5.0.3(svelte@5.19.9)(vite@6.1.0))(svelte@5.19.9)(vite@6.1.0)':
     dependencies:
       '@sveltejs/vite-plugin-svelte': 5.0.3(svelte@5.19.9)(vite@6.1.0)
@@ -1072,6 +1104,20 @@ snapshots:
   '@types/tern@0.23.9':
     dependencies:
       '@types/estree': 1.0.6
+
+  '@uiw/codemirror-theme-github@4.23.8(@codemirror/language@6.10.8)(@codemirror/state@6.5.2)(@codemirror/view@6.36.3)':
+    dependencies:
+      '@uiw/codemirror-themes': 4.23.8(@codemirror/language@6.10.8)(@codemirror/state@6.5.2)(@codemirror/view@6.36.3)
+    transitivePeerDependencies:
+      - '@codemirror/language'
+      - '@codemirror/state'
+      - '@codemirror/view'
+
+  '@uiw/codemirror-themes@4.23.8(@codemirror/language@6.10.8)(@codemirror/state@6.5.2)(@codemirror/view@6.36.3)':
+    dependencies:
+      '@codemirror/language': 6.10.8
+      '@codemirror/state': 6.5.2
+      '@codemirror/view': 6.36.3
 
   '@wallet-standard/app@1.1.0':
     dependencies:
@@ -1126,7 +1172,7 @@ snapshots:
       '@codemirror/lint': 6.8.4
       '@codemirror/search': 6.5.9
       '@codemirror/state': 6.5.2
-      '@codemirror/view': 6.36.2
+      '@codemirror/view': 6.36.3
 
   crelt@1.0.6: {}
 
@@ -1221,6 +1267,8 @@ snapshots:
 
   readdirp@4.0.2: {}
 
+  regenerator-runtime@0.14.1: {}
+
   rollup@4.34.6:
     dependencies:
       '@types/estree': 1.0.6
@@ -1265,10 +1313,6 @@ snapshots:
       typescript: 5.6.3
     transitivePeerDependencies:
       - picomatch
-
-  svelte-json-tree@2.2.0(svelte@5.19.9):
-    dependencies:
-      svelte: 5.19.9
 
   svelte@5.19.9:
     dependencies:
