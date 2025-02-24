@@ -11,48 +11,48 @@
     import { graphql } from "@iota/iota-sdk/graphql/schemas/2024.11";
 
     let address =
-        "0xbb9aae52e92a870876b44eab4582011070ceff28b87176529c6051f3e8e64a34";
-    let domainName = "thoralf.iota";
-    let IOTANS_PACKAGE_ID =
-        "0x323b9fd87dcf0c5cbfdddeb43bf9834b4da5493246cfac2ae59e7b9b0fa62a99";
-    let IOTANS_OBJECT_ID = "";
+        "0xa1a97d20bbad79e2ac89f215a3b3c4f2ff9a1aa3cc26e529bde6e7bc5500d610";
+    let domainName = "iota.iota";
+    let IOTA_NAMES_PACKAGE_ID =
+        "0x20c890da38609db67e2713e6b33b4e4d3c6a8e9f620f9bb48f918d2337e31503";
+    let IOTA_NAMES_OBJECT_ID = "";
     // Will be updated with the result
     let value = {};
 
     const resolveAddress = async () => {
         try {
-            if (IOTANS_OBJECT_ID.length == 0) {
-                await queryIotaNSObjectId();
+            if (IOTA_NAMES_OBJECT_ID.length == 0) {
+                await queryIotaNamesObjectId();
             }
             const tx = new Transaction();
             let domain = tx.moveCall({
-                target: `${IOTANS_PACKAGE_ID}::domain::new`,
+                target: `${IOTA_NAMES_PACKAGE_ID}::domain::new`,
                 arguments: [tx.pure.string(domainName)],
             });
             let registry = tx.moveCall({
-                target: `${IOTANS_PACKAGE_ID}::iotans::registry`,
-                typeArguments: [`${IOTANS_PACKAGE_ID}::registry::Registry`],
+                target: `${IOTA_NAMES_PACKAGE_ID}::iota_names::registry`,
+                typeArguments: [`${IOTA_NAMES_PACKAGE_ID}::registry::Registry`],
                 arguments: [
                     tx.sharedObjectRef({
-                        objectId: IOTANS_OBJECT_ID,
+                        objectId: IOTA_NAMES_OBJECT_ID,
                         initialSharedVersion: 1,
                         mutable: true,
                     }),
                 ],
             });
             let nameRecordOption = tx.moveCall({
-                target: `${IOTANS_PACKAGE_ID}::registry::lookup`,
+                target: `${IOTA_NAMES_PACKAGE_ID}::registry::lookup`,
                 arguments: [registry, domain],
             });
             let nameRecord = tx.moveCall({
                 target: `0x1::option::borrow`,
                 typeArguments: [
-                    `${IOTANS_PACKAGE_ID}::name_record::NameRecord`,
+                    `${IOTA_NAMES_PACKAGE_ID}::name_record::NameRecord`,
                 ],
                 arguments: [nameRecordOption],
             });
             let targetAddressOption = tx.moveCall({
-                target: `${IOTANS_PACKAGE_ID}::name_record::target_address`,
+                target: `${IOTA_NAMES_PACKAGE_ID}::name_record::target_address`,
                 arguments: [nameRecord],
             });
             tx.moveCall({
@@ -87,32 +87,32 @@
             if (!isValidIotaAddress(address)) {
                 throw new Error("invalid address");
             }
-            if (IOTANS_OBJECT_ID.length == 0) {
-                await queryIotaNSObjectId();
+            if (IOTA_NAMES_OBJECT_ID.length == 0) {
+                await queryIotaNamesObjectId();
             }
             const tx = new Transaction();
             let registry = tx.moveCall({
-                target: `${IOTANS_PACKAGE_ID}::iotans::registry`,
-                typeArguments: [`${IOTANS_PACKAGE_ID}::registry::Registry`],
+                target: `${IOTA_NAMES_PACKAGE_ID}::iota_names::registry`,
+                typeArguments: [`${IOTA_NAMES_PACKAGE_ID}::registry::Registry`],
                 arguments: [
                     tx.sharedObjectRef({
-                        objectId: IOTANS_OBJECT_ID,
+                        objectId: IOTA_NAMES_OBJECT_ID,
                         initialSharedVersion: 1,
                         mutable: true,
                     }),
                 ],
             });
             let domainOption = tx.moveCall({
-                target: `${IOTANS_PACKAGE_ID}::registry::reverse_lookup`,
+                target: `${IOTA_NAMES_PACKAGE_ID}::registry::reverse_lookup`,
                 arguments: [registry, tx.pure.address(address)],
             });
             let domain = tx.moveCall({
                 target: `0x1::option::borrow`,
-                typeArguments: [`${IOTANS_PACKAGE_ID}::domain::Domain`],
+                typeArguments: [`${IOTA_NAMES_PACKAGE_ID}::domain::Domain`],
                 arguments: [domainOption],
             });
             tx.moveCall({
-                target: `${IOTANS_PACKAGE_ID}::domain::to_string`,
+                target: `${IOTA_NAMES_PACKAGE_ID}::domain::to_string`,
                 arguments: [domain],
             });
 
@@ -137,13 +137,13 @@
             console.error(err);
         }
     };
-    async function queryIotaNSObjectId() {
+    async function queryIotaNamesObjectId() {
         const gqlClient = new IotaGraphQLClient({
             url: getSelectedNetwork().graphql,
         });
 
         const objectQuery = `{
-          objects(filter: {type: "${IOTANS_PACKAGE_ID}::iotans::IotaNS"}) {
+          objects(filter: {type: "${IOTA_NAMES_PACKAGE_ID}::iota_names::IotaNames"}) {
             edges {
               node {
                 address
@@ -157,7 +157,7 @@
             {},
         );
         // @ts-ignore
-        IOTANS_OBJECT_ID = object.data.objects.edges[0].node.address;
+        IOTA_NAMES_OBJECT_ID = object.data.objects.edges[0].node.address;
     }
     async function queryGraphQl(
         gqlClient: IotaGraphQLClient,
@@ -182,7 +182,7 @@
                 dynamicFields.data.owner.dynamicFields.nodes.find(
                     (v: any) =>
                         v.name.type.repr ==
-                        `${IOTANS_PACKAGE_ID}::iotans::RegistryKey<${IOTANS_PACKAGE_ID}::registry::Registry>`,
+                        `${IOTA_NAMES_PACKAGE_ID}::iota_names::RegistryKey<${IOTA_NAMES_PACKAGE_ID}::registry::Registry>`,
                 );
             let registryId = registration.value.json.registry.id;
 
@@ -238,7 +238,7 @@
                 dynamicFields.data.owner.dynamicFields.nodes.find(
                     (v: any) =>
                         v.name.type.repr ==
-                        `${IOTANS_PACKAGE_ID}::iotans::RegistryKey<${IOTANS_PACKAGE_ID}::registry::Registry>`,
+                        `${IOTA_NAMES_PACKAGE_ID}::iota_names::RegistryKey<${IOTA_NAMES_PACKAGE_ID}::registry::Registry>`,
                 );
             let reverseRegistryId = registration.value.json.reverse_registry.id;
 
@@ -298,8 +298,8 @@
             url: getSelectedNetwork().graphql,
         });
 
-        if (IOTANS_OBJECT_ID.length == 0) {
-            await queryIotaNSObjectId();
+        if (IOTA_NAMES_OBJECT_ID.length == 0) {
+            await queryIotaNamesObjectId();
         }
 
         const objectQuery = `query ($address: IotaAddress!) {
@@ -319,7 +319,7 @@
                 }
             }`;
         let dynamicFields: any = await queryGraphQl(gqlClient, objectQuery, {
-            address: IOTANS_OBJECT_ID,
+            address: IOTA_NAMES_OBJECT_ID,
         });
         return dynamicFields;
     }
@@ -327,14 +327,14 @@
 </script>
 
 <main>
-    Default IDs are for the devnet
+    Default ID is for the devnet
     <br />
     <span>
-        iotans package id:
+        IotaNames package id:
         <input
-            bind:value={IOTANS_PACKAGE_ID}
+            bind:value={IOTA_NAMES_PACKAGE_ID}
             onchange={() => {
-                IOTANS_OBJECT_ID = "";
+                IOTA_NAMES_OBJECT_ID = "";
             }}
             placeholder="package id 0x..."
             size="67"
@@ -352,8 +352,8 @@
     </span>
     <br />
 
-    {#if IOTANS_OBJECT_ID.length != 0}
-        IOTANS Object ID: {IOTANS_OBJECT_ID}
+    {#if IOTA_NAMES_OBJECT_ID.length != 0}
+        IotaNames Object ID: {IOTA_NAMES_OBJECT_ID}
         <br />
     {/if}
 

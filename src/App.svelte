@@ -9,7 +9,7 @@
     import SplitMergeCoins from "./lib/pages/SplitMergeCoins.svelte";
     import Signer from "./lib/Signer.svelte";
     import Stake from "./lib/pages/Stake.svelte";
-    import Iotans from "./lib/pages/Iotans.svelte";
+    import IotaNames from "./lib/pages/IotaNames.svelte";
     import WebWallet from "./lib/WebWallet.svelte";
     import ProgrammableTransactionBlock from "./lib/pages/ProgrammableTransactionBlock.svelte";
 
@@ -26,7 +26,7 @@
         { label: "PTB Code", component: ProgrammableTransactionBlock },
         { label: "Split Merge Coins", component: SplitMergeCoins },
         { label: "Stake", component: Stake },
-        { label: "Iotans", component: Iotans },
+        { label: "IOTA-Names", component: IotaNames },
     ].map((e, index) => {
         // @ts-ignore
         e.value = index;
