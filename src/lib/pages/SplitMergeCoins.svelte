@@ -17,6 +17,7 @@
     let amountPerObject = "0";
     // Will be updated with the result
     let value = {};
+    let iotaBalance = 0;
 
     const mergeAllIotaCoins = async () => {
         try {
@@ -121,6 +122,10 @@
         try {
             let client = await getClient();
             let coins = await getAllIotaCoins(client, $activeAddress);
+            iotaBalance = 0;
+            for (const coin of coins) {
+                iotaBalance += parseInt(coin.balance);
+            }
             value = coins;
         } catch (err: any) {
             value = err.toString();
@@ -154,6 +159,7 @@
 </script>
 
 <main>
+    <div>IOTA balance: {(iotaBalance / 1000_000_000).toFixed(9)}</div>
     <button on:click={() => listAllIotaCoinObjects()}
         >List all IOTA coins</button
     >
