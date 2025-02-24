@@ -3,9 +3,11 @@
     import { getClient } from "../Client.svelte";
 
     let value = {};
+    let apiVersion = "";
     const getLatestSystemState = async () => {
         try {
             let client = await getClient();
+            apiVersion = (await client.getRpcApiVersion()) || "";
             const systemState = await client.getLatestIotaSystemState();
             console.log(systemState);
             value = systemState;
@@ -23,6 +25,9 @@
     </button>
 
     <div class="value" hidden={Object.keys(value).length == 0}>
+        <div>
+            API Version: {apiVersion}
+        </div>
         <button on:click={() => (showJsonTree = !showJsonTree)}>
             toggle JSON tree
         </button>
