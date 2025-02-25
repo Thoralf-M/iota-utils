@@ -5,7 +5,7 @@
 
     color-scheme: light dark;
     color: rgba(255, 255, 255, 0.87);
-    background-color: #242424;
+    background-color: rgb(24, 26, 27);
 
     font-synthesis: none;
     text-rendering: optimizeLegibility;
@@ -65,7 +65,7 @@ button {
     font-size: 1em;
     font-weight: 500;
     font-family: inherit;
-    background-color: #1a1a1a;
+    background-color: rgb(20, 21, 22);
     cursor: pointer;
     transition: border-color 0.25s;
     -webkit-user-select: text;
@@ -75,7 +75,7 @@ button {
 }
 
 button:hover {
-    border-color: #646cff;
+    border-color: #cfd2ff;
 }
 
 button:focus,
@@ -107,11 +107,12 @@ th {
 }
 
 :root {
-    --json-tree-string-color: #ae9660;
-    --json-tree-symbol-color: #949494;
-    --json-tree-boolean-color: #6e78a8;
-    --json-tree-internal-color: grey;
-    --json-tree-property-color: #919191;
-    --json-tree-number-color: #acacac;
+    --json-tree-string-color: #ffd97f;
+    --json-tree-symbol-color: #cccccc;
+    --json-tree-boolean-color: #6384f3;
+    --json-tree-internal-color: rgb(238, 238, 238);
+    --json-tree-number-color: #dedede;
     --json-tree-label-color: #916c93;
+    --json-tree-property-color: #e5e5e5;
+    --json-tree-operator-color: #cb6666;
 }

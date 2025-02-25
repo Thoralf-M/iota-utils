@@ -42,7 +42,7 @@
         padding-left: 0;
         margin-bottom: 0;
         list-style: none;
-        border-bottom: 1px solid #dee2e6;
+        border-bottom: 1px solid #aeaeae;
     }
     li {
         margin-bottom: -1px;
@@ -60,12 +60,11 @@
     }
 
     button:hover {
-        border-color: #e9ecef #e9ecef #dee2e6;
+        border-color: #e9ecef;
     }
 
     li.active > button {
-        color: #495057;
-        background-color: #fff;
-        border-color: #dee2e6 #dee2e6 #fff;
+        background-color: #525252;
+        border-color: #c3c3c3;
     }
 </style>

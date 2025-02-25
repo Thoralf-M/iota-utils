@@ -343,8 +343,7 @@
         text-align: left;
     }
     div.active > button {
-        color: #495057;
-        background-color: #fff;
-        border-color: #dee2e6 #dee2e6 #fff;
+        background-color: #525252;
+        border-color: #c3c3c3;
     }
 </style>
