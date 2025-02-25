@@ -9,12 +9,21 @@
         IotaGraphQLClient,
     } from "@iota/iota-sdk/graphql";
     import { graphql } from "@iota/iota-sdk/graphql/schemas/2024.11";
+    import {
+        activeAddress,
+        iota_accounts,
+        iota_wallets,
+    } from "../SignerData.svelte";
 
     let address =
         "0xa1a97d20bbad79e2ac89f215a3b3c4f2ff9a1aa3cc26e529bde6e7bc5500d610";
     let domainName = "iota.iota";
+    let years = 1;
     let IOTA_NAMES_PACKAGE_ID =
         "0x20c890da38609db67e2713e6b33b4e4d3c6a8e9f620f9bb48f918d2337e31503";
+    let UTILS_PACKAGE_ID = "";
+    let REGISTRATION_PACKAGE_ID = "";
+    let SUBDOMAIN_PACKAGE_ID = "";
     let IOTA_NAMES_OBJECT_ID = "";
     // Will be updated with the result
     let value = {};
@@ -170,23 +179,22 @@
         };
         return gqlClient.query(options);
     }
-    async function getRegisteredNames() {
-        try {
-            const gqlClient = new IotaGraphQLClient({
-                url: getSelectedNetwork().graphql,
-            });
+    async function getRegisteredNamesInner(): Promise<object> {
+        const gqlClient = new IotaGraphQLClient({
+            url: getSelectedNetwork().graphql,
+        });
 
-            let dynamicFields = await queryDynamicFields();
-            let registration =
-                // @ts-ignore
-                dynamicFields.data.owner.dynamicFields.nodes.find(
-                    (v: any) =>
-                        v.name.type.repr ==
-                        `${IOTA_NAMES_PACKAGE_ID}::iota_names::RegistryKey<${IOTA_NAMES_PACKAGE_ID}::registry::Registry>`,
-                );
-            let registryId = registration.value.json.registry.id;
+        let dynamicFields = await queryDynamicFields();
+        let registration =
+            // @ts-ignore
+            dynamicFields.data.owner.dynamicFields.nodes.find(
+                (v: any) =>
+                    v.name.type.repr ==
+                    `${IOTA_NAMES_PACKAGE_ID}::iota_names::RegistryKey<${IOTA_NAMES_PACKAGE_ID}::registry::Registry>`,
+            );
+        let registryId = registration.value.json.registry.id;
 
-            let query = `query ($address: IotaAddress) {
+        let query = `query ($address: IotaAddress) {
                 owner(address: $address) {
                     dynamicFields {
                         nodes {
@@ -203,24 +211,25 @@
                 }
             }`;
 
-            let object: GraphQLQueryResult = await queryGraphQl(
-                gqlClient,
-                query,
-                {
-                    address: registryId,
-                },
-            );
+        let object: GraphQLQueryResult = await queryGraphQl(gqlClient, query, {
+            address: registryId,
+        });
 
-            let res = {};
-            // @ts-ignore
-            res.total = object.data.owner.dynamicFields.nodes.length;
-            // @ts-ignore
-            res.names = object.data.owner.dynamicFields.nodes.map((v) =>
-                v.name.json.labels.reverse().join("."),
-            );
-            // @ts-ignore
-            res.registrations = object.data.owner.dynamicFields.nodes;
-            value = res;
+        let res = {};
+        // @ts-ignore
+        res.total = object.data.owner.dynamicFields.nodes.length;
+        // @ts-ignore
+        res.names = object.data.owner.dynamicFields.nodes.map((v) =>
+            v.name.json.labels.reverse().join("."),
+        );
+        // @ts-ignore
+        res.registrations = object.data.owner.dynamicFields.nodes;
+        return res;
+    }
+    async function getRegisteredNames() {
+        try {
+            let registered = await getRegisteredNamesInner();
+            value = registered;
         } catch (err: any) {
             value = err.toString();
             console.error(err);
@@ -323,6 +332,183 @@
         });
         return dynamicFields;
     }
+    async function getPackageIds() {
+        try {
+            // @ts-ignore
+            let dynamicFields = (await queryDynamicFields()).data.owner
+                .dynamicFields.nodes;
+            UTILS_PACKAGE_ID = parsePackageId(
+                "direct_setup::DirectSetup",
+                dynamicFields,
+            );
+            REGISTRATION_PACKAGE_ID = parsePackageId(
+                "register::Register",
+                dynamicFields,
+            );
+            SUBDOMAIN_PACKAGE_ID = parsePackageId(
+                "subdomains::SubDomains",
+                dynamicFields,
+            );
+
+            function parsePackageId(
+                moduleStruct: string,
+                dynamicFields: object[],
+            ): string {
+                return dynamicFields
+                    .filter((d: any) => d.name.type.repr.includes(moduleStruct))
+                    .map((d: any) => {
+                        let type: string = d.name.type.repr;
+                        let index = type.indexOf("<");
+                        return type.slice(index + 1, index + 67);
+                    })[0];
+            }
+        } catch (err: any) {
+            value = err.toString();
+            console.error(err);
+        }
+    }
+    async function registerName() {
+        try {
+            await getPackageIds();
+            let dynamicFields = await queryDynamicFields();
+            let priceConfig =
+                // @ts-ignore
+                dynamicFields.data.owner.dynamicFields.nodes.filter((d: any) =>
+                    d.name.type.repr.includes("config::Config"),
+                )[0].value.json;
+
+            let length = domainName.split(".")[0].length;
+            let price = 0;
+            switch (true) {
+                case length < 4:
+                    price = priceConfig.three_char_price;
+                    break;
+                case length < 5:
+                    price = priceConfig.four_char_price;
+                    break;
+                default:
+                    price = priceConfig.five_plus_char_price;
+            }
+
+            let tx = new Transaction();
+            let nft = tx.moveCall({
+                target: `${REGISTRATION_PACKAGE_ID}::register::register`,
+                arguments: [
+                    tx.object(IOTA_NAMES_OBJECT_ID),
+                    tx.pure.string(domainName),
+                    tx.pure.u8(years),
+                    tx.splitCoins(tx.gas, [tx.pure.u64(price)]),
+                    tx.object("0x6"),
+                ],
+            });
+            tx.transferObjects([nft], tx.pure.address($activeAddress));
+
+            // @ts-ignore
+            let txResult = await $iota_wallets[0].signAndExecuteTransaction({
+                transaction: tx,
+                options: {
+                    showEffects: true,
+                    showObjectChanges: true,
+                    showBalanceChanges: true,
+                },
+                account: $iota_accounts.filter(
+                    (account) => account.address == $activeAddress,
+                )[0],
+            });
+            value = txResult;
+        } catch (err: any) {
+            value = err.toString();
+            console.error(err);
+        }
+    }
+    async function setTargetAddress() {
+        try {
+            await getPackageIds();
+
+            let registered = await getRegisteredNamesInner();
+            // @ts-ignore
+            let registrationIndex = registered.registrations.findIndex(
+                (e: any) => e.name.json.labels.join(".") == domainName,
+            );
+            if (registrationIndex == -1) {
+                throw new Error("domain name not found");
+            }
+            let nft_id =
+                // @ts-ignore
+                registered.registrations[registrationIndex].value.json.nft_id;
+
+            let tx = new Transaction();
+            tx.moveCall({
+                target: `${UTILS_PACKAGE_ID}::direct_setup::set_target_address`,
+                arguments: [
+                    tx.object(IOTA_NAMES_OBJECT_ID),
+                    tx.object(nft_id),
+                    tx.pure.option("address", address),
+                    tx.object("0x6"),
+                ],
+            });
+
+            // @ts-ignore
+            let txResult = await $iota_wallets[0].signAndExecuteTransaction({
+                transaction: tx,
+                options: {
+                    showEffects: true,
+                    showObjectChanges: true,
+                    showBalanceChanges: true,
+                },
+                account: $iota_accounts.filter(
+                    (account) => account.address == $activeAddress,
+                )[0],
+            });
+            value = txResult;
+        } catch (err: any) {
+            value = err.toString();
+            console.error(err);
+        }
+    }
+    async function getNft(): Promise<string> {
+        let registered = await getRegisteredNamesInner();
+        // @ts-ignore
+        let registrationIndex = registered.registrations.findIndex(
+            (e: any) => e.name.json.labels.join(".") == domainName,
+        );
+        if (registrationIndex == -1) {
+            throw new Error("domain name not found");
+        }
+        // @ts-ignore
+        return registered.registrations[registrationIndex].value.json.nft_id;
+    }
+    async function setReverseLookup() {
+        try {
+            await getPackageIds();
+
+            let tx = new Transaction();
+            tx.moveCall({
+                target: `${UTILS_PACKAGE_ID}::direct_setup::set_reverse_lookup`,
+                arguments: [
+                    tx.object(IOTA_NAMES_OBJECT_ID),
+                    tx.pure.string(domainName),
+                ],
+            });
+
+            // @ts-ignore
+            let txResult = await $iota_wallets[0].signAndExecuteTransaction({
+                transaction: tx,
+                options: {
+                    showEffects: true,
+                    showObjectChanges: true,
+                    showBalanceChanges: true,
+                },
+                account: $iota_accounts.filter(
+                    (account) => account.address == $activeAddress,
+                )[0],
+            });
+            value = txResult;
+        } catch (err: any) {
+            value = err.toString();
+            console.error(err);
+        }
+    }
     let showJsonTree = false;
 </script>
 
@@ -335,6 +521,9 @@
             bind:value={IOTA_NAMES_PACKAGE_ID}
             onchange={() => {
                 IOTA_NAMES_OBJECT_ID = "";
+                UTILS_PACKAGE_ID = "";
+                REGISTRATION_PACKAGE_ID = "";
+                SUBDOMAIN_PACKAGE_ID = "";
             }}
             placeholder="package id 0x..."
             size="67"
@@ -350,13 +539,24 @@
         domain name:
         <input bind:value={domainName} placeholder="name.iota" />
     </span>
+    <span>
+        years:
+        <input bind:value={years} type="number" placeholder="1" />
+    </span>
     <br />
 
     {#if IOTA_NAMES_OBJECT_ID.length != 0}
         IotaNames Object ID: {IOTA_NAMES_OBJECT_ID}
         <br />
     {/if}
+    {#each [["Utils", UTILS_PACKAGE_ID], ["Registration", REGISTRATION_PACKAGE_ID], ["Subdomain", SUBDOMAIN_PACKAGE_ID]] as item}
+        {#if item[1].length != 0}
+            {item[0]} Package ID: {item[1]}
+            <br />
+        {/if}
+    {/each}
 
+    <button onclick={getPackageIds}> get package ids </button>
     <button onclick={resolveAddress}> resolve address </button>
     <button onclick={resolveName}> resolve name </button>
     <button onclick={getRegisteredNames}> get registered names </button>
@@ -364,6 +564,9 @@
         get reverse registered addresses
     </button>
     <button onclick={getDynamicFields}> get dynamic fields </button>
+    <button onclick={registerName}> register name </button>
+    <button onclick={setTargetAddress}> set target address </button>
+    <button onclick={setReverseLookup}> set reverse lookup </button>
 
     <div class="value" hidden={Object.keys(value).length == 0}>
         <button onclick={() => (showJsonTree = !showJsonTree)}>
