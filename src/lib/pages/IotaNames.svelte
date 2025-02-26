@@ -2,7 +2,11 @@
     import { Transaction } from "@iota/iota-sdk/transactions";
     import JSONTree from "@sveltejs/svelte-json-tree";
     import { getClient, getSelectedNetwork } from "../Client.svelte";
-    import { isValidIotaAddress, toHEX } from "@iota/iota-sdk/utils";
+    import {
+        IOTA_CLOCK_OBJECT_ID,
+        isValidIotaAddress,
+        toHEX,
+    } from "@iota/iota-sdk/utils";
     import {
         type GraphQLQueryOptions,
         type GraphQLQueryResult,
@@ -25,6 +29,7 @@
     let REGISTRATION_PACKAGE_ID = "";
     let SUBDOMAIN_PACKAGE_ID = "";
     let IOTA_NAMES_OBJECT_ID = "";
+    let SUBDOMAIN_PROXY_PACKAGE_ID = "";
     // Will be updated with the result
     let value = {};
 
@@ -350,6 +355,8 @@
                 dynamicFields,
             );
 
+            await getSubDomainProxyPackageId();
+
             function parsePackageId(
                 moduleStruct: string,
                 dynamicFields: object[],
@@ -377,7 +384,8 @@
                     d.name.type.repr.includes("config::Config"),
                 )[0].value.json;
 
-            let length = domainName.split(".")[0].length;
+            let domainLabels = domainName.split(".");
+            let length = domainLabels[0].length;
             let price = 0;
             switch (true) {
                 case length < 4:
@@ -391,17 +399,74 @@
             }
 
             let tx = new Transaction();
-            let nft = tx.moveCall({
-                target: `${REGISTRATION_PACKAGE_ID}::register::register`,
-                arguments: [
-                    tx.object(IOTA_NAMES_OBJECT_ID),
-                    tx.pure.string(domainName),
-                    tx.pure.u8(years),
-                    tx.splitCoins(tx.gas, [tx.pure.u64(price)]),
-                    tx.object("0x6"),
-                ],
-            });
-            tx.transferObjects([nft], tx.pure.address($activeAddress));
+            if (domainLabels.length == 2) {
+                let nft = tx.moveCall({
+                    target: `${REGISTRATION_PACKAGE_ID}::register::register`,
+                    arguments: [
+                        tx.object(IOTA_NAMES_OBJECT_ID),
+                        tx.pure.string(domainName),
+                        tx.pure.u8(years),
+                        tx.splitCoins(tx.gas, [tx.pure.u64(price)]),
+                        tx.object(IOTA_CLOCK_OBJECT_ID),
+                    ],
+                });
+                tx.transferObjects([nft], tx.pure.address($activeAddress));
+            } else {
+                // Subdomains
+                let isParentSubdomain = domainLabels.length > 3;
+                domainLabels.shift();
+                let parentDomainName = domainLabels.join(".")!;
+                let parentNft = await getNft(parentDomainName);
+
+                let expirationNextMonthTimestampMs =
+                    Date.now() + 1000 * 60 * 60 * 24 * 30;
+
+                if (isParentSubdomain) {
+                    // parent NFT is wrapped in Subdomain NFT, so the subdomain NFT must be provided
+                    const client = await getClient();
+                    const outputs = await client.getOwnedObjects({
+                        owner: $activeAddress,
+                        options: { showContent: true, showType: true },
+                    });
+                    // Find the output that contains the parentNft id
+                    const subdomainOutputs = outputs.data.filter((output) =>
+                        // @ts-ignore
+                        output.data.content.type.includes(
+                            "SubDomainRegistration",
+                        ),
+                    );
+                    let subdomainNft = subdomainOutputs.find(
+                        (e) =>
+                            // @ts-ignore
+                            e.data.content.fields.nft.fields.domain_name ==
+                            parentDomainName,
+                    );
+                    parentNft = subdomainNft?.data?.objectId!;
+                    // Expiration time can be at most the same as the parent
+                    expirationNextMonthTimestampMs =
+                        // @ts-ignore
+                        subdomainNft.data.content.fields.nft.fields
+                            .expiration_timestamp_ms;
+                }
+
+                let allowChildCreation = true;
+                let allowTimeExtension = true;
+                const subNft = tx.moveCall({
+                    target: isParentSubdomain
+                        ? `${SUBDOMAIN_PROXY_PACKAGE_ID}::subdomain_proxy::new`
+                        : `${SUBDOMAIN_PACKAGE_ID}::subdomains::new`,
+                    arguments: [
+                        tx.object(IOTA_NAMES_OBJECT_ID),
+                        tx.object(parentNft),
+                        tx.object(IOTA_CLOCK_OBJECT_ID),
+                        tx.pure.string(domainName),
+                        tx.pure.u64(expirationNextMonthTimestampMs),
+                        tx.pure.bool(allowChildCreation),
+                        tx.pure.bool(allowTimeExtension),
+                    ],
+                });
+                tx.transferObjects([subNft], tx.pure.address($activeAddress));
+            }
 
             // @ts-ignore
             let txResult = await $iota_wallets[0].signAndExecuteTransaction({
@@ -466,7 +531,7 @@
             console.error(err);
         }
     }
-    async function getNft(): Promise<string> {
+    async function getNft(domainName: string): Promise<string> {
         let registered = await getRegisteredNamesInner();
         // @ts-ignore
         let registrationIndex = registered.registrations.findIndex(
@@ -509,6 +574,51 @@
             console.error(err);
         }
     }
+    async function getSubDomainProxyPackageId() {
+        let client = await getClient();
+        let iotaNamesPackageObject = await client.getObject({
+            id: IOTA_NAMES_PACKAGE_ID,
+            options: { showPreviousTransaction: true },
+        });
+        let publishTx = await client.getTransactionBlock({
+            digest: iotaNamesPackageObject.data?.previousTransaction!,
+        });
+
+        const gqlClient = new IotaGraphQLClient({
+            url: getSelectedNetwork().graphql,
+        });
+        // This assumes that the subdomain_proxy package was published right afterwards
+        const objectQuery = `{
+            packages(filter: {afterCheckpoint: ${publishTx.checkpoint}}) {
+                nodes {
+                    address
+                        latestPackage {
+                            modules {
+                                nodes {
+                                    name
+                                    functions {
+                                        nodes {
+                                          name
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }`;
+        let publishedPackages: any = await queryGraphQl(
+            gqlClient,
+            objectQuery,
+            {},
+        );
+        let subdomainProxyPackage =
+            publishedPackages.data.packages.nodes.filter(
+                (e: any) =>
+                    e.latestPackage.modules.nodes[0].name == "subdomain_proxy",
+            )[0];
+        SUBDOMAIN_PROXY_PACKAGE_ID = subdomainProxyPackage.address;
+    }
     let showJsonTree = false;
 </script>
 
@@ -524,6 +634,7 @@
                 UTILS_PACKAGE_ID = "";
                 REGISTRATION_PACKAGE_ID = "";
                 SUBDOMAIN_PACKAGE_ID = "";
+                SUBDOMAIN_PROXY_PACKAGE_ID = "";
             }}
             placeholder="package id 0x..."
             size="67"
@@ -549,7 +660,7 @@
         IotaNames Object ID: {IOTA_NAMES_OBJECT_ID}
         <br />
     {/if}
-    {#each [["Utils", UTILS_PACKAGE_ID], ["Registration", REGISTRATION_PACKAGE_ID], ["Subdomain", SUBDOMAIN_PACKAGE_ID]] as item}
+    {#each [["Utils", UTILS_PACKAGE_ID], ["Registration", REGISTRATION_PACKAGE_ID], ["Subdomain", SUBDOMAIN_PACKAGE_ID], ["Subdomain Proxy", SUBDOMAIN_PROXY_PACKAGE_ID]] as item}
         {#if item[1].length != 0}
             {item[0]} Package ID: {item[1]}
             <br />
