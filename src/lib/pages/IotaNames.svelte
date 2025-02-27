@@ -201,9 +201,8 @@
 
         let res = { total: 0, names: [], registrations: [] };
 
-        let nextPage = true;
         let cursorSection = "";
-        while (nextPage) {
+        while (true) {
             let query = `query ($address: IotaAddress) {
                 owner(address: $address) {
                     dynamicFields${cursorSection} {
@@ -233,6 +232,9 @@
                 },
             );
 
+            if (object.errors) {
+                break;
+            }
             // @ts-ignore
             res.total += object.data.owner.dynamicFields.nodes.length;
             res.names.push(
@@ -249,7 +251,7 @@
                 // @ts-ignore
                 cursorSection = `(after: "${object.data.owner.dynamicFields.pageInfo.endCursor}")`;
             } else {
-                nextPage = false;
+                break;
             }
         }
 
