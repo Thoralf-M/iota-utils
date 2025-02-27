@@ -199,9 +199,18 @@
             );
         let registryId = registration.value.json.registry.id;
 
-        let query = `query ($address: IotaAddress) {
+        let res = { total: 0, names: [], registrations: [] };
+
+        let nextPage = true;
+        let cursorSection = "";
+        while (nextPage) {
+            let query = `query ($address: IotaAddress) {
                 owner(address: $address) {
-                    dynamicFields {
+                    dynamicFields${cursorSection} {
+                        pageInfo{
+                            hasNextPage
+                            endCursor
+                        }
                         nodes {
                             name {
                                 json
@@ -216,19 +225,34 @@
                 }
             }`;
 
-        let object: GraphQLQueryResult = await queryGraphQl(gqlClient, query, {
-            address: registryId,
-        });
+            let object: GraphQLQueryResult = await queryGraphQl(
+                gqlClient,
+                query,
+                {
+                    address: registryId,
+                },
+            );
 
-        let res = {};
-        // @ts-ignore
-        res.total = object.data.owner.dynamicFields.nodes.length;
-        // @ts-ignore
-        res.names = object.data.owner.dynamicFields.nodes.map((v) =>
-            v.name.json.labels.reverse().join("."),
-        );
-        // @ts-ignore
-        res.registrations = object.data.owner.dynamicFields.nodes;
+            // @ts-ignore
+            res.total += object.data.owner.dynamicFields.nodes.length;
+            res.names.push(
+                // @ts-ignore
+                ...object.data.owner.dynamicFields.nodes.map((v) =>
+                    v.name.json.labels.reverse().join("."),
+                ),
+            );
+            // @ts-ignore
+            res.registrations.push(...object.data.owner.dynamicFields.nodes);
+
+            // @ts-ignore
+            if (object.data.owner.dynamicFields.pageInfo.hasNextPage) {
+                // @ts-ignore
+                cursorSection = `(after: "${object.data.owner.dynamicFields.pageInfo.endCursor}")`;
+            } else {
+                nextPage = false;
+            }
+        }
+
         return res;
     }
     async function getRegisteredNames() {
