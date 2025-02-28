@@ -184,7 +184,9 @@
         };
         return gqlClient.query(options);
     }
-    async function getRegisteredNamesInner(): Promise<object> {
+    async function getRegisteredNamesInner(
+        showResult?: boolean,
+    ): Promise<object> {
         const gqlClient = new IotaGraphQLClient({
             url: getSelectedNetwork().graphql,
         });
@@ -246,6 +248,9 @@
             // @ts-ignore
             res.registrations.push(...object.data.owner.dynamicFields.nodes);
 
+            if (showResult) {
+                value = res;
+            }
             // @ts-ignore
             if (object.data.owner.dynamicFields.pageInfo.hasNextPage) {
                 // @ts-ignore
@@ -259,8 +264,7 @@
     }
     async function getRegisteredNames() {
         try {
-            let registered = await getRegisteredNamesInner();
-            value = registered;
+            await getRegisteredNamesInner(true);
         } catch (err: any) {
             value = err.toString();
             console.error(err);
