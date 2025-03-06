@@ -21,12 +21,11 @@
 
     let address =
         "0xa1a97d20bbad79e2ac89f215a3b3c4f2ff9a1aa3cc26e529bde6e7bc5500d610";
-    let domainName = "iota.iota";
+    let domainName = "name.iota";
     let years = 1;
     let IOTA_NAMES_PACKAGE_ID =
-        "0x20c890da38609db67e2713e6b33b4e4d3c6a8e9f620f9bb48f918d2337e31503";
-    let UTILS_PACKAGE_ID = "";
-    let REGISTRATION_PACKAGE_ID = "";
+        "0x29ab1b20537b620febdb8bf1f93fcfb32d8024e96f4bd6661688f5ab2d912638";
+    let PAYMENTS_PACKAGE_ID = "";
     let SUBDOMAIN_PACKAGE_ID = "";
     let IOTA_NAMES_OBJECT_ID = "";
     let SUBDOMAIN_PROXY_PACKAGE_ID = "";
@@ -372,12 +371,8 @@
             // @ts-ignore
             let dynamicFields = (await queryDynamicFields()).data.owner
                 .dynamicFields.nodes;
-            UTILS_PACKAGE_ID = parsePackageId(
-                "direct_setup::DirectSetup",
-                dynamicFields,
-            );
-            REGISTRATION_PACKAGE_ID = parsePackageId(
-                "register::Register",
+            PAYMENTS_PACKAGE_ID = parsePackageId(
+                "payments::PaymentsConfig",
                 dynamicFields,
             );
             SUBDOMAIN_PACKAGE_ID = parsePackageId(
@@ -411,32 +406,50 @@
             let priceConfig =
                 // @ts-ignore
                 dynamicFields.data.owner.dynamicFields.nodes.filter((d: any) =>
-                    d.name.type.repr.includes("config::Config"),
+                    d.name.type.repr.includes("pricing_config::PricingConfig"),
                 )[0].value.json;
-
             let domainLabels = domainName.split(".");
             let length = domainLabels[0].length;
-            let price = 0;
-            switch (true) {
-                case length < 4:
-                    price = priceConfig.three_char_price;
-                    break;
-                case length < 5:
-                    price = priceConfig.four_char_price;
-                    break;
-                default:
-                    price = priceConfig.five_plus_char_price;
+            if (length < 3) {
+                throw new Error("name too short (minimum 3 characters)");
             }
-
+            let price = 0;
+            for (const pricing of priceConfig.pricing.contents) {
+                if (
+                    length >= parseInt(pricing.key.pos0) &&
+                    length <= parseInt(pricing.key.pos1)
+                ) {
+                    price = pricing.value;
+                    break;
+                }
+            }
             let tx = new Transaction();
             if (domainLabels.length == 2) {
-                let nft = tx.moveCall({
-                    target: `${REGISTRATION_PACKAGE_ID}::register::register`,
+                const paymentIntent = tx.moveCall({
+                    target: `${IOTA_NAMES_PACKAGE_ID}::payment::init_registration`,
                     arguments: [
                         tx.object(IOTA_NAMES_OBJECT_ID),
                         tx.pure.string(domainName),
-                        tx.pure.u8(years),
-                        tx.splitCoins(tx.gas, [tx.pure.u64(price)]),
+                    ],
+                });
+
+                const payment = tx.splitCoins(tx.gas, [price]);
+                const receipt = tx.moveCall({
+                    target: `${PAYMENTS_PACKAGE_ID}::payments::handle_base_payment`,
+                    arguments: [
+                        tx.object(IOTA_NAMES_OBJECT_ID),
+                        paymentIntent,
+                        payment,
+                    ],
+                    typeArguments: [
+                        "0x0000000000000000000000000000000000000000000000000000000000000002::iota::IOTA",
+                    ],
+                });
+                const nft = tx.moveCall({
+                    target: `${IOTA_NAMES_PACKAGE_ID}::payment::register`,
+                    arguments: [
+                        receipt,
+                        tx.object(IOTA_NAMES_OBJECT_ID),
                         tx.object(IOTA_CLOCK_OBJECT_ID),
                     ],
                 });
@@ -534,7 +547,7 @@
 
             let tx = new Transaction();
             tx.moveCall({
-                target: `${UTILS_PACKAGE_ID}::direct_setup::set_target_address`,
+                target: `${IOTA_NAMES_PACKAGE_ID}::controller::set_target_address`,
                 arguments: [
                     tx.object(IOTA_NAMES_OBJECT_ID),
                     tx.object(nft_id),
@@ -579,7 +592,7 @@
 
             let tx = new Transaction();
             tx.moveCall({
-                target: `${UTILS_PACKAGE_ID}::direct_setup::set_reverse_lookup`,
+                target: `${IOTA_NAMES_PACKAGE_ID}::controller::set_reverse_lookup`,
                 arguments: [
                     tx.object(IOTA_NAMES_OBJECT_ID),
                     tx.pure.string(domainName),
@@ -661,8 +674,7 @@
             bind:value={IOTA_NAMES_PACKAGE_ID}
             onchange={() => {
                 IOTA_NAMES_OBJECT_ID = "";
-                UTILS_PACKAGE_ID = "";
-                REGISTRATION_PACKAGE_ID = "";
+                PAYMENTS_PACKAGE_ID = "";
                 SUBDOMAIN_PACKAGE_ID = "";
                 SUBDOMAIN_PROXY_PACKAGE_ID = "";
             }}
@@ -690,7 +702,7 @@
         IotaNames Object ID: {IOTA_NAMES_OBJECT_ID}
         <br />
     {/if}
-    {#each [["Utils", UTILS_PACKAGE_ID], ["Registration", REGISTRATION_PACKAGE_ID], ["Subdomain", SUBDOMAIN_PACKAGE_ID], ["Subdomain Proxy", SUBDOMAIN_PROXY_PACKAGE_ID]] as item}
+    {#each [["Payments", PAYMENTS_PACKAGE_ID], ["Subdomain", SUBDOMAIN_PACKAGE_ID], ["Subdomain Proxy", SUBDOMAIN_PROXY_PACKAGE_ID]] as item}
         {#if item[1].length != 0}
             {item[0]} Package ID: {item[1]}
             <br />
