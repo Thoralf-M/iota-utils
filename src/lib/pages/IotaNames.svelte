@@ -23,8 +23,11 @@
         "0xa1a97d20bbad79e2ac89f215a3b3c4f2ff9a1aa3cc26e529bde6e7bc5500d610";
     let domainName = "name.iota";
     let years = 1;
+    let bidPrice = 10000000;
     let IOTA_NAMES_PACKAGE_ID =
-        "0x29ab1b20537b620febdb8bf1f93fcfb32d8024e96f4bd6661688f5ab2d912638";
+        "0xa1d2ed2008d31d358cfaf61a89aa7cfaa78ed183dbe683620258e98c59f48b13";
+    let AUCTION_PACKAGE_ID = "";
+    let AUCTION_HOUSE_OBJECT_ID = "";
     let PAYMENTS_PACKAGE_ID = "";
     let SUBDOMAIN_PACKAGE_ID = "";
     let IOTA_NAMES_OBJECT_ID = "";
@@ -171,6 +174,28 @@
         );
         // @ts-ignore
         IOTA_NAMES_OBJECT_ID = object.data.objects.edges[0].node.address;
+    }
+    async function queryAuctionObjectId() {
+        const gqlClient = new IotaGraphQLClient({
+            url: getSelectedNetwork().graphql,
+        });
+
+        const objectQuery = `{
+          objects(filter: {type: "${AUCTION_PACKAGE_ID}::auction::AuctionHouse"}) {
+            edges {
+              node {
+                address
+              }
+            }
+          }
+        }`;
+        let object: GraphQLQueryResult = await queryGraphQl(
+            gqlClient,
+            objectQuery,
+            {},
+        );
+        // @ts-ignore
+        AUCTION_HOUSE_OBJECT_ID = object.data.objects.edges[0].node.address;
     }
     async function queryGraphQl(
         gqlClient: IotaGraphQLClient,
@@ -371,6 +396,15 @@
             // @ts-ignore
             let dynamicFields = (await queryDynamicFields()).data.owner
                 .dynamicFields.nodes;
+            // Don't want to fail everything if auction is not existing
+            try {
+                AUCTION_PACKAGE_ID = parsePackageId(
+                    "auction::App",
+                    dynamicFields,
+                );
+            } catch (e) {
+                console.error(e);
+            }
             PAYMENTS_PACKAGE_ID = parsePackageId(
                 "payments::PaymentsConfig",
                 dynamicFields,
@@ -662,6 +696,150 @@
             )[0];
         SUBDOMAIN_PROXY_PACKAGE_ID = subdomainProxyPackage.address;
     }
+    async function startAuctionAndPlaceBid() {
+        try {
+            await getPackageIds();
+            await queryAuctionObjectId();
+            let domainLabels = domainName.split(".");
+            if (domainLabels.length != 2) {
+                throw new Error(
+                    "can only start an auction for TLD (name.iota)",
+                );
+            }
+
+            let tx = new Transaction();
+            const payment = tx.splitCoins(tx.gas, [bidPrice]);
+            tx.moveCall({
+                target: `${AUCTION_PACKAGE_ID}::auction::start_auction_and_place_bid`,
+                arguments: [
+                    tx.object(AUCTION_HOUSE_OBJECT_ID),
+                    tx.object(IOTA_NAMES_OBJECT_ID),
+                    tx.pure.string(domainName),
+                    payment,
+                    tx.object("0x6"),
+                ],
+            });
+
+            // @ts-ignore
+            let txResult = await $iota_wallets[0].signAndExecuteTransaction({
+                transaction: tx,
+                options: {
+                    showEffects: true,
+                    showObjectChanges: true,
+                    showBalanceChanges: true,
+                },
+                account: $iota_accounts.filter(
+                    (account) => account.address == $activeAddress,
+                )[0],
+            });
+            value = txResult;
+        } catch (err: any) {
+            value = err.toString();
+            console.error(err);
+        }
+    }
+    async function placeBid() {
+        try {
+            await getPackageIds();
+            await queryAuctionObjectId();
+            let domainLabels = domainName.split(".");
+            if (domainLabels.length != 2) {
+                throw new Error(
+                    "can only start an auction for TLD (name.iota)",
+                );
+            }
+
+            let tx = new Transaction();
+            const payment = tx.splitCoins(tx.gas, [bidPrice]);
+            tx.moveCall({
+                target: `${AUCTION_PACKAGE_ID}::auction::place_bid`,
+                arguments: [
+                    tx.object(AUCTION_HOUSE_OBJECT_ID),
+                    tx.pure.string(domainName),
+                    payment,
+                    tx.object("0x6"),
+                ],
+            });
+
+            // @ts-ignore
+            let txResult = await $iota_wallets[0].signAndExecuteTransaction({
+                transaction: tx,
+                options: {
+                    showEffects: true,
+                    showObjectChanges: true,
+                    showBalanceChanges: true,
+                },
+                account: $iota_accounts.filter(
+                    (account) => account.address == $activeAddress,
+                )[0],
+            });
+            value = txResult;
+        } catch (err: any) {
+            value = err.toString();
+            console.error(err);
+        }
+    }
+    async function getAuctionHouse() {
+        try {
+            await getPackageIds();
+            await queryAuctionObjectId();
+            let client = await getClient();
+            let object = await client.getObject({
+                id: AUCTION_HOUSE_OBJECT_ID,
+                options: { showContent: true, showPreviousTransaction: true },
+            });
+            let res: any = {};
+            res.objectId = object.data?.objectId;
+            res.previousTransaction = object.data?.previousTransaction;
+            // @ts-ignore
+            res.balance = object.data?.content?.fields?.balance;
+            let linked_table_id =
+                // @ts-ignore
+                object.data.content.fields.auctions.fields.id.id;
+            let query = `{
+                owner(
+                    address: "${linked_table_id}"
+                ) {
+                    dynamicFields {
+                        nodes {
+                            value {
+                                ... on MoveValue {
+                                    json
+                                }
+                            }
+                        }
+                    }
+                }
+            }`;
+
+            const gqlClient = new IotaGraphQLClient({
+                url: getSelectedNetwork().graphql,
+            });
+
+            let linkedTable: any = await queryGraphQl(gqlClient, query, {
+                address: IOTA_NAMES_OBJECT_ID,
+            });
+            let auctions = linkedTable.data.owner.dynamicFields.nodes.map(
+                (e: any) => {
+                    let auction = e.value.json;
+                    delete auction["prev"];
+                    delete auction["next"];
+                    delete auction["value"]["domain"];
+                    delete auction["value"]["nft"]["domain"];
+                    return auction;
+                },
+            );
+            res.auctionNames = auctions.map(
+                (e: any) => e.value.nft.domain_name,
+            );
+            res.auctions = auctions;
+
+            value = res;
+        } catch (err: any) {
+            value = err.toString();
+            console.error(err);
+        }
+    }
     let showJsonTree = false;
 </script>
 
@@ -674,6 +852,7 @@
             bind:value={IOTA_NAMES_PACKAGE_ID}
             onchange={() => {
                 IOTA_NAMES_OBJECT_ID = "";
+                AUCTION_PACKAGE_ID = "";
                 PAYMENTS_PACKAGE_ID = "";
                 SUBDOMAIN_PACKAGE_ID = "";
                 SUBDOMAIN_PROXY_PACKAGE_ID = "";
@@ -696,13 +875,17 @@
         years:
         <input bind:value={years} type="number" placeholder="1" />
     </span>
+    <span>
+        bid price:
+        <input bind:value={bidPrice} type="number" placeholder="0" />
+    </span>
     <br />
 
     {#if IOTA_NAMES_OBJECT_ID.length != 0}
         IotaNames Object ID: {IOTA_NAMES_OBJECT_ID}
         <br />
     {/if}
-    {#each [["Payments", PAYMENTS_PACKAGE_ID], ["Subdomain", SUBDOMAIN_PACKAGE_ID], ["Subdomain Proxy", SUBDOMAIN_PROXY_PACKAGE_ID]] as item}
+    {#each [["Payments", PAYMENTS_PACKAGE_ID], ["Subdomain", SUBDOMAIN_PACKAGE_ID], ["Subdomain Proxy", SUBDOMAIN_PROXY_PACKAGE_ID], ["Auction", AUCTION_PACKAGE_ID]] as item}
         {#if item[1].length != 0}
             {item[0]} Package ID: {item[1]}
             <br />
@@ -720,6 +903,11 @@
     <button onclick={registerName}> register name </button>
     <button onclick={setTargetAddress}> set target address </button>
     <button onclick={setReverseLookup}> set reverse lookup </button>
+    <button onclick={startAuctionAndPlaceBid}>
+        start auction and place bid
+    </button>
+    <button onclick={placeBid}> place bid </button>
+    <button onclick={getAuctionHouse}> get auction house </button>
 
     <div class="value" hidden={Object.keys(value).length == 0}>
         <button onclick={() => (showJsonTree = !showJsonTree)}>
