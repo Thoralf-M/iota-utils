@@ -20,7 +20,7 @@
     } from "../SignerData.svelte";
 
     let address =
-        "0xa1a97d20bbad79e2ac89f215a3b3c4f2ff9a1aa3cc26e529bde6e7bc5500d610";
+        "0x689dae2f77b048dcc08e14d73104ea14222b5be14cc31f34a16a1221f944c1e3";
     let domainName = "name.iota";
     let years = 1;
     let bidPrice = 10000000;
@@ -83,6 +83,9 @@
                 transactionBlock: tx,
             });
             console.log(txResult);
+            if (txResult.error) {
+                throw new Error(txResult.error);
+            }
             let resolvedAddress =
                 "0x" +
                 toHEX(
@@ -138,6 +141,9 @@
                 transactionBlock: tx,
             });
             console.log(txResult);
+            if (txResult.error) {
+                throw new Error(txResult.error);
+            }
             // .slice(1) to remove the length prefix
             let nameBytes = txResult.results
                 ?.pop()
