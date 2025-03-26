@@ -703,7 +703,7 @@
             let domainLabels = domainName.split(".");
             if (domainLabels.length != 2) {
                 throw new Error(
-                    "can only start an auction for TLD (name.iota)",
+                    "can only start an auction for domains with 2 labels (name.iota)",
                 );
             }
 
@@ -745,7 +745,7 @@
             let domainLabels = domainName.split(".");
             if (domainLabels.length != 2) {
                 throw new Error(
-                    "can only start an auction for TLD (name.iota)",
+                    "can only bid for domains with 2 labels (name.iota)",
                 );
             }
 
@@ -779,7 +779,47 @@
             console.error(err);
         }
     }
-    async function getAuctionHouse() {
+    async function claim() {
+        try {
+            await getPackageIds();
+            await queryAuctionObjectId();
+            let domainLabels = domainName.split(".");
+            if (domainLabels.length != 2) {
+                throw new Error(
+                    "can only claim domains with 2 labels (name.iota)",
+                );
+            }
+
+            let tx = new Transaction();
+            let nft = tx.moveCall({
+                target: `${AUCTION_PACKAGE_ID}::auction::claim`,
+                arguments: [
+                    tx.object(AUCTION_HOUSE_OBJECT_ID),
+                    tx.pure.string(domainName),
+                    tx.object("0x6"),
+                ],
+            });
+            tx.transferObjects([nft], tx.pure.address($activeAddress));
+
+            // @ts-ignore
+            let txResult = await $iota_wallets[0].signAndExecuteTransaction({
+                transaction: tx,
+                options: {
+                    showEffects: true,
+                    showObjectChanges: true,
+                    showBalanceChanges: true,
+                },
+                account: $iota_accounts.filter(
+                    (account) => account.address == $activeAddress,
+                )[0],
+            });
+            value = txResult;
+        } catch (err: any) {
+            value = err.toString();
+            console.error(err);
+        }
+    }
+    async function getAuctions() {
         try {
             await getPackageIds();
             await queryAuctionObjectId();
@@ -788,7 +828,15 @@
                 id: AUCTION_HOUSE_OBJECT_ID,
                 options: { showContent: true, showPreviousTransaction: true },
             });
-            let res: any = {};
+            let res: any = {
+                objectId: "",
+                previousTransaction: "",
+                balance: 0,
+                auctionNames: [],
+                unclaimedAuctionNames: [],
+                auctions: [],
+                unclaimedAuctions: [],
+            };
             res.objectId = object.data?.objectId;
             res.previousTransaction = object.data?.previousTransaction;
             // @ts-ignore
@@ -796,48 +844,120 @@
             let linked_table_id =
                 // @ts-ignore
                 object.data.content.fields.auctions.fields.id.id;
-            let query = `{
-                owner(
-                    address: "${linked_table_id}"
-                ) {
-                    dynamicFields {
-                        nodes {
-                            value {
-                                ... on MoveValue {
-                                    json
-                                }
-                            }
-                        }
-                    }
-                }
-            }`;
 
             const gqlClient = new IotaGraphQLClient({
                 url: getSelectedNetwork().graphql,
             });
+            let cursorSection = "";
+            while (true) {
+                let query = `{
+                    owner(
+                        address: "${linked_table_id}"
+                    ) {
+                        dynamicFields${cursorSection} {
+                            pageInfo{
+                                hasNextPage
+                                endCursor
+                            }
+                            nodes {
+                                value {
+                                    ... on MoveValue {
+                                        json
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }`;
 
-            let linkedTable: any = await queryGraphQl(gqlClient, query, {
-                address: IOTA_NAMES_OBJECT_ID,
-            });
-            let auctions = linkedTable.data.owner.dynamicFields.nodes.map(
-                (e: any) => {
-                    let auction = e.value.json;
+                let object: GraphQLQueryResult = await queryGraphQl(
+                    gqlClient,
+                    query,
+                    {
+                        address: IOTA_NAMES_OBJECT_ID,
+                    },
+                );
+
+                if (object.errors) {
+                    break;
+                }
+                let now = new Date().getTime();
+                // @ts-ignore
+                for (let auctionNode of object.data.owner.dynamicFields.nodes) {
+                    // @ts-ignore
+                    let auction = auctionNode.value.json;
                     delete auction["prev"];
                     delete auction["next"];
                     delete auction["value"]["domain"];
                     delete auction["value"]["nft"]["domain"];
-                    return auction;
-                },
-            );
-            res.auctionNames = auctions.map(
-                (e: any) => e.value.nft.domain_name,
-            );
-            res.auctions = auctions;
+                    // @ts-ignore
+                    let auctionEndTime = Number(auction.value.end_timestamp_ms);
+                    auction.endsIn = timeAgo(auctionEndTime);
+
+                    if (auctionEndTime < now) {
+                        res.unclaimedAuctions.push(auction);
+                        res.unclaimedAuctionNames.push(
+                            auction.value.nft.domain_name +
+                                " " +
+                                auction.value.winner,
+                        );
+                    } else {
+                        res.auctions.push(auction);
+                        res.auctionNames.push(
+                            auction.value.nft.domain_name +
+                                " " +
+                                auction.endsIn,
+                        );
+                    }
+                }
+
+                // @ts-ignore
+                if (object.data.owner.dynamicFields.pageInfo.hasNextPage) {
+                    // @ts-ignore
+                    cursorSection = `(after: "${object.data.owner.dynamicFields.pageInfo.endCursor}")`;
+                } else {
+                    break;
+                }
+            }
 
             value = res;
         } catch (err: any) {
             value = err.toString();
             console.error(err);
+        }
+    }
+    function timeAgo(timestamp: number): string {
+        const now = new Date().getTime();
+        const diff = timestamp - now;
+
+        const seconds = Math.abs(diff) / 1000;
+        const minutes = seconds / 60;
+        const hours = minutes / 60;
+        const days = hours / 24;
+        const months = days / 30;
+
+        if (diff > 0) {
+            // Future times (e.g., "in 2 days")
+            if (months >= 1)
+                return `in ${Math.round(months)} month${months > 1 ? "s" : ""}`;
+            if (days >= 1)
+                return `in ${Math.round(days)} day${days > 1 ? "s" : ""}`;
+            if (hours >= 1)
+                return `in ${Math.round(hours)} hour${hours > 1 ? "s" : ""}`;
+            if (minutes >= 1)
+                return `in ${Math.round(minutes)} minute${minutes > 1 ? "s" : ""}`;
+            return `in ${Math.round(seconds)} second${seconds > 1 ? "s" : ""}`;
+        } else {
+            // Past times (e.g., "1 day ago")
+            if (months >= 1)
+                return `${Math.round(months)} month${months > 1 ? "s" : ""} ago`;
+            if (days >= 1)
+                return `${Math.round(days)} day${days > 1 ? "s" : ""} ago`;
+            if (hours >= 1)
+                return `${Math.round(hours)} hour${hours > 1 ? "s" : ""} ago`;
+            if (minutes >= 1)
+                return `${Math.round(minutes)} minute${minutes > 1 ? "s" : ""} ago`;
+            return `${Math.round(seconds)} second${seconds > 1 ? "s" : ""} ago`;
         }
     }
     let showJsonTree = false;
@@ -907,7 +1027,8 @@
         start auction and place bid
     </button>
     <button onclick={placeBid}> place bid </button>
-    <button onclick={getAuctionHouse}> get auction house </button>
+    <button onclick={claim}> claim </button>
+    <button onclick={getAuctions}> get auctions </button>
 
     <div class="value" hidden={Object.keys(value).length == 0}>
         <button onclick={() => (showJsonTree = !showJsonTree)}>
