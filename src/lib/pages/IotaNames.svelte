@@ -25,7 +25,7 @@
     let years = 1;
     let bidPrice = 10000000;
     let IOTA_NAMES_PACKAGE_ID =
-        "0xa1d2ed2008d31d358cfaf61a89aa7cfaa78ed183dbe683620258e98c59f48b13";
+        "0x3ec4826f1d6e0d9f00680b2e9a7a41f03788ee610b3d11c24f41ab0ae71da39f";
     let AUCTION_PACKAGE_ID = "";
     let AUCTION_HOUSE_OBJECT_ID = "";
     let PAYMENTS_PACKAGE_ID = "";
@@ -405,7 +405,7 @@
             // Don't want to fail everything if auction is not existing
             try {
                 AUCTION_PACKAGE_ID = parsePackageId(
-                    "auction::App",
+                    "auction::AuctionAuth",
                     dynamicFields,
                 );
             } catch (e) {
@@ -416,11 +416,13 @@
                 dynamicFields,
             );
             SUBDOMAIN_PACKAGE_ID = parsePackageId(
-                "subdomains::SubDomains",
+                "subdomains::SubdomainsAuth",
                 dynamicFields,
             );
-
-            await getSubDomainProxyPackageId();
+            SUBDOMAIN_PROXY_PACKAGE_ID = parsePackageId(
+                "subdomain_proxy::SubdomainProxyAuth",
+                dynamicFields,
+            );
 
             function parsePackageId(
                 moduleStruct: string,
@@ -656,51 +658,6 @@
             value = err.toString();
             console.error(err);
         }
-    }
-    async function getSubDomainProxyPackageId() {
-        let client = await getClient();
-        let iotaNamesPackageObject = await client.getObject({
-            id: IOTA_NAMES_PACKAGE_ID,
-            options: { showPreviousTransaction: true },
-        });
-        let publishTx = await client.getTransactionBlock({
-            digest: iotaNamesPackageObject.data?.previousTransaction!,
-        });
-
-        const gqlClient = new IotaGraphQLClient({
-            url: getSelectedNetwork().graphql,
-        });
-        // This assumes that the subdomain_proxy package was published right afterwards
-        const objectQuery = `{
-            packages(filter: {afterCheckpoint: ${publishTx.checkpoint}}) {
-                nodes {
-                    address
-                        latestPackage {
-                            modules {
-                                nodes {
-                                    name
-                                    functions {
-                                        nodes {
-                                          name
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }`;
-        let publishedPackages: any = await queryGraphQl(
-            gqlClient,
-            objectQuery,
-            {},
-        );
-        let subdomainProxyPackage =
-            publishedPackages.data.packages.nodes.filter(
-                (e: any) =>
-                    e.latestPackage.modules.nodes[0].name == "subdomain_proxy",
-            )[0];
-        SUBDOMAIN_PROXY_PACKAGE_ID = subdomainProxyPackage.address;
     }
     async function startAuctionAndPlaceBid() {
         try {
