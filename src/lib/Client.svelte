@@ -20,6 +20,11 @@
         selected: "testnet",
         networks: [
             {
+                name: "mainnet",
+                url: "https://api.mainnet.iota.cafe",
+                graphql: "https://graphql.mainnet.iota.cafe",
+            },
+            {
                 name: "localnet",
                 url: "http://127.0.0.1:9000",
                 graphql: "http://127.0.0.1:9125",
