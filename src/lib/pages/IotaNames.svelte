@@ -32,6 +32,7 @@
     let SUBDOMAIN_PACKAGE_ID = "";
     let IOTA_NAMES_OBJECT_ID = "";
     let SUBDOMAIN_PROXY_PACKAGE_ID = "";
+    let showIotaNamesIds = false;
     // Will be updated with the result
     let value = {};
 
@@ -292,7 +293,7 @@
 
         return res;
     }
-    async function getRegisteredNames() {
+    async function listRegisteredNames() {
         try {
             await getRegisteredNamesInner(true);
         } catch (err: any) {
@@ -396,6 +397,10 @@
             address: IOTA_NAMES_OBJECT_ID,
         });
         return dynamicFields;
+    }
+    async function toggleIotaNamesIds() {
+        showIotaNamesIds = !showIotaNamesIds;
+        await getPackageIds();
     }
     async function getPackageIds() {
         try {
@@ -782,7 +787,7 @@
             console.error(err);
         }
     }
-    async function getAuctions() {
+    async function listAuctions() {
         try {
             await getPackageIds();
             await queryAuctionObjectId();
@@ -958,40 +963,51 @@
         years:
         <input bind:value={years} type="number" placeholder="1" />
     </span>
+
+    <br />
+
+    {#if showIotaNamesIds}
+        <details>
+            <summary>IOTA-Names IDs</summary>
+            <div>
+                IotaNames Object ID: {IOTA_NAMES_OBJECT_ID}
+                <br />
+                {#each [["Payments", PAYMENTS_PACKAGE_ID], ["Subdomain", SUBDOMAIN_PACKAGE_ID], ["Subdomain Proxy", SUBDOMAIN_PROXY_PACKAGE_ID], ["Auction", AUCTION_PACKAGE_ID]] as item}
+                    {#if item[1].length != 0}
+                        {item[0]} Package ID: {item[1]}
+                        <br />
+                    {/if}
+                {/each}
+            </div>
+        </details>
+    {/if}
+
+    Information:
+    <button onclick={listRegisteredNames}> list registered names </button>
+    <button onclick={resolveAddress}> resolve address </button>
+    <button onclick={resolveName}> resolve name </button>
+    <button onclick={getReverseRegisteredAddresses}>
+        get reverse registered addresses
+    </button>
+    <button onclick={toggleIotaNamesIds}> show package ids </button>
+    <button onclick={getDynamicFields}> get dynamic fields </button>
+    <hr />
+    Tx actions:
+    <button onclick={registerName}> register name </button>
+    <button onclick={setTargetAddress}> set target address </button>
+    <button onclick={setReverseLookup}> set reverse lookup </button>
+    <hr />
+    Auction:
     <span>
         bid price:
         <input bind:value={bidPrice} type="number" placeholder="0" />
     </span>
-    <br />
-
-    {#if IOTA_NAMES_OBJECT_ID.length != 0}
-        IotaNames Object ID: {IOTA_NAMES_OBJECT_ID}
-        <br />
-    {/if}
-    {#each [["Payments", PAYMENTS_PACKAGE_ID], ["Subdomain", SUBDOMAIN_PACKAGE_ID], ["Subdomain Proxy", SUBDOMAIN_PROXY_PACKAGE_ID], ["Auction", AUCTION_PACKAGE_ID]] as item}
-        {#if item[1].length != 0}
-            {item[0]} Package ID: {item[1]}
-            <br />
-        {/if}
-    {/each}
-
-    <button onclick={getPackageIds}> get package ids </button>
-    <button onclick={resolveAddress}> resolve address </button>
-    <button onclick={resolveName}> resolve name </button>
-    <button onclick={getRegisteredNames}> get registered names </button>
-    <button onclick={getReverseRegisteredAddresses}>
-        get reverse registered addresses
-    </button>
-    <button onclick={getDynamicFields}> get dynamic fields </button>
-    <button onclick={registerName}> register name </button>
-    <button onclick={setTargetAddress}> set target address </button>
-    <button onclick={setReverseLookup}> set reverse lookup </button>
     <button onclick={startAuctionAndPlaceBid}>
         start auction and place bid
     </button>
     <button onclick={placeBid}> place bid </button>
     <button onclick={claim}> claim </button>
-    <button onclick={getAuctions}> get auctions </button>
+    <button onclick={listAuctions}> list auctions </button>
 
     <div class="value" hidden={Object.keys(value).length == 0}>
         <button onclick={() => (showJsonTree = !showJsonTree)}>
