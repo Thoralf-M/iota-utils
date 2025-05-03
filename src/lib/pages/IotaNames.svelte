@@ -932,10 +932,8 @@
 </script>
 
 <main>
-    Default ID is for the devnet
-    <br />
     <span>
-        IotaNames package id:
+        IotaNames package id (default for devnet):
         <input
             bind:value={IOTA_NAMES_PACKAGE_ID}
             onchange={() => {
@@ -950,11 +948,11 @@
         />
     </span>
     <br />
+    <br />
     <span>
         address:
         <input bind:value={address} placeholder="address 0x..." size="67" />
     </span>
-    <br />
     <span>
         domain name:
         <input bind:value={domainName} placeholder="name.iota" />
@@ -963,7 +961,7 @@
         years:
         <input bind:value={years} type="number" placeholder="1" />
     </span>
-
+    <br />
     <br />
 
     {#if showIotaNamesIds}
@@ -982,15 +980,17 @@
         </details>
     {/if}
 
-    Information:
+    General information:
     <button onclick={listRegisteredNames}> list registered names </button>
-    <button onclick={resolveAddress}> resolve address </button>
-    <button onclick={resolveName}> resolve name </button>
     <button onclick={getReverseRegisteredAddresses}>
         get reverse registered addresses
     </button>
     <button onclick={toggleIotaNamesIds}> show package ids </button>
     <button onclick={getDynamicFields}> get dynamic fields </button>
+    <hr />
+    Resolver:
+    <button onclick={resolveAddress}> resolve address </button>
+    <button onclick={resolveName}> resolve name </button>
     <hr />
     Tx actions:
     <button onclick={registerName}> register name </button>
