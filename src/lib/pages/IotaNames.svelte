@@ -586,7 +586,7 @@
                 (e: any) => e.name.json.labels.join(".") == domainName,
             );
             if (registrationIndex == -1) {
-                throw new Error("domain name not found");
+                throw new Error("name not found");
             }
             let nft_id =
                 // @ts-ignore
@@ -628,7 +628,7 @@
             (e: any) => e.name.json.labels.join(".") == domainName,
         );
         if (registrationIndex == -1) {
-            throw new Error("domain name not found");
+            throw new Error("name not found");
         }
         // @ts-ignore
         return registered.registrations[registrationIndex].value.json.nft_id;
@@ -954,7 +954,7 @@
         <input bind:value={address} placeholder="address 0x..." size="67" />
     </span>
     <span>
-        domain name:
+        name:
         <input bind:value={domainName} placeholder="name.iota" />
     </span>
     <span>
@@ -989,8 +989,8 @@
     <button onclick={getDynamicFields}> get dynamic fields </button>
     <hr />
     Resolver:
-    <button onclick={resolveAddress}> resolve address </button>
-    <button onclick={resolveName}> resolve name </button>
+    <button onclick={resolveAddress}> resolve address (by name) </button>
+    <button onclick={resolveName}> resolve name (by address) </button>
     <hr />
     Tx actions:
     <button onclick={registerName}> register name </button>
