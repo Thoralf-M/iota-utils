@@ -4,6 +4,12 @@
 
     let value = {};
     let apiVersion = "";
+    let stakeInfo = {
+        totalSupply: undefined,
+        totalStake: undefined,
+        candidateStake: undefined,
+        pendingStake: undefined,
+    };
     const getLatestSystemState = async () => {
         try {
             let client = await getClient();
@@ -11,6 +17,10 @@
             const systemState = await client.getLatestIotaSystemState();
             console.log(systemState);
             value = systemState;
+            // @ts-ignore
+            stakeInfo.totalSupply = parseInt(systemState.iotaTotalSupply);
+            // @ts-ignore
+            stakeInfo.totalStake = parseInt(systemState.totalStake);
         } catch (err: any) {
             value = err.toString();
             console.error(err);
@@ -22,6 +32,13 @@
             let client = await getClient();
             apiVersion = (await client.getRpcApiVersion()) || "";
             const systemState = await client.getLatestIotaSystemState();
+
+            // @ts-ignore
+            stakeInfo.totalSupply = parseInt(systemState.iotaTotalSupply);
+            // @ts-ignore
+            stakeInfo.totalStake = parseInt(systemState.totalStake);
+            // @ts-ignore
+            stakeInfo.candidateStake = 0;
 
             const validatorCandidatesId = systemState.validatorCandidatesId;
             let hasNextPage = true;
@@ -53,6 +70,11 @@
                     const validator =
                         // @ts-ignore
                         validatorObject.data?.content.fields.value.fields;
+
+                    // @ts-ignore
+                    stakeInfo.candidateStake += parseInt(
+                        validator.staking_pool.fields.iota_balance,
+                    );
                     if (!showAllValidatorData) {
                         cleanupValidatorFields(validator);
                     }
@@ -77,6 +99,14 @@
             let client = await getClient();
             apiVersion = (await client.getRpcApiVersion()) || "";
             const systemState = await client.getLatestIotaSystemState();
+
+            // @ts-ignore
+            stakeInfo.totalSupply = parseInt(systemState.iotaTotalSupply);
+            // @ts-ignore
+            stakeInfo.totalStake = parseInt(systemState.totalStake);
+            // @ts-ignore
+            stakeInfo.pendingStake = 0;
+
             const pendingActiveValidatorsId =
                 systemState.pendingActiveValidatorsId;
 
@@ -97,6 +127,11 @@
                     const validator =
                         // @ts-ignore
                         validatorObject.data?.content.fields.value.fields;
+
+                    // @ts-ignore
+                    stakeInfo.pendingStake += parseInt(
+                        validator.staking_pool.fields.iota_balance,
+                    );
                     if (!showAllValidatorData) {
                         cleanupValidatorFields(validator);
                     }
@@ -171,6 +206,9 @@
             <JSONTree {value} />
         </div>
         <pre hidden={showJsonTree}>{JSON.stringify(value, null, 2)}</pre>
+    </div>
+    <div class="value" hidden={stakeInfo.totalSupply == 0}>
+        {JSON.stringify(stakeInfo, null, 2)}
     </div>
 </main>
 
