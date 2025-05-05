@@ -24,35 +24,45 @@
             const systemState = await client.getLatestIotaSystemState();
 
             const validatorCandidatesId = systemState.validatorCandidatesId;
-            // Note: pagination is not handled here, so only the first page of results will be returned
-            const candidateValidators = await client.getDynamicFields({
-                parentId: validatorCandidatesId,
-            });
+            let hasNextPage = true;
+            let nextPageCursor;
             let validatorCandidates = [];
-            for (const candidateValidator of candidateValidators.data) {
-                const validatorWrapper = await client.getDynamicFieldObject({
+            while (hasNextPage) {
+                const candidateValidatorsPage = await client.getDynamicFields({
                     parentId: validatorCandidatesId,
-                    name: candidateValidator.name,
+                    cursor: nextPageCursor,
                 });
-                const validatorV1 = await client.getDynamicFields({
-                    parentId:
-                        // @ts-ignore
-                        validatorWrapper.data?.content.fields.value.fields.inner
-                            .fields.id.id,
-                });
-                const validatorObject = await client.getObject({
-                    id: validatorV1.data[0].objectId,
-                    options: { showContent: true },
-                });
+                for (const candidateValidator of candidateValidatorsPage.data) {
+                    const validatorWrapper = await client.getDynamicFieldObject(
+                        {
+                            parentId: validatorCandidatesId,
+                            name: candidateValidator.name,
+                        },
+                    );
+                    const validatorV1 = await client.getDynamicFields({
+                        parentId:
+                            // @ts-ignore
+                            validatorWrapper.data?.content.fields.value.fields
+                                .inner.fields.id.id,
+                    });
+                    const validatorObject = await client.getObject({
+                        id: validatorV1.data[0].objectId,
+                        options: { showContent: true },
+                    });
 
-                const validator =
-                    // @ts-ignore
-                    validatorObject.data?.content.fields.value.fields;
-                if (!showAllValidatorData) {
-                    cleanupValidatorFields(validator);
+                    const validator =
+                        // @ts-ignore
+                        validatorObject.data?.content.fields.value.fields;
+                    if (!showAllValidatorData) {
+                        cleanupValidatorFields(validator);
+                    }
+                    validatorCandidates.push(validator);
+                    value = validatorCandidates;
                 }
-                validatorCandidates.push(validator);
-                value = validatorCandidates;
+                hasNextPage = candidateValidatorsPage.hasNextPage;
+                if (hasNextPage) {
+                    nextPageCursor = candidateValidatorsPage.nextCursor;
+                }
             }
             if (validatorCandidates.length == 0) {
                 value = "No candidate validators";
@@ -70,27 +80,35 @@
             const pendingActiveValidatorsId =
                 systemState.pendingActiveValidatorsId;
 
-            // Note: pagination is not handled here, so only the first page of results will be returned
-            const pendingValidators = await client.getDynamicFields({
-                parentId: pendingActiveValidatorsId,
-            });
-            let validatorsPending = [];
-            for (const pendingValidator of pendingValidators.data) {
-                const validatorObject = await client.getObject({
-                    id: pendingValidator.objectId,
-                    options: { showContent: true },
+            let hasNextPage = true;
+            let nextPageCursor;
+            let pendingValidators = [];
+            while (hasNextPage) {
+                const pendingValidatorsPage = await client.getDynamicFields({
+                    parentId: pendingActiveValidatorsId,
+                    cursor: nextPageCursor,
                 });
+                for (const pendingValidator of pendingValidatorsPage.data) {
+                    const validatorObject = await client.getObject({
+                        id: pendingValidator.objectId,
+                        options: { showContent: true },
+                    });
 
-                const validator =
-                    // @ts-ignore
-                    validatorObject.data?.content.fields.value.fields;
-                if (!showAllValidatorData) {
-                    cleanupValidatorFields(validator);
+                    const validator =
+                        // @ts-ignore
+                        validatorObject.data?.content.fields.value.fields;
+                    if (!showAllValidatorData) {
+                        cleanupValidatorFields(validator);
+                    }
+                    pendingValidators.push(validator);
+                    value = pendingValidators;
                 }
-                validatorsPending.push(validator);
-                value = validatorsPending;
+                hasNextPage = pendingValidatorsPage.hasNextPage;
+                if (hasNextPage) {
+                    nextPageCursor = pendingValidatorsPage.nextCursor;
+                }
             }
-            if (validatorsPending.length == 0) {
+            if (pendingValidators.length == 0) {
                 value = "No pending validators";
             }
         } catch (err: any) {
@@ -128,7 +146,7 @@
 
 <main>
     <button on:click={() => getLatestSystemState()}>
-        get latest iota system state
+        get latest IOTA system state
     </button>
     <button on:click={() => getCandidateValidators()}>
         candidate validators

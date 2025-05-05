@@ -21,7 +21,7 @@
         },
         { label: "Converter", component: Converter },
         { label: "Faucet", component: Faucet },
-        { label: "Iota System State", component: IotaSystemState },
+        { label: "IOTA System State", component: IotaSystemState },
         { label: "Publish Data", component: PublishData },
         { label: "PTB Code", component: ProgrammableTransactionBlock },
         { label: "Split Merge Coins", component: SplitMergeCoins },
