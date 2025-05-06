@@ -22,7 +22,6 @@
     let address =
         "0x689dae2f77b048dcc08e14d73104ea14222b5be14cc31f34a16a1221f944c1e3";
     let domainName = "name.iota";
-    let years = 1;
     let bidPrice = 10000000;
     let IOTA_NAMES_PACKAGE_ID =
         "0x3ec4826f1d6e0d9f00680b2e9a7a41f03788ee610b3d11c24f41ab0ae71da39f";
@@ -956,10 +955,6 @@
     <span>
         name:
         <input bind:value={domainName} placeholder="name.iota" />
-    </span>
-    <span>
-        years:
-        <input bind:value={years} type="number" placeholder="1" />
     </span>
     <br />
     <br />
