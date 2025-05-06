@@ -1,14 +1,17 @@
 <script lang="ts">
     import JSONTree from "@sveltejs/svelte-json-tree";
     import { getClient } from "../Client.svelte";
+    import type { IotaSystemStateSummary } from "@iota/iota-sdk/client";
 
     let value = {};
     let apiVersion = "";
     let stakeInfo = {
         totalSupply: undefined,
         totalStake: undefined,
-        candidateStake: undefined,
         pendingStake: undefined,
+        nextEpochStake: undefined,
+        candidateValidatorsStake: undefined,
+        pendingValidatorsStake: undefined,
     };
     const getLatestSystemState = async () => {
         try {
@@ -17,10 +20,7 @@
             const systemState = await client.getLatestIotaSystemState();
             console.log(systemState);
             value = systemState;
-            // @ts-ignore
-            stakeInfo.totalSupply = parseInt(systemState.iotaTotalSupply);
-            // @ts-ignore
-            stakeInfo.totalStake = parseInt(systemState.totalStake);
+            stakeInfo = systemStateStake(stakeInfo, systemState);
         } catch (err: any) {
             value = err.toString();
             console.error(err);
@@ -33,12 +33,9 @@
             apiVersion = (await client.getRpcApiVersion()) || "";
             const systemState = await client.getLatestIotaSystemState();
 
+            stakeInfo = systemStateStake(stakeInfo, systemState);
             // @ts-ignore
-            stakeInfo.totalSupply = parseInt(systemState.iotaTotalSupply);
-            // @ts-ignore
-            stakeInfo.totalStake = parseInt(systemState.totalStake);
-            // @ts-ignore
-            stakeInfo.candidateStake = 0;
+            stakeInfo.candidateValidatorsStake = 0;
 
             const validatorCandidatesId = systemState.validatorCandidatesId;
             let hasNextPage = true;
@@ -72,7 +69,7 @@
                         validatorObject.data?.content.fields.value.fields;
 
                     // @ts-ignore
-                    stakeInfo.candidateStake += parseInt(
+                    stakeInfo.candidateValidatorsStake += parseInt(
                         validator.staking_pool.fields.iota_balance,
                     );
                     if (!showAllValidatorData) {
@@ -100,12 +97,9 @@
             apiVersion = (await client.getRpcApiVersion()) || "";
             const systemState = await client.getLatestIotaSystemState();
 
+            stakeInfo = systemStateStake(stakeInfo, systemState);
             // @ts-ignore
-            stakeInfo.totalSupply = parseInt(systemState.iotaTotalSupply);
-            // @ts-ignore
-            stakeInfo.totalStake = parseInt(systemState.totalStake);
-            // @ts-ignore
-            stakeInfo.pendingStake = 0;
+            stakeInfo.pendingValidatorsStake = 0;
 
             const pendingActiveValidatorsId =
                 systemState.pendingActiveValidatorsId;
@@ -129,7 +123,7 @@
                         validatorObject.data?.content.fields.value.fields;
 
                     // @ts-ignore
-                    stakeInfo.pendingStake += parseInt(
+                    stakeInfo.pendingValidatorsStake += parseInt(
                         validator.staking_pool.fields.iota_balance,
                     );
                     if (!showAllValidatorData) {
@@ -151,6 +145,26 @@
             console.error(err);
         }
     };
+    function systemStateStake(
+        stakeInfo: any,
+        systemState: IotaSystemStateSummary,
+    ) {
+        // @ts-ignore
+        stakeInfo.totalSupply = parseInt(systemState.iotaTotalSupply);
+        // @ts-ignore
+        stakeInfo.totalStake = parseInt(systemState.totalStake);
+        // @ts-ignore
+        stakeInfo.pendingStake = 0;
+        // @ts-ignore
+        stakeInfo.nextEpochStake = 0;
+        for (const validator of systemState.activeValidators) {
+            // @ts-ignore
+            stakeInfo.pendingStake += parseInt(validator.pendingStake);
+            // @ts-ignore
+            stakeInfo.nextEpochStake += parseInt(validator.nextEpochStake);
+        }
+        return stakeInfo;
+    }
     // Remove fields from the validator to have a cleaner output
     function cleanupValidatorFields(validator: any) {
         delete validator.extra_fields;
