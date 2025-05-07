@@ -12,7 +12,7 @@
         type GraphQLQueryResult,
         IotaGraphQLClient,
     } from "@iota/iota-sdk/graphql";
-    import { graphql } from "@iota/iota-sdk/graphql/schemas/2024.11";
+    import { graphql } from "@iota/iota-sdk/graphql/schemas/2025.2";
     import {
         activeAddress,
         iota_accounts,

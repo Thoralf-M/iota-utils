@@ -21,8 +21,8 @@
   "dependencies": {
     "@babel/runtime": "^7.26.9",
     "@codemirror/lang-javascript": "^6.2.3",
-    "@iota/bcs": "^0.2.1",
-    "@iota/iota-sdk": "^0.5.0",
+    "@iota/bcs": "^1.0.0",
+    "@iota/iota-sdk": "^1.0.0",
     "@iota/wallet-standard": "^0.2.1",
     "@lezer/highlight": "^1.2.1",
     "@noble/hashes": "^1.5.0",

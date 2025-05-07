@@ -4,9 +4,12 @@
     let base58 = "";
     let base64 = "";
     let utf8 = "";
+    let u64 = "";
     let error = "";
 
-    import { toHEX, fromB58, toB58, fromB64, toB64 } from "@iota/bcs";
+    import { toHEX, fromB58, toB58, fromB64, toB64, bcs } from "@iota/bcs";
+    import { bcs as IotaBcs } from "@iota/iota-sdk/bcs";
+    import { TransactionDataBuilder } from "@iota/iota-sdk/transactions";
 
     enum SourceType {
         Bytes,
@@ -14,6 +17,7 @@
         Base58,
         Base64,
         UTF8,
+        U64,
     }
 
     function convert(source: SourceType) {
@@ -46,6 +50,9 @@
                 case SourceType.UTF8:
                     sourceBytes = new TextEncoder().encode(utf8);
                     break;
+                case SourceType.U64:
+                    sourceBytes = bcs.u64().serialize(u64).toBytes();
+                    break;
             }
             if (source != SourceType.Bytes) {
                 bytes = sourceBytes;
@@ -54,6 +61,7 @@
             base58 = toB58(sourceBytes);
             base64 = toB64(sourceBytes);
             utf8 = bytesToUtf8(sourceBytes);
+            u64 = bcsBytesToU64(sourceBytes);
         } catch (err: any) {
             try {
                 error = JSON.stringify(JSON.parse(err.message).payload.error);
@@ -85,6 +93,12 @@
         let bytes_utf8 = new TextDecoder().decode(new Uint8Array(bytes));
         return bytes_utf8;
     }
+
+    function bcsBytesToU64(bytes: number[]) {
+        return bcs.u64().parse(new Uint8Array(bytes));
+    }
+
+    let transaction: any;
 </script>
 
 <main>
@@ -143,8 +157,50 @@
                 placeholder="UTF-8 string"
             />
         </div>
+
+        <div class="box">u64 (from/to BCS bytes):</div>
+        <div class="box">
+            <input
+                type="string"
+                size="160"
+                bind:value={u64}
+                on:input={() => convert(SourceType.U64)}
+                placeholder="u64 number"
+            />
+        </div>
+    </div>
+    <br />
+    <div class="wrapper">
+        <div class="box">Tx bytes base64:</div>
+        <div class="box">
+            <input
+                type="string"
+                size="160"
+                on:input={(event) => {
+                    // @ts-ignore
+                    let inputString = event.target.value;
+                    try {
+                        transaction = TransactionDataBuilder.fromBytes(
+                            fromB64(inputString),
+                        );
+                    } catch (e) {
+                        console.log("error TransactionDataBuilder", e);
+                        try {
+                            transaction = IotaBcs.SenderSignedData.parse(
+                                fromB64(inputString),
+                            );
+                        } catch (e) {
+                            console.log("error SenderSignedData", e);
+                            transaction = e;
+                        }
+                    }
+                }}
+                placeholder="base64 transaction bytes"
+            />
+        </div>
     </div>
 
+    <pre>{JSON.stringify(transaction, null, 2)}</pre>
     <br />
     {error}
 </main>
@@ -157,5 +213,8 @@
     }
     .box {
         padding: 2px;
+    }
+    pre {
+        text-align: left;
     }
 </style>
