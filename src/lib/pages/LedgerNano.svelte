@@ -348,9 +348,13 @@
 
     .inner-table th,
     .inner-table td {
-        border: 1px solid #ccc;
+        border: 1px solid #4f4f4f;
         padding: 0.4rem 0.6rem;
         text-align: left;
+    }
+    .inner-table th,
+    td {
+        background-color: #262626;
     }
 
     .mono {
