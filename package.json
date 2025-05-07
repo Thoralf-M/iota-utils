@@ -23,12 +23,16 @@
     "@codemirror/lang-javascript": "^6.2.3",
     "@iota/bcs": "^1.0.0",
     "@iota/iota-sdk": "^1.0.0",
+    "@iota/ledgerjs-hw-app-iota": "^0.2.2",
     "@iota/wallet-standard": "^0.2.1",
+    "@ledgerhq/hw-transport-webhid": "^6.30.0",
     "@lezer/highlight": "^1.2.1",
     "@noble/hashes": "^1.5.0",
+    "@rollup/plugin-inject": "^5.0.5",
     "@scure/bip39": "^1.4.0",
     "@sveltejs/svelte-json-tree": "^2.2.1",
     "@uiw/codemirror-theme-github": "^4.23.8",
+    "buffer": "^6.0.3",
     "codemirror": "^6.0.1"
   }
 }

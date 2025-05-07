@@ -11,6 +11,7 @@
     import Stake from "./lib/pages/Stake.svelte";
     import IotaNames from "./lib/pages/IotaNames.svelte";
     import WebWallet from "./lib/WebWallet.svelte";
+    import LedgerNano from "./lib/pages/LedgerNano.svelte";
     import ProgrammableTransactionBlock from "./lib/pages/ProgrammableTransactionBlock.svelte";
 
     // List of tab items with labels, values and assigned components
@@ -27,6 +28,7 @@
         { label: "Split Merge Coins", component: SplitMergeCoins },
         { label: "Stake", component: Stake },
         { label: "IOTA-Names", component: IotaNames },
+        { label: "LedgerNano", component: LedgerNano },
     ].map((e, index) => {
         // @ts-ignore
         e.value = index;
