@@ -3,17 +3,28 @@
     import { getClient } from "../Client.svelte";
     import TransportWebHID from "@ledgerhq/hw-transport-webhid";
     import IotaLedgerClient from "@iota/ledgerjs-hw-app-iota";
-    import { toHEX } from "@iota/bcs";
+    import { toB64, toHEX } from "@iota/bcs";
+    import { isValidIotaAddress } from "@iota/iota-sdk/utils";
+    import { Transaction } from "@iota/iota-sdk/transactions";
+    import {
+        messageWithIntent,
+        toSerializedSignature,
+    } from "@iota/iota-sdk/cryptography";
+    import { Ed25519PublicKey } from "@iota/iota-sdk/keypairs/ed25519";
 
-    const IOTA_BIP44_COIN_TYPE = 4218;
+    const IOTA_BIP44_COIN_TYPE = 1;
     const TESTNET_BIP44_COIN_TYPE = 1;
     let coinType = $state(IOTA_BIP44_COIN_TYPE);
     let accountIndex = $state(0);
     let change = $state(0);
     let addressIndex = $state(0);
 
-    let numberToIncrease = $state(5);
+    let numberToIncrease = $state(3);
     let accountOrAddress = $state("account");
+
+    let dryRun = $state(true);
+    let senderAddress = $state("");
+    let recipientAddress = $state("");
 
     // Will be updated with the result
     let value = $state({});
@@ -22,6 +33,7 @@
         publicKey: string;
         bip44Path: string;
         totalBalance?: string;
+        objectCount?: number;
     };
     let accountEntries: AccountEntry[] = $state([]);
 
@@ -91,6 +103,7 @@
         internal: boolean;
         index: number;
         totalBalance?: string;
+        objectCount?: number;
     };
     type GroupedAccountEntry = [number, AddressWithIndex[]];
     let tableAccounts: GroupedAccountEntry[] = $state([]);
@@ -123,6 +136,7 @@
                 internal: change == 1,
                 index: addressIndex,
                 totalBalance: address.totalBalance,
+                objectCount: address.objectCount,
             });
             grouped[accountIndex].sort((a, b) => a.index - b.index);
         }
@@ -143,20 +157,132 @@
     function isExpanded(index: number): boolean {
         return expanded.includes(index);
     }
-    async function getUnknownBalances() {
+    async function getAllBalances(skipKnown: boolean = false) {
         try {
             const client = await getClient();
             for (const entry of accountEntries) {
                 // skip if the balance is already known
-                if (entry.totalBalance) {
+                if (entry.totalBalance && skipKnown) {
                     continue;
                 }
-                let balance = await client.getBalance({
+                let page = await client.getBalance({
                     owner: entry.address,
                 });
-                entry.totalBalance = balance.totalBalance;
+                entry.totalBalance = page.totalBalance;
             }
             formatAsTable();
+        } catch (err: any) {
+            value = err.toString();
+            console.error(err);
+        }
+    }
+    async function getAllObjects(skipKnown: boolean = false) {
+        try {
+            const client = await getClient();
+            for (const entry of accountEntries) {
+                // skip if the balance is already known
+                if (entry.objectCount && skipKnown) {
+                    continue;
+                }
+                let page = await client.getOwnedObjects({
+                    owner: entry.address,
+                });
+                entry.objectCount = page.data.length;
+            }
+            formatAsTable();
+        } catch (err: any) {
+            value = err.toString();
+            console.error(err);
+        }
+    }
+
+    async function sendAllObjects() {
+        try {
+            if (!isValidIotaAddress(senderAddress)) {
+                throw new Error("invalid sender address");
+            }
+            if (!isValidIotaAddress(recipientAddress)) {
+                throw new Error("invalid recipient address");
+            }
+
+            // Get bip path from previously generated address or use from the input fields
+            let address = accountEntries.find(
+                (addr) => addr.address == senderAddress,
+            );
+            let bip44Path = address?.bip44Path;
+            if (!bip44Path) {
+                bip44Path = `m/44'/${coinType}'/${accountIndex}'/${change}'/${addressIndex}'`;
+            }
+
+            const client = await getClient();
+
+            const tx = new Transaction();
+            let page = await client.getOwnedObjects({
+                owner: senderAddress,
+                options: {
+                    showType: true,
+                },
+            });
+            if (page.data.length == 0) {
+                throw new Error("No objects found");
+            }
+
+            const gasCoinIndex = page.data.findIndex((o) => {
+                console.log(o.data?.type);
+                return o.data?.type === `0x2::coin::Coin<0x2::iota::IOTA>`;
+            });
+            let gasCoin = null;
+            if (gasCoinIndex !== -1) {
+                gasCoin = page.data.splice(gasCoinIndex, 1)[0];
+            }
+            if (!gasCoin) {
+                throw new Error("No gas coin found");
+            }
+
+            let objectsToTransfer = page.data.map((o) => o.data?.objectId!);
+            // @ts-ignore
+            objectsToTransfer.push(tx.gas);
+            tx.transferObjects(
+                objectsToTransfer,
+                tx.pure.address(recipientAddress),
+            );
+
+            tx.setSender(senderAddress);
+            const txBytes = await tx.build({ client });
+            if (dryRun) {
+                const dryRunResult = await client.dryRunTransactionBlock({
+                    transactionBlock: txBytes,
+                });
+                console.log(dryRunResult);
+                value = dryRunResult;
+            } else {
+                const ledgerClient = new IotaLedgerClient(ledgerTransport);
+                let txMessageIntent = messageWithIntent(
+                    "TransactionData",
+                    txBytes,
+                );
+                const { signature } = await ledgerClient.signTransaction(
+                    bip44Path,
+                    txMessageIntent,
+                );
+                const { publicKey } =
+                    await ledgerClient.getPublicKey(bip44Path);
+                const serializedSignature = toSerializedSignature({
+                    signature,
+                    signatureScheme: "ED25519",
+                    publicKey: new Ed25519PublicKey(publicKey),
+                });
+                const result = await client.executeTransactionBlock({
+                    transactionBlock: txBytes,
+                    signature: serializedSignature,
+                    options: {
+                        showBalanceChanges: true,
+                        showEffects: true,
+                    },
+                });
+                console.log(result);
+                value = result;
+            }
         } catch (err: any) {
             value = err.toString();
             console.error(err);
@@ -218,6 +344,37 @@
     <button onclick={() => generateMultipleAddresses()}>
         generate multiple addresses
     </button>
+
+    <hr />
+    <button onclick={() => getAllBalances(true)}> get unknown balances </button>
+    <button onclick={() => getAllBalances()}> get all balances </button>
+    <button onclick={() => getAllObjects(true)}> get unknown objects </button>
+    <button onclick={() => getAllObjects()}> get all objects </button>
+    <hr />
+
+    <div>
+        Sender address: <input
+            type="string"
+            size="70"
+            bind:value={senderAddress}
+            placeholder="sender address"
+        />
+    </div>
+    <div>
+        Recipient address: <input
+            type="string"
+            size="70"
+            bind:value={recipientAddress}
+            placeholder="recipient address"
+        />
+    </div>
+    <select bind:value={dryRun}>
+        <option value={true}>dry run</option>
+        <option value={false}>send</option>
+    </select>
+    <button onclick={() => sendAllObjects()}> send all objects </button>
+
+    <hr />
     <button
         onclick={() => {
             accountEntries = [];
@@ -243,8 +400,6 @@
     >
         collapse all
     </button>
-    <button onclick={() => getUnknownBalances()}> get unknown balances </button>
-
     <div
         class="value"
         hidden={Object.keys(value).length == 0 ||
@@ -310,6 +465,7 @@
                                         <th>Internal</th>
                                         <th>Address</th>
                                         <th>Balance</th>
+                                        <th>Owned Objects</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -319,6 +475,7 @@
                                             <td>{addr.internal}</td>
                                             <td class="mono">{addr.address}</td>
                                             <td>{addr.totalBalance}</td>
+                                            <td>{addr.objectCount}</td>
                                         </tr>
                                     {/each}
                                 </tbody>
