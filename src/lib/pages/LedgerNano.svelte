@@ -11,6 +11,7 @@
         toSerializedSignature,
     } from "@iota/iota-sdk/cryptography";
     import { Ed25519PublicKey } from "@iota/iota-sdk/keypairs/ed25519";
+    import type { IotaClient } from "@iota/iota-sdk/client";
 
     const IOTA_BIP44_COIN_TYPE = 1;
     const TESTNET_BIP44_COIN_TYPE = 1;
@@ -23,6 +24,7 @@
     let accountOrAddress = $state("account");
 
     let dryRun = $state(true);
+    let iotaAmountToSend = $state("1");
     let senderAddress = $state("");
     let recipientAddress = $state("");
 
@@ -228,7 +230,6 @@
             }
 
             const gasCoinIndex = page.data.findIndex((o) => {
-                console.log(o.data?.type);
                 return o.data?.type === `0x2::coin::Coin<0x2::iota::IOTA>`;
             });
             let gasCoin = null;
@@ -246,7 +247,59 @@
                 objectsToTransfer,
                 tx.pure.address(recipientAddress),
             );
+            await finishTransaction(tx, bip44Path, client);
+        } catch (err: any) {
+            value = err.toString();
+            console.error(err);
+        }
+    }
 
+    async function sendIotaAmount() {
+        try {
+            if (!isValidIotaAddress(senderAddress)) {
+                throw new Error("invalid sender address");
+            }
+            if (!isValidIotaAddress(recipientAddress)) {
+                throw new Error("invalid recipient address");
+            }
+
+            // Get bip path from previously generated address or use from the input fields
+            let address = accountEntries.find(
+                (addr) => addr.address == senderAddress,
+            );
+            let bip44Path = address?.bip44Path;
+            if (!bip44Path) {
+                bip44Path = `m/44'/${coinType}'/${accountIndex}'/${change}'/${addressIndex}'`;
+            }
+
+            const client = await getClient();
+
+            const tx = new Transaction();
+            let balance = await client.getBalance({
+                owner: senderAddress,
+            });
+
+            if (BigInt(balance.totalBalance) < BigInt(iotaAmountToSend)) {
+                throw new Error(
+                    `Not enough balance ${balance.totalBalance}/${iotaAmountToSend}`,
+                );
+            }
+
+            const coins = tx.splitCoins(tx.gas, [BigInt(iotaAmountToSend)]);
+            tx.transferObjects([coins[0]], tx.pure.address(recipientAddress));
+            await finishTransaction(tx, bip44Path, client);
+        } catch (err: any) {
+            value = err.toString();
+            console.error(err);
+        }
+    }
+
+    async function finishTransaction(
+        tx: Transaction,
+        bip44Path: string,
+        client: IotaClient,
+    ) {
+        try {
             tx.setSender(senderAddress);
             const txBytes = await tx.build({ client });
             if (dryRun) {
@@ -373,6 +426,14 @@
         <option value={false}>send</option>
     </select>
     <button onclick={() => sendAllObjects()}> send all objects </button>
+    IOTA amount(in Nanos) to send:
+    <input
+        type="number"
+        min="0"
+        bind:value={iotaAmountToSend}
+        placeholder="IOTA amount to send"
+    />
+    <button onclick={() => sendIotaAmount()}> send IOTA </button>
 
     <hr />
     <button
