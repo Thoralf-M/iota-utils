@@ -7,8 +7,16 @@
     let u64 = "";
     let error = "";
 
+    let transaction: any;
+
+    let nano = "";
+    let nanoWithUnderscore = "";
+    let iota = "";
+    let iotaWithUnderscore = "";
+
     import { toHEX, fromB58, toB58, fromB64, toB64, bcs } from "@iota/bcs";
     import { bcs as IotaBcs } from "@iota/iota-sdk/bcs";
+    import { IOTA_DECIMALS, NANOS_PER_IOTA } from "@iota/iota-sdk/utils";
     import { TransactionDataBuilder } from "@iota/iota-sdk/transactions";
 
     enum SourceType {
@@ -98,7 +106,71 @@
         return bcs.u64().parse(new Uint8Array(bytes));
     }
 
-    let transaction: any;
+    function convertToIota() {
+        error = "";
+        try {
+            if (nano) {
+                iota = nanoToIota(nano);
+                iotaWithUnderscore = iota.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1_");
+                nanoWithUnderscore = nano.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1_");
+            } else {
+                iota = "";
+            }
+        } catch (err: any) {
+            error = err;
+        }
+    }
+
+    function convertToNano() {
+        error = "";
+        try {
+            if (iota) {
+                nano = iotaToNano(iota);
+                iotaWithUnderscore = iota.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1_");
+                nanoWithUnderscore = nano.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1_");
+            } else {
+                nano = "";
+            }
+        } catch (err: any) {
+            error = err;
+        }
+    }
+    
+function iotaToNano(iota: string): string{
+    const [intPart, decPart = ''] = iota.replace(/_/g, "").split('.');
+    if (decPart.length > 9) {
+        throw new Error('Decimal part exceeds 9 digits');
+    }
+  
+  // Pad or trim the decimal part to 9 digits
+  const paddedDec = (decPart + '0'.repeat(IOTA_DECIMALS)).slice(0, 9);
+  
+  // Combine the parts
+  const combined = intPart + paddedDec;
+  
+  return BigInt(combined).toString();
+}
+
+function formatBigIntWithDecimal(bigint: BigInt, decimalPlaces: number): string {
+  const str = bigint.toString();
+  const len = str.length;
+
+  if (len <= decimalPlaces) {
+    // Pad with zeros on the left if necessary
+    const padded = str.padStart(decimalPlaces, '0');
+    return `0.${padded}`;
+  }
+
+  const intPart = str.slice(0, len - decimalPlaces);
+  const decimalPart = str.slice(len - decimalPlaces);
+  return `${intPart}.${decimalPart}`;
+}
+
+const nanoToIota = (nano: string) => {
+    return formatBigIntWithDecimal(BigInt(nano.replace(/_/g, "")), IOTA_DECIMALS);
+};
+
+
 </script>
 
 <main>
@@ -167,6 +239,31 @@
                 on:input={() => convert(SourceType.U64)}
                 placeholder="u64 number"
             />
+        </div>
+    </div>
+    <br />
+    <div class="wrapper2">
+        <div class="box">
+            NANO:
+            <input
+                type="string"
+                size="40"
+                bind:value={nano}
+                on:input={() => convertToIota()}
+                placeholder="NANO amount"
+            />
+            {nanoWithUnderscore}
+        </div>
+        <div class="box">
+            IOTA:
+            <input
+            type="string"
+            size="40"
+            bind:value={iota}
+            on:input={() => convertToNano()}
+            placeholder="IOTA amount"
+            />
+            {iotaWithUnderscore}
         </div>
     </div>
     <br />
