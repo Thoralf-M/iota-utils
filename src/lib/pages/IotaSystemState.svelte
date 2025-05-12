@@ -221,9 +221,9 @@
         </div>
         <pre hidden={showJsonTree}>{JSON.stringify(value, null, 2)}</pre>
     </div>
-    <div class="value" hidden={stakeInfo.totalSupply == 0}>
+    <pre class="value" hidden={stakeInfo.totalSupply == 0}>
         {JSON.stringify(stakeInfo, null, 2)}
-    </div>
+    </pre>
 </main>
 
 <style>
