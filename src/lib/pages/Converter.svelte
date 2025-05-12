@@ -16,7 +16,7 @@
 
     import { toHEX, fromB58, toB58, fromB64, toB64, bcs } from "@iota/bcs";
     import { bcs as IotaBcs } from "@iota/iota-sdk/bcs";
-    import { IOTA_DECIMALS, NANOS_PER_IOTA } from "@iota/iota-sdk/utils";
+    import { IOTA_DECIMALS } from "@iota/iota-sdk/utils";
     import { TransactionDataBuilder } from "@iota/iota-sdk/transactions";
 
     enum SourceType {

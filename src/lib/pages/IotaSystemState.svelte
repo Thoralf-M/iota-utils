@@ -19,8 +19,9 @@
             apiVersion = (await client.getRpcApiVersion()) || "";
             const systemState = await client.getLatestIotaSystemState();
             console.log(systemState);
-            value = systemState;
+            value = formatNumbersWithUnderscores(systemState);
             stakeInfo = systemStateStake(stakeInfo, systemState);
+            stakeInfo = formatNumbersWithUnderscores(stakeInfo);
         } catch (err: any) {
             value = err.toString();
             console.error(err);
@@ -76,7 +77,7 @@
                         cleanupValidatorFields(validator);
                     }
                     validatorCandidates.push(validator);
-                    value = validatorCandidates;
+                    value = formatNumbersWithUnderscores(validatorCandidates);
                 }
                 hasNextPage = candidateValidatorsPage.hasNextPage;
                 if (hasNextPage) {
@@ -86,6 +87,7 @@
             if (validatorCandidates.length == 0) {
                 value = "No candidate validators";
             }
+            stakeInfo = formatNumbersWithUnderscores(stakeInfo);
         } catch (err: any) {
             value = err.toString();
             console.error(err);
@@ -130,7 +132,7 @@
                         cleanupValidatorFields(validator);
                     }
                     pendingValidators.push(validator);
-                    value = pendingValidators;
+                    value = formatNumbersWithUnderscores(pendingValidators);
                 }
                 hasNextPage = pendingValidatorsPage.hasNextPage;
                 if (hasNextPage) {
@@ -140,6 +142,7 @@
             if (pendingValidators.length == 0) {
                 value = "No pending validators";
             }
+            stakeInfo = formatNumbersWithUnderscores(stakeInfo);
         } catch (err: any) {
             value = err.toString();
             console.error(err);
@@ -190,6 +193,36 @@
         delete validator.staking_pool.fields.extra_fields;
         delete validator.staking_pool.fields.id;
     }
+    function formatNumbersWithUnderscores(obj: object): any {
+  // Helper function to add _ as a thousands separator
+  function formatNumber(n: any) {
+    return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '_');
+  }
+
+  // Recursively process the object
+  function process(value: object): object {
+    if (Array.isArray(value)) {
+      return value.map(process);
+    } else if (value !== null && typeof value === 'object') {
+      const newObj = {};
+      for (const key in value) {
+        // @ts-ignore
+        newObj[key] = process(value[key]);
+      }
+      return newObj;
+    } else if (
+      typeof value === 'number' ||
+      (typeof value === 'string' && /^\d+$/.test(value))
+    ) {
+      return formatNumber(value);
+    } else {
+      return value;
+    }
+  }
+
+  return process(obj);
+}
+
     let showJsonTree = true;
 </script>
 
