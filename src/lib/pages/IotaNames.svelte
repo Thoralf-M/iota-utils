@@ -398,8 +398,10 @@
         return dynamicFields;
     }
     async function toggleIotaNamesIds() {
-        showIotaNamesIds = !showIotaNamesIds;
+        showIotaNamesIds = true;
         await getPackageIds();
+        // open the details element
+        document.querySelector("details")?.setAttribute("open", "true");
     }
     async function getPackageIds() {
         try {
