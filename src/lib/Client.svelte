@@ -41,7 +41,7 @@
             },
             {
                 name: "alphanet",
-                url: "https://api.iota-rebased-alphanet.iota.cafe",
+                url: "https://indexer.iota-rebased-alphanet.iota.cafe",
                 graphql: "https://graphql.iota-rebased-alphanet.iota.cafe",
             },
         ],

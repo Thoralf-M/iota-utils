@@ -24,7 +24,7 @@
     let domainName = "name.iota";
     let bidPrice = 10000000;
     let IOTA_NAMES_PACKAGE_ID =
-        "0x3ec4826f1d6e0d9f00680b2e9a7a41f03788ee610b3d11c24f41ab0ae71da39f";
+        "0xa9a9c358922b1d8395bf9c3c18c524dc8b458eeccf5090614443a958bbba0e43";
     let AUCTION_PACKAGE_ID = "";
     let AUCTION_HOUSE_OBJECT_ID = "";
     let PAYMENTS_PACKAGE_ID = "";
@@ -932,7 +932,7 @@
 
 <main>
     <span>
-        IotaNames package id (default for devnet):
+        IotaNames package id (default for alphanet):
         <input
             bind:value={IOTA_NAMES_PACKAGE_ID}
             onchange={() => {
