@@ -34,9 +34,11 @@
     let showIotaNamesIds = false;
     // Will be updated with the result
     let value = {};
+    let imageToShow: undefined | string = undefined;
 
     const resolveAddress = async () => {
         try {
+            imageToShow= undefined
             if (IOTA_NAMES_OBJECT_ID.length == 0) {
                 await queryIotaNamesObjectId();
             }
@@ -99,10 +101,12 @@
         } catch (err: any) {
             value = err.toString();
             console.error(err);
+            imageToShow= "static/notAlreadyTaken.png"
         }
     };
     const resolveName = async () => {
         try {
+            imageToShow= undefined
             if (!isValidIotaAddress(address)) {
                 throw new Error("invalid address");
             }
@@ -157,6 +161,7 @@
         } catch (err: any) {
             value = err.toString();
             console.error(err);
+            imageToShow = "static/noName.png"
         }
     };
     async function queryIotaNamesObjectId() {
@@ -294,7 +299,9 @@
     }
     async function listRegisteredNames() {
         try {
+            imageToShow= undefined
             await getRegisteredNamesInner(true);
+            imageToShow = "static/nameList.png";
         } catch (err: any) {
             value = err.toString();
             console.error(err);
@@ -302,6 +309,7 @@
     }
     async function getReverseRegisteredAddresses() {
         try {
+            imageToShow= undefined
             const gqlClient = new IotaGraphQLClient({
                 url: getSelectedNetwork().graphql,
             });
@@ -361,6 +369,7 @@
     }
     async function getDynamicFields() {
         try {
+            imageToShow= undefined
             value = await queryDynamicFields();
         } catch (err: any) {
             value = err.toString();
@@ -398,6 +407,7 @@
         return dynamicFields;
     }
     async function toggleIotaNamesIds() {
+        imageToShow= undefined
         showIotaNamesIds = true;
         await getPackageIds();
         // open the details element
@@ -449,6 +459,7 @@
     }
     async function registerName() {
         try {
+            imageToShow= undefined
             await getPackageIds();
             let dynamicFields = await queryDynamicFields();
             let priceConfig =
@@ -572,6 +583,7 @@
                 )[0],
             });
             value = txResult;
+            imageToShow = "static/buyDomain.png"
         } catch (err: any) {
             value = err.toString();
             console.error(err);
@@ -579,6 +591,7 @@
     }
     async function setTargetAddress() {
         try {
+            imageToShow= undefined
             await getPackageIds();
 
             let registered = await getRegisteredNamesInner();
@@ -623,6 +636,7 @@
         }
     }
     async function getNft(domainName: string): Promise<string> {
+        imageToShow= undefined
         let registered = await getRegisteredNamesInner();
         // @ts-ignore
         let registrationIndex = registered.registrations.findIndex(
@@ -636,6 +650,7 @@
     }
     async function setReverseLookup() {
         try {
+            imageToShow= undefined
             await getPackageIds();
 
             let tx = new Transaction();
@@ -667,6 +682,7 @@
     }
     async function startAuctionAndPlaceBid() {
         try {
+            imageToShow= undefined
             await getPackageIds();
             await queryAuctionObjectId();
             let domainLabels = domainName.split(".");
@@ -709,6 +725,7 @@
     }
     async function placeBid() {
         try {
+            imageToShow= undefined
             await getPackageIds();
             await queryAuctionObjectId();
             let domainLabels = domainName.split(".");
@@ -743,6 +760,7 @@
                 )[0],
             });
             value = txResult;
+            imageToShow = "https://media1.tenor.com/m/nm0QBDJWiiQAAAAd/maxbidding.gif";
         } catch (err: any) {
             value = err.toString();
             console.error(err);
@@ -750,6 +768,7 @@
     }
     async function claim() {
         try {
+            imageToShow= undefined
             await getPackageIds();
             await queryAuctionObjectId();
             let domainLabels = domainName.split(".");
@@ -790,6 +809,7 @@
     }
     async function listAuctions() {
         try {
+            imageToShow= undefined
             await getPackageIds();
             await queryAuctionObjectId();
             let client = await getClient();
@@ -1015,6 +1035,9 @@
         </div>
         <pre hidden={showJsonTree}>{JSON.stringify(value, null, 2)}</pre>
     </div>
+    {#if imageToShow}
+    <img src={imageToShow} alt="" />
+{/if}
 </main>
 
 <style>
