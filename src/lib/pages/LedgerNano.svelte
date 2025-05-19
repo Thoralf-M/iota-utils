@@ -13,9 +13,9 @@
     import { Ed25519PublicKey } from "@iota/iota-sdk/keypairs/ed25519";
     import type { IotaClient } from "@iota/iota-sdk/client";
 
-    const IOTA_BIP44_COIN_TYPE = 1;
+    const IOTA_BIP44_COIN_TYPE = 4218;
     const TESTNET_BIP44_COIN_TYPE = 1;
-    let coinType = $state(IOTA_BIP44_COIN_TYPE);
+    let coinType = $state(TESTNET_BIP44_COIN_TYPE);
     let accountIndex = $state(0);
     let change = $state(0);
     let addressIndex = $state(0);
