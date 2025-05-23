@@ -32,7 +32,7 @@
     .box {
         margin-bottom: 10px;
         padding: 20px;
-        border: 1px solid #dee2e6;
+        border: 1px solid #696969;
         border-radius: 0 0 0.5rem 0.5rem;
         border-top: 0;
     }
@@ -42,7 +42,7 @@
         padding-left: 0;
         margin-bottom: 0;
         list-style: none;
-        border-bottom: 1px solid #aeaeae;
+        border-bottom: 1px solid #696969;
     }
     li {
         margin-bottom: -1px;

@@ -34,6 +34,7 @@
     "@sveltejs/svelte-json-tree": "^2.2.1",
     "@uiw/codemirror-theme-github": "^4.23.8",
     "buffer": "^6.0.3",
-    "codemirror": "^6.0.1"
+    "codemirror": "^6.0.1",
+    "svelte-dnd-action": "^0.9.61"
   }
 }

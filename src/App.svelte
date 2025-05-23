@@ -13,6 +13,7 @@
     import WebWallet from "./lib/WebWallet.svelte";
     import LedgerNano from "./lib/pages/LedgerNano.svelte";
     import ProgrammableTransactionBlock from "./lib/pages/ProgrammableTransactionBlock.svelte";
+    import MultiAccountView from "./lib/pages/MultiAccountView.svelte";
 
     // List of tab items with labels, values and assigned components
     let items = [
@@ -29,6 +30,7 @@
         { label: "Stake", component: Stake },
         { label: "IOTA-Names", component: IotaNames },
         { label: "LedgerNano", component: LedgerNano },
+        { label: "Multi Account View", component: MultiAccountView },
     ].map((e, index) => {
         // @ts-ignore
         e.value = index;
