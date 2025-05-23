@@ -1,10 +1,10 @@
 <script lang="ts">
     export let items: any[] = [];
-    let activeTabs = JSON.parse(localStorage.getItem("activeTabs") || "[0]");
+    let activeTabs = JSON.parse(localStorage.getItem('activeTabs') || '[0]');
 
     const handleClick = (tabValue: number) => () => {
         activeTabs[0] = tabValue;
-        localStorage.setItem("activeTabs", JSON.stringify(activeTabs));
+        localStorage.setItem('activeTabs', JSON.stringify(activeTabs));
         // Commented part could be used to have multiple tabs at once visible
         // if (activeTabs.includes(tabValue)) {
         //     activeTabs = activeTabs.filter((v) => v != tabValue);
@@ -16,7 +16,7 @@
 
 <ul>
     {#each items as item}
-        <li class={activeTabs.includes(item.value) ? "active" : ""}>
+        <li class={activeTabs.includes(item.value) ? 'active' : ''}>
             <button on:click={handleClick(item.value)}>{item.label}</button>
         </li>
     {/each}
@@ -31,7 +31,7 @@
 <style>
     .box {
         margin-bottom: 10px;
-        padding: 20px;
+        padding: 1rem;
         border: 1px solid #696969;
         border-radius: 0 0 0.5rem 0.5rem;
         border-top: 0;
@@ -45,7 +45,7 @@
         border-bottom: 1px solid #696969;
     }
     li {
-        margin-bottom: -1px;
+        margin-bottom: 0px;
     }
 
     button {

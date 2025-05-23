@@ -1,24 +1,14 @@
 <script lang="ts">
-    import { Transaction } from "@iota/iota-sdk/transactions";
-    import JSONTree from "@sveltejs/svelte-json-tree";
-    import { getClient } from "../Client.svelte";
-    import {
-        activeAddress,
-        iota_accounts,
-        iota_wallets,
-    } from "../SignerData.svelte";
-    import {
-        IOTA_SYSTEM_STATE_OBJECT_ID,
-        isValidIotaAddress,
-    } from "@iota/iota-sdk/utils";
-    import type { IotaObjectData } from "@iota/iota-sdk/client";
-    import {
-        dragHandle,
-        dragHandleZone,
-        type DndEvent,
-    } from "svelte-dnd-action";
-    import WebWallet from "../WebWallet.svelte";
-    import { onMount } from "svelte";
+    import type { IotaObjectData } from '@iota/iota-sdk/client';
+    import { Transaction } from '@iota/iota-sdk/transactions';
+    import { IOTA_SYSTEM_STATE_OBJECT_ID, isValidIotaAddress } from '@iota/iota-sdk/utils';
+    import { onMount } from 'svelte';
+    import { dragHandle, dragHandleZone, type DndEvent } from 'svelte-dnd-action';
+
+    import { getClient } from '../Client.svelte';
+    import { nanoToIota } from '../lib/iota-nano-conversion';
+    import JsonToggleView from '../lib/JsonToggleView.svelte';
+    import { activeAddress, iota_accounts, iota_wallets } from '../SignerData.svelte';
 
     // Will be updated with the result
     let value = $state({});
@@ -37,16 +27,8 @@
 
     let extendedAccounts: ExtendedAccount[] = $state([]);
 
-    let webWalletComponent: WebWallet;
-    let connectWallet: any;
-    onMount(function () {
-        connectWallet = async function () {
-            await webWalletComponent.connectWallet();
-        };
-    });
     const syncReset = async () => {
         try {
-            await connectWallet();
             extendedAccounts = $iota_accounts.map((account, i) => {
                 return {
                     id: account.address,
@@ -61,8 +43,6 @@
             console.error(err);
         }
     };
-
-    let showJsonTree = $state(true);
 
     function handleDnd(event: CustomEvent<DndEvent<any>>) {
         // Find the account being updated and set its new items
@@ -104,9 +84,9 @@
                     const objects = result.data.map((obj, idx) => {
                         // @ts-ignore
                         let label = obj.data.content?.type;
-                        if (typeof label === "string") {
+                        if (typeof label === 'string') {
                             // Only show the actual type name
-                            label = label.split("::").slice(2).join("::");
+                            label = label.split('::').slice(2).join('::');
                         }
                         return {
                             // @ts-ignore
@@ -126,52 +106,19 @@
             console.error(err);
         }
     }
-
-    function formatBigIntWithDecimal(
-        bigint: BigInt,
-        decimalPlaces: number,
-    ): string {
-        const str = bigint.toString();
-        const len = str.length;
-
-        if (len <= decimalPlaces) {
-            // Pad with zeros on the left if necessary
-            const padded = str.padStart(decimalPlaces, "0");
-            return `0.${padded}`;
-        }
-
-        const intPart = str.slice(0, len - decimalPlaces);
-        const decimalPart = str.slice(len - decimalPlaces);
-        return `${intPart}.${decimalPart}`;
-    }
-
-    const nanoToIota = (nano: string) => {
-        return formatBigIntWithDecimal(BigInt(nano.replace(/_/g, "")), 9);
-    };
 </script>
 
-<WebWallet bind:this={webWalletComponent} />
 <main>
     <button onclick={syncReset}> sync/reset </button>
 
-    <div class="value" hidden={Object.keys(value).length == 0}>
-        <button onclick={() => (showJsonTree = !showJsonTree)}>
-            toggle JSON tree
-        </button>
-        <div hidden={!showJsonTree}>
-            <JSONTree {value} />
-        </div>
-        <pre hidden={showJsonTree}>{JSON.stringify(value, null, 2)}</pre>
-    </div>
+    <JsonToggleView {value} />
 
     <div class="grid">
         {#each extendedAccounts as account (account.id)}
             <div class="account">
                 <div>
                     {account.label ||
-                        account.address.slice(0, 6) +
-                            "..." +
-                            account.address.slice(-4)}
+                        account.address.slice(0, 6) + '...' + account.address.slice(-4)}
                 </div>
                 <div
                     use:dragHandleZone={{
@@ -193,18 +140,13 @@
                                     : ''}"
                             >
                                 <span>
-                                    {#if item.label.startsWith("Coin<0x2::iota::IOTA>")}
+                                    {#if item.label.startsWith('Coin<0x2::iota::IOTA>')}
+                                        {item.label}: {nanoToIota(item.data?.fields?.balance)} IOTA
+                                    {:else if item.label == 'StakedIota'}
+                                        {item.label}: {nanoToIota(item.data?.fields?.principal)} IOTA
+                                    {:else if item.label == 'TimelockedStakedIota'}
                                         {item.label}: {nanoToIota(
-                                            item.data?.fields?.balance,
-                                        )} IOTA
-                                    {:else if item.label == "StakedIota"}
-                                        {item.label}: {nanoToIota(
-                                            item.data?.fields?.principal,
-                                        )} IOTA
-                                    {:else if item.label == "TimelockedStakedIota"}
-                                        {item.label}: {nanoToIota(
-                                            item.data.fields.staked_iota.fields
-                                                .principal,
+                                            item.data.fields.staked_iota.fields.principal,
                                         )} IOTA
                                     {:else}
                                         {item.label}
@@ -213,7 +155,7 @@
                                 {#if account.address !== item.currentOwner}
                                     <div>
                                         from: {item.currentOwner.slice(0, 6) +
-                                            "..." +
+                                            '...' +
                                             item.currentOwner.slice(-4)}
                                     </div>
                                 {/if}
@@ -221,9 +163,8 @@
                             <div class="item">
                                 <details>
                                     <summary>Show object data</summary>
-                                    <pre
-                                        style="font-size:0.7rem;  text-align: left;">
-                                    {"\n" + JSON.stringify(item.data, null, 2)}
+                                    <pre style="font-size:0.7rem;  text-align: left;">
+                                    {'\n' + JSON.stringify(item.data, null, 2)}
                                 </pre>
                                 </details>
                             </div>

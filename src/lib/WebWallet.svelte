@@ -1,20 +1,14 @@
 <script lang="ts">
-    import {
-        getWallets,
-        isWalletWithRequiredFeatureSet,
-    } from "@iota/wallet-standard";
-    import {
-        iota_wallets,
-        iota_accounts,
-        activeAddress,
-    } from "./SignerData.svelte";
+    import { getWallets, isWalletWithRequiredFeatureSet } from '@iota/wallet-standard';
+
+    import { activeAddress, iota_accounts, iota_wallets } from './SignerData.svelte';
 
     const features = {
-        CONNECT: "standard:connect",
-        EVENTS: "standard:events",
-        SIGN_AND_EXECUTE_TRANSACTION: "iota:signAndExecuteTransaction",
-        SIGN_PERSONAL_MESSAGE: "iota:signPersonalMessage",
-        SIGN_TRANSACTION: "iota:signTransaction",
+        CONNECT: 'standard:connect',
+        EVENTS: 'standard:events',
+        SIGN_AND_EXECUTE_TRANSACTION: 'iota:signAndExecuteTransaction',
+        SIGN_PERSONAL_MESSAGE: 'iota:signPersonalMessage',
+        SIGN_TRANSACTION: 'iota:signTransaction',
     };
 
     function get_wallets() {
@@ -25,11 +19,10 @@
                     .filter((wallet) => {
                         const raw_features = Object.values(features);
                         // console.log(wallet);
-                        let isWalletWithRequired =
-                            isWalletWithRequiredFeatureSet(
-                                wallet,
-                                raw_features,
-                            );
+                        let isWalletWithRequired = isWalletWithRequiredFeatureSet(
+                            wallet,
+                            raw_features,
+                        );
                         // console.log(
                         //     "isWalletWithRequiredFeatureSet",
                         //     isWalletWithRequired,
@@ -50,9 +43,7 @@
                                     signAndExecuteTransaction,
                                 },
                                 // @ts-ignore
-                                [features.SIGN_PERSONAL_MESSAGE]: {
-                                    signPersonalMessage,
-                                },
+                                [features.SIGN_PERSONAL_MESSAGE]: { signPersonalMessage },
                                 // @ts-ignore
                                 [features.SIGN_TRANSACTION]: {
                                     // @ts-ignore
@@ -63,7 +54,7 @@
                             name,
                             version,
                         }) => {
-                            console.log("connect", connect);
+                            console.log('connect', connect);
                             return {
                                 accounts,
                                 chains,
@@ -84,7 +75,7 @@
             console.log(iota_wallets);
             // @ts-ignore
             if (iota_wallets.length == 0) {
-                throw new Error("no web wallet found");
+                throw new Error('no web wallet found');
             }
         } catch (err) {
             console.error(err);
@@ -101,7 +92,7 @@
         let connectResult = await $iota_wallets[0].connect();
         $iota_accounts = connectResult.accounts;
         $activeAddress = connectResult.accounts[0].address;
-        console.log("web wallet connect result", connectResult);
+        console.log('web wallet connect result', connectResult);
         console.log($iota_accounts);
     };
 </script>

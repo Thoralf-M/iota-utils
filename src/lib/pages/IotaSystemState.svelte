@@ -1,10 +1,11 @@
 <script lang="ts">
-    import JSONTree from "@sveltejs/svelte-json-tree";
-    import { getClient } from "../Client.svelte";
-    import type { IotaSystemStateSummary } from "@iota/iota-sdk/client";
+    import type { LatestIotaSystemStateSummary } from '@iota/iota-sdk/client';
+
+    import { getClient } from '../Client.svelte';
+    import JsonToggleView from '../lib/JsonToggleView.svelte';
 
     let value = {};
-    let apiVersion = "";
+    let apiVersion = '';
     let stakeInfo = {
         totalSupply: undefined,
         totalStake: undefined,
@@ -16,7 +17,7 @@
     const getLatestSystemState = async () => {
         try {
             let client = await getClient();
-            apiVersion = (await client.getRpcApiVersion()) || "";
+            apiVersion = (await client.getRpcApiVersion()) || '';
             const systemState = await client.getLatestIotaSystemState();
             console.log(systemState);
             value = formatNumbersWithUnderscores(systemState);
@@ -31,7 +32,7 @@
     const getCandidateValidators = async () => {
         try {
             let client = await getClient();
-            apiVersion = (await client.getRpcApiVersion()) || "";
+            apiVersion = (await client.getRpcApiVersion()) || '';
             const systemState = await client.getLatestIotaSystemState();
 
             stakeInfo = systemStateStake(stakeInfo, systemState);
@@ -48,17 +49,14 @@
                     cursor: nextPageCursor,
                 });
                 for (const candidateValidator of candidateValidatorsPage.data) {
-                    const validatorWrapper = await client.getDynamicFieldObject(
-                        {
-                            parentId: validatorCandidatesId,
-                            name: candidateValidator.name,
-                        },
-                    );
+                    const validatorWrapper = await client.getDynamicFieldObject({
+                        parentId: validatorCandidatesId,
+                        name: candidateValidator.name,
+                    });
                     const validatorV1 = await client.getDynamicFields({
                         parentId:
                             // @ts-ignore
-                            validatorWrapper.data?.content.fields.value.fields
-                                .inner.fields.id.id,
+                            validatorWrapper.data?.content.fields.value.fields.inner.fields.id.id,
                     });
                     const validatorObject = await client.getObject({
                         id: validatorV1.data[0].objectId,
@@ -85,7 +83,7 @@
                 }
             }
             if (validatorCandidates.length == 0) {
-                value = "No candidate validators";
+                value = 'No candidate validators';
             }
             stakeInfo = formatNumbersWithUnderscores(stakeInfo);
         } catch (err: any) {
@@ -96,15 +94,14 @@
     const getPendingValidators = async () => {
         try {
             let client = await getClient();
-            apiVersion = (await client.getRpcApiVersion()) || "";
+            apiVersion = (await client.getRpcApiVersion()) || '';
             const systemState = await client.getLatestIotaSystemState();
 
             stakeInfo = systemStateStake(stakeInfo, systemState);
             // @ts-ignore
             stakeInfo.pendingValidatorsStake = 0;
 
-            const pendingActiveValidatorsId =
-                systemState.pendingActiveValidatorsId;
+            const pendingActiveValidatorsId = systemState.pendingActiveValidatorsId;
 
             let hasNextPage = true;
             let nextPageCursor;
@@ -140,7 +137,7 @@
                 }
             }
             if (pendingValidators.length == 0) {
-                value = "No pending validators";
+                value = 'No pending validators';
             }
             stakeInfo = formatNumbersWithUnderscores(stakeInfo);
         } catch (err: any) {
@@ -148,10 +145,7 @@
             console.error(err);
         }
     };
-    function systemStateStake(
-        stakeInfo: any,
-        systemState: IotaSystemStateSummary,
-    ) {
+    function systemStateStake(stakeInfo: any, systemState: LatestIotaSystemStateSummary) {
         // @ts-ignore
         stakeInfo.totalSupply = parseInt(systemState.iotaTotalSupply);
         // @ts-ignore
@@ -194,76 +188,58 @@
         delete validator.staking_pool.fields.id;
     }
     function formatNumbersWithUnderscores(obj: object): any {
-  // Helper function to add _ as a thousands separator
-  function formatNumber(n: any) {
-    return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '_');
-  }
+        // Helper function to add _ as a thousands separator
+        function formatNumber(n: any) {
+            return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '_');
+        }
 
-  // Recursively process the object
-  function process(value: object): object {
-    if (Array.isArray(value)) {
-      return value.map(process);
-    } else if (value !== null && typeof value === 'object') {
-      const newObj = {};
-      for (const key in value) {
-        // @ts-ignore
-        newObj[key] = process(value[key]);
-      }
-      return newObj;
-    } else if (
-      typeof value === 'number' ||
-      (typeof value === 'string' && /^\d+$/.test(value))
-    ) {
-      return formatNumber(value);
-    } else {
-      return value;
+        // Recursively process the object
+        function process(value: object): object {
+            if (Array.isArray(value)) {
+                return value.map(process);
+            } else if (value !== null && typeof value === 'object') {
+                const newObj = {};
+                for (const key in value) {
+                    // @ts-ignore
+                    newObj[key] = process(value[key]);
+                }
+                return newObj;
+            } else if (
+                typeof value === 'number' ||
+                (typeof value === 'string' && /^\d+$/.test(value))
+            ) {
+                return formatNumber(value);
+            } else {
+                return value;
+            }
+        }
+
+        return process(obj);
     }
-  }
-
-  return process(obj);
-}
-
-    let showJsonTree = true;
 </script>
 
 <main>
-    <button on:click={() => getLatestSystemState()}>
-        get latest IOTA system state
-    </button>
-    <button on:click={() => getCandidateValidators()}>
-        candidate validators
-    </button>
-    <button on:click={() => getPendingValidators()}>
-        pending validators
-    </button>
+    <button on:click={() => getLatestSystemState()}> get latest IOTA system state </button>
+    <button on:click={() => getCandidateValidators()}> candidate validators </button>
+    <button on:click={() => getPendingValidators()}> pending validators </button>
     show full data (set before requesting):
     <select bind:value={showAllValidatorData}>
         <option value={true}>{true}</option>
         <option value={false}>{false}</option>
     </select>
 
-    <div class="value" hidden={Object.keys(value).length == 0}>
+    {#if apiVersion}
         <div>
             API Version: {apiVersion}
         </div>
-        <button on:click={() => (showJsonTree = !showJsonTree)}>
-            toggle JSON tree
-        </button>
-        <div hidden={!showJsonTree}>
-            <JSONTree {value} />
-        </div>
-        <pre hidden={showJsonTree}>{JSON.stringify(value, null, 2)}</pre>
-    </div>
-    <pre class="value" hidden={stakeInfo.totalSupply == 0}>
-        {JSON.stringify(stakeInfo, null, 2)}
+    {/if}
+    <JsonToggleView {value} />
+    <pre class="value" style="text-align: left" hidden={stakeInfo.totalSupply == 0}>
+        {'\n' + JSON.stringify(stakeInfo, null, 2)}
     </pre>
 </main>
 
 <style>
-    .value,
-    pre {
-        text-align: left;
-    }
     button {
         margin: 0.5rem;
     }

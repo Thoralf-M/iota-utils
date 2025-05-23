@@ -1,17 +1,15 @@
 <script lang="ts">
-    import JSONTree from "@sveltejs/svelte-json-tree";
-    import { getClient } from "../Client.svelte";
-    import TransportWebHID from "@ledgerhq/hw-transport-webhid";
-    import IotaLedgerClient from "@iota/ledgerjs-hw-app-iota";
-    import { toB64, toHEX } from "@iota/bcs";
-    import { isValidIotaAddress } from "@iota/iota-sdk/utils";
-    import { Transaction } from "@iota/iota-sdk/transactions";
-    import {
-        messageWithIntent,
-        toSerializedSignature,
-    } from "@iota/iota-sdk/cryptography";
-    import { Ed25519PublicKey } from "@iota/iota-sdk/keypairs/ed25519";
-    import type { IotaClient } from "@iota/iota-sdk/client";
+    import { toB64, toHEX } from '@iota/bcs';
+    import type { IotaClient } from '@iota/iota-sdk/client';
+    import { messageWithIntent, toSerializedSignature } from '@iota/iota-sdk/cryptography';
+    import { Ed25519PublicKey } from '@iota/iota-sdk/keypairs/ed25519';
+    import { Transaction } from '@iota/iota-sdk/transactions';
+    import { isValidIotaAddress } from '@iota/iota-sdk/utils';
+    import IotaLedgerClient from '@iota/ledgerjs-hw-app-iota';
+    import TransportWebHID from '@ledgerhq/hw-transport-webhid';
+
+    import { getClient } from '../Client.svelte';
+    import JsonToggleView from '../lib/JsonToggleView.svelte';
 
     const IOTA_BIP44_COIN_TYPE = 4218;
     const TESTNET_BIP44_COIN_TYPE = 1;
@@ -21,12 +19,12 @@
     let addressIndex = $state(0);
 
     let numberToIncrease = $state(3);
-    let accountOrAddress = $state("account");
+    let accountOrAddress = $state('account');
 
     let dryRun = $state(true);
-    let iotaAmountToSend = $state("1");
-    let senderAddress = $state("");
-    let recipientAddress = $state("");
+    let iotaAmountToSend = $state('1');
+    let senderAddress = $state('');
+    let recipientAddress = $state('');
 
     // Will be updated with the result
     let value = $state({});
@@ -45,7 +43,7 @@
         try {
             ledgerTransport = await TransportWebHID.create();
             console.log(ledgerTransport);
-            value = "connected!";
+            value = 'connected!';
         } catch (err: any) {
             value = err.toString();
             console.error(err);
@@ -58,17 +56,15 @@
             let bip44Path = `m/44'/${coinType}'/${accountIndex}'/${change}'/${addressIndex}'`;
             console.log(bip44Path);
 
-            const exists = accountEntries.some(
-                (entry) => entry.bip44Path === bip44Path,
-            );
+            const exists = accountEntries.some((entry) => entry.bip44Path === bip44Path);
             if (exists) {
                 return;
             }
 
             let result = await ledgerClient.getPublicKey(bip44Path);
             console.log(result);
-            let publicKey = "0x" + toHEX(result.publicKey);
-            let address = "0x" + toHEX(result.address);
+            let publicKey = '0x' + toHEX(result.publicKey);
+            let address = '0x' + toHEX(result.address);
             accountEntries.push({
                 address: address,
                 publicKey: publicKey,
@@ -83,7 +79,7 @@
     }
     async function generateMultipleAddresses() {
         try {
-            if (accountOrAddress == "account") {
+            if (accountOrAddress == 'account') {
                 let finalIndex = accountIndex + numberToIncrease;
                 for (accountIndex; accountIndex < finalIndex; accountIndex++) {
                     await generateAddress();
@@ -119,11 +115,9 @@
         let grouped: GroupedAccounts = [];
 
         for (const address of accountEntries) {
-            const match = address.bip44Path.match(
-                /m\/44'\/\d+'\/(\d+)'\/(\d+)'\/(\d+)'?/,
-            );
+            const match = address.bip44Path.match(/m\/44'\/\d+'\/(\d+)'\/(\d+)'\/(\d+)'?/);
             if (!match) {
-                throw new Error("Invalid BIP44 path:" + address.bip44Path);
+                throw new Error('Invalid BIP44 path:' + address.bip44Path);
             }
             const accountIndex = parseInt(match[1]);
             const change = parseInt(match[2]);
@@ -143,10 +137,7 @@
             grouped[accountIndex].sort((a, b) => a.index - b.index);
         }
 
-        tableAccounts = Object.entries(grouped).map(([key, value]) => [
-            parseInt(key),
-            value,
-        ]);
+        tableAccounts = Object.entries(grouped).map(([key, value]) => [parseInt(key), value]);
     }
     function toggle(index: number) {
         if (expanded.includes(index)) {
@@ -201,16 +192,14 @@
     async function sendAllObjects() {
         try {
             if (!isValidIotaAddress(senderAddress)) {
-                throw new Error("invalid sender address");
+                throw new Error('invalid sender address');
             }
             if (!isValidIotaAddress(recipientAddress)) {
-                throw new Error("invalid recipient address");
+                throw new Error('invalid recipient address');
             }
 
             // Get bip path from previously generated address or use from the input fields
-            let address = accountEntries.find(
-                (addr) => addr.address == senderAddress,
-            );
+            let address = accountEntries.find((addr) => addr.address == senderAddress);
             let bip44Path = address?.bip44Path;
             if (!bip44Path) {
                 bip44Path = `m/44'/${coinType}'/${accountIndex}'/${change}'/${addressIndex}'`;
@@ -226,7 +215,7 @@
                 },
             });
             if (page.data.length == 0) {
-                throw new Error("No objects found");
+                throw new Error('No objects found');
             }
 
             const gasCoinIndex = page.data.findIndex((o) => {
@@ -237,16 +226,13 @@
                 gasCoin = page.data.splice(gasCoinIndex, 1)[0];
             }
             if (!gasCoin) {
-                throw new Error("No gas coin found");
+                throw new Error('No gas coin found');
             }
 
             let objectsToTransfer = page.data.map((o) => o.data?.objectId!);
             // @ts-ignore
             objectsToTransfer.push(tx.gas);
-            tx.transferObjects(
-                objectsToTransfer,
-                tx.pure.address(recipientAddress),
-            );
+            tx.transferObjects(objectsToTransfer, tx.pure.address(recipientAddress));
             await finishTransaction(tx, bip44Path, client);
         } catch (err: any) {
             value = err.toString();
@@ -257,16 +243,14 @@
     async function sendIotaAmount() {
         try {
             if (!isValidIotaAddress(senderAddress)) {
-                throw new Error("invalid sender address");
+                throw new Error('invalid sender address');
             }
             if (!isValidIotaAddress(recipientAddress)) {
-                throw new Error("invalid recipient address");
+                throw new Error('invalid recipient address');
             }
 
             // Get bip path from previously generated address or use from the input fields
-            let address = accountEntries.find(
-                (addr) => addr.address == senderAddress,
-            );
+            let address = accountEntries.find((addr) => addr.address == senderAddress);
             let bip44Path = address?.bip44Path;
             if (!bip44Path) {
                 bip44Path = `m/44'/${coinType}'/${accountIndex}'/${change}'/${addressIndex}'`;
@@ -280,9 +264,7 @@
             });
 
             if (BigInt(balance.totalBalance) < BigInt(iotaAmountToSend)) {
-                throw new Error(
-                    `Not enough balance ${balance.totalBalance}/${iotaAmountToSend}`,
-                );
+                throw new Error(`Not enough balance ${balance.totalBalance}/${iotaAmountToSend}`);
             }
 
             const coins = tx.splitCoins(tx.gas, [BigInt(iotaAmountToSend)]);
@@ -294,11 +276,7 @@
         }
     }
 
-    async function finishTransaction(
-        tx: Transaction,
-        bip44Path: string,
-        client: IotaClient,
-    ) {
+    async function finishTransaction(tx: Transaction, bip44Path: string, client: IotaClient) {
         try {
             tx.setSender(senderAddress);
             const txBytes = await tx.build({ client });
@@ -310,19 +288,15 @@
                 value = dryRunResult;
             } else {
                 const ledgerClient = new IotaLedgerClient(ledgerTransport);
-                let txMessageIntent = messageWithIntent(
-                    "TransactionData",
-                    txBytes,
-                );
+                let txMessageIntent = messageWithIntent('TransactionData', txBytes);
                 const { signature } = await ledgerClient.signTransaction(
                     bip44Path,
                     txMessageIntent,
                 );
-                const { publicKey } =
-                    await ledgerClient.getPublicKey(bip44Path);
+                const { publicKey } = await ledgerClient.getPublicKey(bip44Path);
                 const serializedSignature = toSerializedSignature({
                     signature,
-                    signatureScheme: "ED25519",
+                    signatureScheme: 'ED25519',
                     publicKey: new Ed25519PublicKey(publicKey),
                 });
                 const result = await client.executeTransactionBlock({
@@ -341,7 +315,6 @@
             console.error(err);
         }
     }
-    let showJsonTree = $state(true);
 </script>
 
 <main>
@@ -349,54 +322,31 @@
     <br />
     BIP 44 path: (m/44'/coinType'/accountIndex'/change'/addressIndex')
     <br />
-    <input
-        type="number"
-        list="coinTypes"
-        bind:value={coinType}
-        placeholder="BIP-44 coin type"
-    />
+    <input type="number" list="coinTypes" bind:value={coinType} placeholder="BIP-44 coin type" />
     <datalist id="coinTypes">
         <option value={IOTA_BIP44_COIN_TYPE}>IOTA </option>
         <option value={TESTNET_BIP44_COIN_TYPE}>Testnet </option>
     </datalist>
 
-    <input
-        type="number"
-        min="0"
-        bind:value={accountIndex}
-        placeholder="account index"
-    />
+    <input type="number" min="0" bind:value={accountIndex} placeholder="account index" />
     <select bind:value={change}>
         <option value={0}>0</option>
         <option value={1}>1</option>
     </select>
-    <input
-        type="number"
-        width="1"
-        min="0"
-        bind:value={addressIndex}
-        placeholder="address index"
-    />
+    <input type="number" width="1" min="0" bind:value={addressIndex} placeholder="address index" />
 
     <button onclick={() => generateAddress()}> generate address </button>
     <br />
 
     increase
     <select bind:value={accountOrAddress}>
-        <option value={"account"}>account</option>
-        <option value={"address"}>address</option>
+        <option value={'account'}>account</option>
+        <option value={'address'}>address</option>
     </select>
     index by:
-    <input
-        type="number"
-        min="1"
-        bind:value={numberToIncrease}
-        placeholder="number to generate"
-    />
+    <input type="number" min="1" bind:value={numberToIncrease} placeholder="number to generate" />
 
-    <button onclick={() => generateMultipleAddresses()}>
-        generate multiple addresses
-    </button>
+    <button onclick={() => generateMultipleAddresses()}> generate multiple addresses </button>
 
     <hr />
     <button onclick={() => getAllBalances(true)}> get unknown balances </button>
@@ -427,12 +377,7 @@
     </select>
     <button onclick={() => sendAllObjects()}> send all objects </button>
     IOTA amount(in Nanos) to send:
-    <input
-        type="number"
-        min="0"
-        bind:value={iotaAmountToSend}
-        placeholder="IOTA amount to send"
-    />
+    <input type="number" min="0" bind:value={iotaAmountToSend} placeholder="IOTA amount to send" />
     <button onclick={() => sendIotaAmount()}> send IOTA </button>
 
     <hr />
@@ -440,7 +385,7 @@
         onclick={() => {
             accountEntries = [];
             tableAccounts = [];
-            value = "";
+            value = '';
         }}
     >
         clear address list
@@ -461,20 +406,7 @@
     >
         collapse all
     </button>
-    <div
-        class="value"
-        hidden={Object.keys(value).length == 0 ||
-            // @ts-ignore
-            value.length == 0}
-    >
-        <button onclick={() => (showJsonTree = !showJsonTree)}>
-            toggle JSON tree
-        </button>
-        <div hidden={!showJsonTree}>
-            <JSONTree {value} />
-        </div>
-        <pre hidden={showJsonTree}>{JSON.stringify(value, null, 2)}</pre>
-    </div>
+    <JsonToggleView {value} />
     <style>
         table {
             width: 100%;
@@ -510,11 +442,7 @@
             {#each tableAccounts as [index, addresses]}
                 <tr class="clickable" onclick={() => toggle(index)}>
                     <td>Account {index} (addresses: {addresses.length})</td>
-                    <td
-                        >{isExpanded(index)
-                            ? "▼ Click to collapse"
-                            : "▶ Click to expand"}</td
-                    >
+                    <td>{isExpanded(index) ? '▼ Click to collapse' : '▶ Click to expand'}</td>
                 </tr>
                 {#if isExpanded(index)}
                     <tr>
@@ -550,10 +478,6 @@
 </main>
 
 <style>
-    .value,
-    pre {
-        text-align: left;
-    }
     button {
         margin: 0.5rem;
     }

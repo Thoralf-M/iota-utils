@@ -1,20 +1,13 @@
 <script lang="ts">
-    import { Transaction } from "@iota/iota-sdk/transactions";
-    import JSONTree from "@sveltejs/svelte-json-tree";
-    import { getClient } from "../Client.svelte";
-    import {
-        activeAddress,
-        iota_accounts,
-        iota_wallets,
-    } from "../SignerData.svelte";
-    import {
-        IOTA_SYSTEM_STATE_OBJECT_ID,
-        isValidIotaAddress,
-    } from "@iota/iota-sdk/utils";
-    import type { IotaObjectData } from "@iota/iota-sdk/client";
+    import type { IotaObjectData } from '@iota/iota-sdk/client';
+    import { Transaction } from '@iota/iota-sdk/transactions';
+    import { IOTA_SYSTEM_STATE_OBJECT_ID, isValidIotaAddress } from '@iota/iota-sdk/utils';
 
-    let validatorAddress =
-        "0x111111111504e9350e635d65cd38ccd2c029434c6a3a480d8947a9ba6a15b215";
+    import { getClient } from '../Client.svelte';
+    import JsonToggleView from '../lib/JsonToggleView.svelte';
+    import { activeAddress, iota_accounts, iota_wallets } from '../SignerData.svelte';
+
+    let validatorAddress = '0x111111111504e9350e635d65cd38ccd2c029434c6a3a480d8947a9ba6a15b215';
     const minStakeAmount = 1000000000;
     let amount = minStakeAmount;
     // Will be updated with the result
@@ -23,12 +16,12 @@
     const stake = async () => {
         try {
             if (!isValidIotaAddress(validatorAddress)) {
-                throw new Error("invalid address");
+                throw new Error('invalid address');
             }
             const tx = new Transaction();
             const stakeCoin = tx.splitCoins(tx.gas, [amount]);
             tx.moveCall({
-                target: "0x3::iota_system::request_add_stake",
+                target: '0x3::iota_system::request_add_stake',
                 arguments: [
                     tx.sharedObjectRef({
                         objectId: IOTA_SYSTEM_STATE_OBJECT_ID,
@@ -48,16 +41,14 @@
                     showObjectChanges: true,
                     showBalanceChanges: true,
                 },
-                account: $iota_accounts.filter(
-                    (account) => account.address == $activeAddress,
-                )[0],
+                account: $iota_accounts.filter((account) => account.address == $activeAddress)[0],
             });
             console.log(txResult);
             value = txResult;
             let client = await getClient();
             // result = JSON.stringify(txResult, null, 2);
             client.waitForTransaction({ digest: txResult.digest }).then(() => {
-                console.log("tx block available via api");
+                console.log('tx block available via api');
             });
         } catch (err: any) {
             value = err.toString();
@@ -70,29 +61,28 @@
         let ownedObjectPage = await client.getOwnedObjects({
             owner: $activeAddress,
             filter: {
-                StructType:
-                    "0x2::timelock::TimeLock<0x2::balance::Balance<0x2::iota::IOTA>>",
+                StructType: '0x2::timelock::TimeLock<0x2::balance::Balance<0x2::iota::IOTA>>',
             },
             options: {
                 showContent: true,
             },
         });
         if (ownedObjectPage.data.length == 0) {
-            throw new Error("no timelocked object found");
+            throw new Error('no timelocked object found');
         }
         return ownedObjectPage.data.map((d) => d.data!);
     };
     const stakeAllTimelockedObjects = async () => {
         try {
             if (!isValidIotaAddress(validatorAddress)) {
-                throw new Error("invalid address");
+                throw new Error('invalid address');
             }
             const tx = new Transaction();
             let timelockedObjects = await getTimelockedObjects();
 
             for (const timelockedObject of timelockedObjects) {
                 tx.moveCall({
-                    target: "0x3::timelocked_staking::request_add_stake",
+                    target: '0x3::timelocked_staking::request_add_stake',
                     arguments: [
                         tx.sharedObjectRef({
                             objectId: IOTA_SYSTEM_STATE_OBJECT_ID,
@@ -125,46 +115,34 @@
                     showObjectChanges: true,
                     showBalanceChanges: true,
                 },
-                account: $iota_accounts.filter(
-                    (account) => account.address == $activeAddress,
-                )[0],
+                account: $iota_accounts.filter((account) => account.address == $activeAddress)[0],
             });
             const client = await getClient();
             console.log(txResult);
             value = txResult;
             // result = JSON.stringify(txResult, null, 2);
             client.waitForTransaction({ digest: txResult.digest }).then(() => {
-                console.log("tx block available via api");
+                console.log('tx block available via api');
             });
         } catch (err: any) {
             value = err.toString();
             console.error(err);
         }
     };
-    let showJsonTree = true;
 </script>
 
 <main>
-    It's only possible to stake to a candidate or active/committee validator,
-    pending is not possible.
+    It's only possible to stake to a candidate or active/committee validator, pending is not
+    possible.
     <br />
     <span>
         validator address:
-        <input
-            bind:value={validatorAddress}
-            placeholder="validator address 0x..."
-            size="67"
-        />
+        <input bind:value={validatorAddress} placeholder="validator address 0x..." size="67" />
     </span>
     <br />
     <span>
         amount (min 1 IOTA):
-        <input
-            type="number"
-            bind:value={amount}
-            placeholder="amount"
-            min="minStakeAmount"
-        />
+        <input type="number" bind:value={amount} placeholder="amount" min="minStakeAmount" />
     </span>
     <br />
 
@@ -183,26 +161,12 @@
     >
         list timelocked objects
     </button>
-    <button on:click={() => stakeAllTimelockedObjects()}>
-        stake all timelocked objects
-    </button>
+    <button on:click={() => stakeAllTimelockedObjects()}> stake all timelocked objects </button>
 
-    <div class="value" hidden={Object.keys(value).length == 0}>
-        <button on:click={() => (showJsonTree = !showJsonTree)}>
-            toggle JSON tree
-        </button>
-        <div hidden={!showJsonTree}>
-            <JSONTree {value} />
-        </div>
-        <pre hidden={showJsonTree}>{JSON.stringify(value, null, 2)}</pre>
-    </div>
+    <JsonToggleView {value} />
 </main>
 
 <style>
-    .value,
-    pre {
-        text-align: left;
-    }
     button {
         margin: 0.5rem;
     }

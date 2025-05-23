@@ -1,15 +1,15 @@
 <script lang="ts">
-    import { isValidIotaAddress } from "@iota/iota-sdk/utils";
     import {
+        getFaucetRequestStatus,
         requestIotaFromFaucetV0,
         requestIotaFromFaucetV1,
-        getFaucetRequestStatus,
-    } from "@iota/iota-sdk/faucet";
-    import JSONTree from "@sveltejs/svelte-json-tree";
+    } from '@iota/iota-sdk/faucet';
+    import { isValidIotaAddress } from '@iota/iota-sdk/utils';
 
-    let address =
-        "0x111111111504e9350e635d65cd38ccd2c029434c6a3a480d8947a9ba6a15b215";
-    let faucetUrl = "https://faucet.testnet.iota.cafe/gas";
+    import JsonToggleView from '../lib/JsonToggleView.svelte';
+
+    let address = '0x111111111504e9350e635d65cd38ccd2c029434c6a3a480d8947a9ba6a15b215';
+    let faucetUrl = 'https://faucet.testnet.iota.cafe/gas';
     let value = {};
     let amountOfRequests = 1;
     let msBetweenRequests = 1000;
@@ -18,15 +18,13 @@
         for (let i = 0; i < amountOfRequests; i++) {
             requestFunds();
             // Just wait some time and don't await on the requestFunds function to get more requests faster
-            await new Promise((resolve) =>
-                setTimeout(resolve, msBetweenRequests),
-            );
+            await new Promise((resolve) => setTimeout(resolve, msBetweenRequests));
         }
     };
     const requestFunds = async () => {
         try {
             if (!isValidIotaAddress(address)) {
-                throw new Error("invalid address");
+                throw new Error('invalid address');
             }
             // Try batched request and switch to single request in case of an error
             try {
@@ -38,7 +36,7 @@
                 let taskId = response.task?.taskId;
 
                 if (error || !taskId) {
-                    throw new Error(error ?? "Failed, task id not found.");
+                    throw new Error(error ?? 'Failed, task id not found.');
                 }
 
                 console.log(taskId);
@@ -69,7 +67,6 @@
             console.error(err);
         }
     };
-    let showJsonTree = true;
 </script>
 
 <main>
@@ -83,19 +80,11 @@
             placeholder="faucet URL, like http://127.0.0.1:9123/gas"
         />
         <datalist id="faucetUrls">
-            <option value={"http://127.0.0.1:9123/gas"}>Localnet </option>
-            <option value={"https://faucet.testnet.iota.cafe/gas"}
-                >Testnet
-            </option>
-            <option value={"https://faucet.testnet.iota.cafe/gas"}
-                >Testnet
-            </option>
-            <option value={"https://faucet.devnet.iota.cafe/gas"}
-                >Devnet
-            </option>
-            <option value={"https://faucet.iota-rebased-alphanet.iota.cafe/gas"}
-                >Alphanet
-            </option>
+            <option value={'http://127.0.0.1:9123/gas'}>Localnet </option>
+            <option value={'https://faucet.testnet.iota.cafe/gas'}>Testnet </option>
+            <option value={'https://faucet.testnet.iota.cafe/gas'}>Testnet </option>
+            <option value={'https://faucet.devnet.iota.cafe/gas'}>Devnet </option>
+            <option value={'https://faucet.iota-rebased-alphanet.iota.cafe/gas'}>Alphanet </option>
         </datalist>
     </span>
     <br />
@@ -106,42 +95,20 @@
     <br />
     <span>
         amount of requests:
-        <input
-            type="number"
-            bind:value={amountOfRequests}
-            placeholder="1"
-            size="4"
-        />
+        <input type="number" bind:value={amountOfRequests} placeholder="1" size="4" />
     </span>
     <span>
         milliseconds between requests:
-        <input
-            type="number"
-            bind:value={msBetweenRequests}
-            placeholder="1000"
-            size="4"
-        />
+        <input type="number" bind:value={msBetweenRequests} placeholder="1000" size="4" />
     </span>
     <br />
 
     <button on:click={() => requestFundsLoop()}> Request funds </button>
 
-    <div class="value" hidden={Object.keys(value).length == 0}>
-        <button on:click={() => (showJsonTree = !showJsonTree)}>
-            toggle JSON tree
-        </button>
-        <div hidden={!showJsonTree}>
-            <JSONTree {value} />
-        </div>
-        <pre hidden={showJsonTree}>{JSON.stringify(value, null, 2)}</pre>
-    </div>
+    <JsonToggleView {value} />
 </main>
 
 <style>
-    .value,
-    pre {
-        text-align: left;
-    }
     button {
         margin: 0.5rem;
     }

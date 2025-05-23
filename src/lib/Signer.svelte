@@ -1,17 +1,13 @@
 <script lang="ts">
-    import WebWallet from "./WebWallet.svelte";
-    import { onMount } from "svelte";
-    import {
-        activeAddress,
-        iota_accounts,
-        iota_wallets,
-    } from "./SignerData.svelte";
-    import { decodeIotaPrivateKey, Keypair } from "@iota/iota-sdk/cryptography";
-    import { Ed25519Keypair } from "@iota/iota-sdk/keypairs/ed25519";
-    import { Secp256k1Keypair } from "@iota/iota-sdk/keypairs/secp256k1";
-    import { Secp256r1Keypair } from "@iota/iota-sdk/keypairs/secp256r1";
-    import { getClient } from "./Client.svelte";
-    import { showSettings } from "./Client.svelte";
+    import { decodeIotaPrivateKey, Keypair } from '@iota/iota-sdk/cryptography';
+    import { Ed25519Keypair } from '@iota/iota-sdk/keypairs/ed25519';
+    import { Secp256k1Keypair } from '@iota/iota-sdk/keypairs/secp256k1';
+    import { Secp256r1Keypair } from '@iota/iota-sdk/keypairs/secp256r1';
+    import { onMount } from 'svelte';
+
+    import { getClient, showSettings } from './Client.svelte';
+    import { activeAddress, iota_accounts, iota_wallets } from './SignerData.svelte';
+    import WebWallet from './WebWallet.svelte';
 
     class PrivateKeyAccount {
         privKey: string;
@@ -36,19 +32,19 @@
     }
 
     enum Signer {
-        WebWallet = "WebWallet",
-        Localstorage = "Localstorage",
+        WebWallet = 'WebWallet',
+        Localstorage = 'Localstorage',
     }
-    let selectedSigner: Signer = $state(
-        (localStorage.getItem("selectedSigner")! as Signer) || Signer.WebWallet,
-    );
+    let initialSelectedSigner =
+        (localStorage.getItem('selectedSigner')! as Signer) || Signer.WebWallet;
+    let selectedSigner: Signer = $state(initialSelectedSigner);
     function updateSelectedSignerAccounts() {
-        localStorage.setItem("selectedSigner", selectedSigner);
+        localStorage.setItem('selectedSigner', selectedSigner);
         if (selectedSigner == Signer.Localstorage) {
             updateAccountsWithPrivateKeys(privateKeys);
         } else {
             $iota_accounts = [];
-            $activeAddress = "";
+            $activeAddress = '';
         }
     }
 
@@ -65,17 +61,14 @@
         bech32PrivateKeys: string[];
     }
 
-    let privateKeys: PrivateKeys = JSON.parse(
-        localStorage.getItem("privateKeys")!,
-    ) || {
-        selected:
-            "iotaprivkey1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqgfjx8t",
+    let privateKeys: PrivateKeys = JSON.parse(localStorage.getItem('privateKeys')!) || {
+        selected: 'iotaprivkey1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqgfjx8t',
         bech32PrivateKeys: [
-            "iotaprivkey1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqgfjx8t",
+            'iotaprivkey1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqgfjx8t',
         ],
     };
     // Init the first time if localstorage is selected
-    if (selectedSigner == Signer.Localstorage) {
+    if (initialSelectedSigner == Signer.Localstorage) {
         updateAccountsWithPrivateKeys(privateKeys);
     }
 
@@ -84,20 +77,17 @@
         try {
             privateKeys = JSON.parse(jsonPrivateKeysString);
             if (
-                !privateKeys.hasOwnProperty("selected") ||
-                !privateKeys.hasOwnProperty("bech32PrivateKeys")
+                !privateKeys.hasOwnProperty('selected') ||
+                !privateKeys.hasOwnProperty('bech32PrivateKeys')
             ) {
                 alert(`Missing "selected" or "bech32PrivateKeys" keys`);
             } else {
                 updateAccountsWithPrivateKeys(privateKeys);
-                localStorage.setItem(
-                    "privateKeys",
-                    JSON.stringify(privateKeys),
-                );
+                localStorage.setItem('privateKeys', JSON.stringify(privateKeys));
                 jsonPrivateKeysString = JSON.stringify(privateKeys, null, 2);
             }
         } catch (e) {
-            console.error("Invalid JSON", e);
+            console.error('Invalid JSON', e);
         }
     }
     function updateAccountsWithPrivateKeys(privateKeys: PrivateKeys) {
@@ -110,10 +100,7 @@
         if ($iota_accounts.length == 0) {
             return;
         }
-        if (
-            typeof privateKeys.selected == "undefined" ||
-            privateKeys.selected == ""
-        ) {
+        if (typeof privateKeys.selected == 'undefined' || privateKeys.selected == '') {
             if ($activeAddress.length != 66) {
                 // @ts-ignore
                 privateKeys.selected = $iota_accounts[0].privKey;
@@ -129,14 +116,12 @@
                 // @ts-ignore
                 (a) => a.privKey == privateKeys.selected,
             );
-            if (typeof exists == "undefined") {
+            if (typeof exists == 'undefined') {
                 // @ts-ignore
                 privateKeys.selected = $iota_accounts[0].privKey;
             }
         }
-        $activeAddress = keypairFromBech32PrivateKey(
-            privateKeys.selected,
-        ).toIotaAddress();
+        $activeAddress = keypairFromBech32PrivateKey(privateKeys.selected).toIotaAddress();
         // This is a hack to get the signer working with the same interface as the web wallet, should be refactored
         // @ts-ignore
         $iota_wallets[0] = new PrivateKeyAccount(privateKeys.selected);
@@ -147,11 +132,11 @@
         const schema = decoded.schema;
         const secretKey = decoded.secretKey;
         switch (schema) {
-            case "ED25519":
+            case 'ED25519':
                 return Ed25519Keypair.fromSecretKey(secretKey);
-            case "Secp256k1":
+            case 'Secp256k1':
                 return Secp256k1Keypair.fromSecretKey(secretKey);
-            case "Secp256r1":
+            case 'Secp256r1':
                 return Secp256r1Keypair.fromSecretKey(secretKey);
             default:
                 throw new Error(`Invalid keypair schema ${schema}`);
@@ -161,58 +146,54 @@
 
 <WebWallet bind:this={webWalletComponent} />
 
-<p>
-    Signer:
-    <select
-        bind:value={selectedSigner}
-        onchange={() => updateSelectedSignerAccounts()}
-    >
-        {#each Object.values(Signer) as signer}
-            <option value={signer}>{signer}</option>
-        {/each}
-    </select>
-    {#if selectedSigner == Signer.WebWallet}
-        <button onclick={() => connectWallet()}> Connect wallet </button>
-    {/if}
+<main>
+    <p>
+        Signer:
+        <select bind:value={selectedSigner} onchange={() => updateSelectedSignerAccounts()}>
+            {#each Object.values(Signer) as signer}
+                <option value={signer}>{signer}</option>
+            {/each}
+        </select>
+        {#if selectedSigner == Signer.WebWallet}
+            <button onclick={() => connectWallet()}> Connect wallet </button>
+        {/if}
 
-    <select
-        bind:value={$activeAddress}
-        onchange={() => {
-            activeAddress.set($activeAddress);
-            if (selectedSigner == Signer.Localstorage) {
-                privateKeys.selected = $iota_accounts.find(
-                    (a) => a.address == $activeAddress,
+        <select
+            bind:value={$activeAddress}
+            onchange={() => {
+                activeAddress.set($activeAddress);
+                if (selectedSigner == Signer.Localstorage) {
+                    privateKeys.selected = $iota_accounts.find(
+                        (a) => a.address == $activeAddress,
+                        // @ts-ignore
+                    )!.privKey;
+                    // This is a hack to get the signer working with the same interface as the web wallet, should be refactored
                     // @ts-ignore
-                )!.privKey;
-                // This is a hack to get the signer working with the same interface as the web wallet, should be refactored
-                // @ts-ignore
-                $iota_wallets[0] = new PrivateKeyAccount(privateKeys.selected);
-                localStorage.setItem(
-                    "privateKeys",
-                    JSON.stringify(privateKeys),
-                );
-                jsonPrivateKeysString = JSON.stringify(privateKeys, null, 2);
-            }
-        }}
-    >
-        {#each $iota_accounts as account}
-            <option value={account.address}>
-                {account.address}
-            </option>
-        {/each}
-    </select>
-    <button
-        onclick={() => {
-            navigator.clipboard.writeText($activeAddress);
-        }}>Copy active address</button
-    >
-</p>
+                    $iota_wallets[0] = new PrivateKeyAccount(privateKeys.selected);
+                    localStorage.setItem('privateKeys', JSON.stringify(privateKeys));
+                    jsonPrivateKeysString = JSON.stringify(privateKeys, null, 2);
+                }
+            }}
+        >
+            {#each $iota_accounts as account}
+                <option value={account.address}>
+                    {account.address}
+                </option>
+            {/each}
+        </select>
+        <button
+            onclick={() => {
+                navigator.clipboard.writeText($activeAddress);
+            }}>Copy active address</button
+        >
+    </p>
 
-{#if selectedSigner == Signer.Localstorage && $showSettings}
-    <textarea
-        bind:value={jsonPrivateKeysString}
-        oninput={handlePrivateKeysChange}
-        rows="8"
-        cols="100"
-    ></textarea>
-{/if}
+    {#if selectedSigner == Signer.Localstorage && $showSettings}
+        <textarea
+            bind:value={jsonPrivateKeysString}
+            oninput={handlePrivateKeysChange}
+            rows="8"
+            cols="100"
+        ></textarea>
+    {/if}
+</main>

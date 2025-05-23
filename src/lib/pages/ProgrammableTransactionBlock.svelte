@@ -1,16 +1,13 @@
 <script lang="ts">
-    import { Transaction } from "@iota/iota-sdk/transactions";
-    import JSONTree from "@sveltejs/svelte-json-tree";
-    import { getClient } from "../Client.svelte";
-    import {
-        activeAddress,
-        iota_accounts,
-        iota_wallets,
-    } from "../SignerData.svelte";
-    import { basicSetup, EditorView } from "codemirror";
-    import { javascript } from "@codemirror/lang-javascript";
-    import { githubDark } from "@uiw/codemirror-theme-github";
-    import { onMount } from "svelte";
+    import { javascript } from '@codemirror/lang-javascript';
+    import { Transaction } from '@iota/iota-sdk/transactions';
+    import { githubDark } from '@uiw/codemirror-theme-github';
+    import { basicSetup, EditorView } from 'codemirror';
+    import { onMount } from 'svelte';
+
+    import { getClient } from '../Client.svelte';
+    import JsonToggleView from '../lib/JsonToggleView.svelte';
+    import { activeAddress, iota_accounts, iota_wallets } from '../SignerData.svelte';
 
     interface CodeSnippets {
         selected: string;
@@ -22,11 +19,11 @@
     }
 
     let codeSnippets: CodeSnippets = $state(
-        JSON.parse(localStorage.getItem("codeSnippets")!) || {
-            selected: "default",
+        JSON.parse(localStorage.getItem('codeSnippets')!) || {
+            selected: 'default',
             snippets: [
                 {
-                    name: "default",
+                    name: 'default',
                     code: `let tx = new Transaction();
 // Build you tx here...
 
@@ -53,7 +50,7 @@
     );
 
     function saveCodeSnippetsToLocalstorage() {
-        localStorage.setItem("codeSnippets", JSON.stringify(codeSnippets));
+        localStorage.setItem('codeSnippets', JSON.stringify(codeSnippets));
     }
 
     let codeEditor: HTMLDivElement;
@@ -73,8 +70,7 @@
                         let index = codeSnippets.snippets.findIndex(
                             (e) => e.name == codeSnippets.selected,
                         );
-                        codeSnippets.snippets[index].code =
-                            codeEditorView.state.doc.toString();
+                        codeSnippets.snippets[index].code = codeEditorView.state.doc.toString();
                         saveCodeSnippetsToLocalstorage();
                     }
                 }),
@@ -92,12 +88,12 @@
 
     async function devInspect() {
         let tx = (await buildTransaction())!;
-        console.log("devInspect", tx);
+        console.log('devInspect', tx);
         let client = await getClient();
         const devInspectResult = await client.devInspectTransactionBlock({
             sender:
                 $activeAddress ||
-                "0x0000000000000000000000000000000000000000000000000000000000000000",
+                '0x0000000000000000000000000000000000000000000000000000000000000000',
             transactionBlock: tx,
         });
         console.log(devInspectResult);
@@ -106,11 +102,10 @@
 
     async function dryRun() {
         let tx = (await buildTransaction())!;
-        console.log("dryRun", tx);
+        console.log('dryRun', tx);
         let client = await getClient();
         tx.setSender(
-            $activeAddress ||
-                "0x0000000000000000000000000000000000000000000000000000000000000000",
+            $activeAddress || '0x0000000000000000000000000000000000000000000000000000000000000000',
         );
         const bytes = await tx.build({ client });
         const dryRunResult = await client.dryRunTransactionBlock({
@@ -123,7 +118,7 @@
     async function execute() {
         try {
             let tx = (await buildTransaction())!;
-            console.log("execute", tx);
+            console.log('execute', tx);
             // @ts-ignore
             let txResult = await $iota_wallets[0].signAndExecuteTransaction({
                 transaction: tx,
@@ -132,16 +127,14 @@
                     showObjectChanges: true,
                     showBalanceChanges: true,
                 },
-                account: $iota_accounts.filter(
-                    (account) => account.address == $activeAddress,
-                )[0],
+                account: $iota_accounts.filter((account) => account.address == $activeAddress)[0],
             });
             console.log(txResult);
             value = txResult;
             let client = await getClient();
             // result = JSON.stringify(txResult, null, 2);
             client.waitForTransaction({ digest: txResult.digest }).then(() => {
-                console.log("tx block available via api");
+                console.log('tx block available via api');
             });
         } catch (err: any) {
             value = err.toString();
@@ -149,11 +142,8 @@
         }
     }
 
-    let showJsonTree = $state(true);
-
     let activeCode = $state(
-        codeSnippets.snippets.find((e) => e.name == codeSnippets.selected)
-            ?.code || "",
+        codeSnippets.snippets.find((e) => e.name == codeSnippets.selected)?.code || '',
     );
 
     async function buildTransaction(): Promise<Transaction | undefined> {
@@ -163,7 +153,7 @@
             const client = await getClient();
             const scope = { Transaction, client };
             return new Function(
-                "scope",
+                'scope',
                 `with(scope) {
                 return (async function() {
                     try {
@@ -176,16 +166,14 @@
                 }`,
             )(scope);
         } catch (error: any) {
-            alert("Error in code: " + error.message);
+            alert('Error in code: ' + error.message);
         }
     }
 
-    let inputCodeSnippetName = $state("");
+    let inputCodeSnippetName = $state('');
     let showPreview = $state(false);
     function replaceCode(codeSnippetName: string) {
-        activeCode = codeSnippets.snippets.find(
-            (e) => e.name == codeSnippetName,
-        )!.code;
+        activeCode = codeSnippets.snippets.find((e) => e.name == codeSnippetName)!.code;
         codeSnippets.selected = codeSnippetName;
         saveCodeSnippetsToLocalstorage();
         codeEditorView.dispatch({
@@ -200,58 +188,51 @@
         if (inputCodeSnippetName.length == 0) {
             inputCodeSnippetName = codeSnippets.snippets.length.toString();
         }
-        let existingIndex = codeSnippets.snippets.findIndex(
-            (e) => e.name == inputCodeSnippetName,
-        );
+        let existingIndex = codeSnippets.snippets.findIndex((e) => e.name == inputCodeSnippetName);
         if (existingIndex > -1) {
-            value = "Name already exists";
-            throw "Name already exists";
+            value = 'Name already exists';
+            throw 'Name already exists';
         }
         codeSnippets.snippets.push({
             name: inputCodeSnippetName,
             code: codeEditorView.state.doc.toString(),
         });
         codeSnippets.selected = inputCodeSnippetName;
-        inputCodeSnippetName = "";
+        inputCodeSnippetName = '';
         saveCodeSnippetsToLocalstorage();
     }
     function renameCodeSnippet() {
         if (inputCodeSnippetName.length == 0) {
-            alert!("insert a new name first");
+            alert!('insert a new name first');
         } else {
             let existingIndex = codeSnippets.snippets.findIndex(
                 (e) => e.name == inputCodeSnippetName,
             );
             if (existingIndex > -1) {
-                value = "Name already exists";
-                throw "Name already exists";
+                value = 'Name already exists';
+                throw 'Name already exists';
             }
-            let index = codeSnippets.snippets.findIndex(
-                (e) => e.name == codeSnippets.selected,
-            );
+            let index = codeSnippets.snippets.findIndex((e) => e.name == codeSnippets.selected);
             codeSnippets.snippets[index].name = inputCodeSnippetName;
             codeSnippets.selected = inputCodeSnippetName;
-            inputCodeSnippetName = "";
+            inputCodeSnippetName = '';
             saveCodeSnippetsToLocalstorage();
         }
     }
     function deleteCodeSnippet() {
         if (inputCodeSnippetName.length == 0) {
-            alert!("insert a name to delete first");
+            alert!('insert a name to delete first');
         } else {
             if (codeSnippets.snippets.length == 1) {
-                value = "at least one code snippet is required";
-                throw new Error("at least one code snippet is required");
+                value = 'at least one code snippet is required';
+                throw new Error('at least one code snippet is required');
             }
-            let index = codeSnippets.snippets.findIndex(
-                (e) => e.name == inputCodeSnippetName,
-            );
+            let index = codeSnippets.snippets.findIndex((e) => e.name == inputCodeSnippetName);
             if (index > -1) {
                 codeSnippets.snippets.splice(index, 1);
                 saveCodeSnippetsToLocalstorage();
                 if (inputCodeSnippetName == codeSnippets.selected) {
-                    codeSnippets.selected =
-                        codeSnippets.snippets[0].name || "default";
+                    codeSnippets.selected = codeSnippets.snippets[0].name || 'default';
                 }
             }
         }
@@ -260,10 +241,7 @@
 
 <main>
     <div>
-        <div
-            class="codeSnippet-selection"
-            style="float: left; padding-right: 1em;"
-        >
+        <div class="codeSnippet-selection" style="float: left; padding-right: 1em;">
             <div style="float: left; display:flexbox">
                 <button onclick={addCodeSnippet}> new </button>
                 <button onclick={renameCodeSnippet}> rename </button>
@@ -271,18 +249,10 @@
             </div>
             <br />
             Name:
-            <input
-                bind:value={inputCodeSnippetName}
-                placeholder="string"
-                size="15"
-            />
+            <input bind:value={inputCodeSnippetName} placeholder="string" size="15" />
             <div style="border: 1px solid #dee2e6; ">
                 {#each codeSnippets.snippets as codeSnippet}
-                    <div
-                        class={codeSnippets.selected == codeSnippet.name
-                            ? "active"
-                            : ""}
-                    >
+                    <div class={codeSnippets.selected == codeSnippet.name ? 'active' : ''}>
                         <button
                             onclick={() => replaceCode(codeSnippet.name)}
                             onmouseover={() => {
@@ -290,8 +260,7 @@
                                 codeEditorPreviewView.dispatch({
                                     changes: {
                                         from: 0,
-                                        to: codeEditorPreviewView.state.doc
-                                            .length,
+                                        to: codeEditorPreviewView.state.doc.length,
                                         insert: codeSnippet.code,
                                     },
                                 });
@@ -320,22 +289,10 @@
     <button onclick={dryRun}> dry run </button>
     <button onclick={execute}> execute </button>
 
-    <div class="value" hidden={Object.keys(value).length == 0}>
-        <button onclick={() => (showJsonTree = !showJsonTree)}>
-            toggle JSON tree
-        </button>
-        <div hidden={!showJsonTree}>
-            <JSONTree {value} />
-        </div>
-        <pre hidden={showJsonTree}>{JSON.stringify(value, null, 2)}</pre>
-    </div>
+    <JsonToggleView {value} />
 </main>
 
 <style>
-    .value,
-    pre {
-        text-align: left;
-    }
     button {
         margin: 0.2rem;
     }

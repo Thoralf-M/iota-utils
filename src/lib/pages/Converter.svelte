@@ -1,23 +1,25 @@
 <script lang="ts">
+    import { bcs, fromB58, fromB64, toB58, toB64, toHEX } from '@iota/bcs';
+    import { bcs as IotaBcs } from '@iota/iota-sdk/bcs';
+    import { TransactionDataBuilder } from '@iota/iota-sdk/transactions';
+
+    import { iotaToNano, nanoToIota } from '../lib/iota-nano-conversion';
+    import JsonToggleView from '../lib/JsonToggleView.svelte';
+
     let bytes: any;
-    let hex = "";
-    let base58 = "";
-    let base64 = "";
-    let utf8 = "";
-    let u64 = "";
-    let error = "";
+    let hex = '';
+    let base58 = '';
+    let base64 = '';
+    let utf8 = '';
+    let u64 = '';
+    let error = '';
 
-    let transaction: any;
+    let value: any;
 
-    let nano = "";
-    let nanoWithUnderscore = "";
-    let iota = "";
-    let iotaWithUnderscore = "";
-
-    import { toHEX, fromB58, toB58, fromB64, toB64, bcs } from "@iota/bcs";
-    import { bcs as IotaBcs } from "@iota/iota-sdk/bcs";
-    import { IOTA_DECIMALS } from "@iota/iota-sdk/utils";
-    import { TransactionDataBuilder } from "@iota/iota-sdk/transactions";
+    let nano = '';
+    let nanoWithUnderscore = '';
+    let iota = '';
+    let iotaWithUnderscore = '';
 
     enum SourceType {
         Bytes,
@@ -29,12 +31,12 @@
     }
 
     function convert(source: SourceType) {
-        error = "";
+        error = '';
         try {
             let sourceBytes: any;
             switch (+source) {
                 case SourceType.Bytes:
-                    let bytes_strings = bytes.trim().split(",");
+                    let bytes_strings = bytes.trim().split(',');
                     let parsedBytes = [];
                     for (let byte_string of bytes_strings) {
                         if (Number.isInteger(parseInt(byte_string))) {
@@ -83,11 +85,11 @@
         var re = /^(0[xX])?[A-Fa-f0-9]+$/;
 
         if (!re.test(hex)) {
-            console.error("invalid hex");
-            throw "invalid hex";
+            console.error('invalid hex');
+            throw 'invalid hex';
         }
 
-        if (hex.toLowerCase().startsWith("0x")) {
+        if (hex.toLowerCase().startsWith('0x')) {
             hex = hex.slice(2, hex.length);
         }
         for (var bytes = [], c = 0; c < hex.length; c += 2) {
@@ -107,14 +109,14 @@
     }
 
     function convertToIota() {
-        error = "";
+        error = '';
         try {
             if (nano) {
                 iota = nanoToIota(nano);
-                iotaWithUnderscore = iota.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1_");
-                nanoWithUnderscore = nano.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1_");
+                iotaWithUnderscore = iota.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1_');
+                nanoWithUnderscore = nano.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1_');
             } else {
-                iota = "";
+                iota = '';
             }
         } catch (err: any) {
             error = err;
@@ -122,55 +124,19 @@
     }
 
     function convertToNano() {
-        error = "";
+        error = '';
         try {
             if (iota) {
                 nano = iotaToNano(iota);
-                iotaWithUnderscore = iota.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1_");
-                nanoWithUnderscore = nano.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1_");
+                iotaWithUnderscore = iota.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1_');
+                nanoWithUnderscore = nano.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1_');
             } else {
-                nano = "";
+                nano = '';
             }
         } catch (err: any) {
             error = err;
         }
     }
-    
-function iotaToNano(iota: string): string{
-    const [intPart, decPart = ''] = iota.replace(/_/g, "").split('.');
-    if (decPart.length > 9) {
-        throw new Error('Decimal part exceeds 9 digits');
-    }
-  
-  // Pad or trim the decimal part to 9 digits
-  const paddedDec = (decPart + '0'.repeat(IOTA_DECIMALS)).slice(0, 9);
-  
-  // Combine the parts
-  const combined = intPart + paddedDec;
-  
-  return BigInt(combined).toString();
-}
-
-function formatBigIntWithDecimal(bigint: BigInt, decimalPlaces: number): string {
-  const str = bigint.toString();
-  const len = str.length;
-
-  if (len <= decimalPlaces) {
-    // Pad with zeros on the left if necessary
-    const padded = str.padStart(decimalPlaces, '0');
-    return `0.${padded}`;
-  }
-
-  const intPart = str.slice(0, len - decimalPlaces);
-  const decimalPart = str.slice(len - decimalPlaces);
-  return `${intPart}.${decimalPart}`;
-}
-
-const nanoToIota = (nano: string) => {
-    return formatBigIntWithDecimal(BigInt(nano.replace(/_/g, "")), IOTA_DECIMALS);
-};
-
-
 </script>
 
 <main>
@@ -179,7 +145,7 @@ const nanoToIota = (nano: string) => {
         <div class="box">
             <input
                 type="string"
-                size="160"
+                style="width: 100%;"
                 bind:value={bytes}
                 on:input={() => convert(SourceType.Bytes)}
                 placeholder="bytes like: 1, 2, 3"
@@ -190,7 +156,7 @@ const nanoToIota = (nano: string) => {
         <div class="box">
             <input
                 type="string"
-                size="160"
+                style="width: 100%;"
                 bind:value={hex}
                 on:input={() => convert(SourceType.Hex)}
                 placeholder="hex string"
@@ -201,7 +167,7 @@ const nanoToIota = (nano: string) => {
         <div class="box">
             <input
                 type="string"
-                size="160"
+                style="width: 100%;"
                 bind:value={base64}
                 on:input={() => convert(SourceType.Base64)}
                 placeholder="base64 string"
@@ -212,7 +178,7 @@ const nanoToIota = (nano: string) => {
         <div class="box">
             <input
                 type="string"
-                size="160"
+                style="width: 100%;"
                 bind:value={base58}
                 on:input={() => convert(SourceType.Base58)}
                 placeholder="base58 string"
@@ -223,7 +189,7 @@ const nanoToIota = (nano: string) => {
         <div class="box">
             <input
                 type="string"
-                size="160"
+                style="width: 100%;"
                 bind:value={utf8}
                 on:input={() => convert(SourceType.UTF8)}
                 placeholder="UTF-8 string"
@@ -234,7 +200,7 @@ const nanoToIota = (nano: string) => {
         <div class="box">
             <input
                 type="string"
-                size="160"
+                style="width: 100%;"
                 bind:value={u64}
                 on:input={() => convert(SourceType.U64)}
                 placeholder="u64 number"
@@ -242,9 +208,9 @@ const nanoToIota = (nano: string) => {
         </div>
     </div>
     <br />
-    <div class="wrapper2">
+    <div class="wrapper">
+        <div class="box">NANO:</div>
         <div class="box">
-            NANO:
             <input
                 type="string"
                 size="40"
@@ -254,50 +220,44 @@ const nanoToIota = (nano: string) => {
             />
             {nanoWithUnderscore}
         </div>
+        <div class="box">IOTA:</div>
         <div class="box">
-            IOTA:
             <input
-            type="string"
-            size="40"
-            bind:value={iota}
-            on:input={() => convertToNano()}
-            placeholder="IOTA amount"
+                type="string"
+                size="40"
+                bind:value={iota}
+                on:input={() => convertToNano()}
+                placeholder="IOTA amount"
             />
             {iotaWithUnderscore}
         </div>
     </div>
     <br />
-    <div class="wrapper">
-        <div class="box">Tx bytes base64:</div>
+    <div>
+        <div style="float: left">Tx bytes base64:</div>
         <div class="box">
-            <input
-                type="string"
-                size="160"
+            <textarea
                 on:input={(event) => {
                     // @ts-ignore
                     let inputString = event.target.value;
                     try {
-                        transaction = TransactionDataBuilder.fromBytes(
-                            fromB64(inputString),
-                        );
+                        value = TransactionDataBuilder.fromBytes(fromB64(inputString));
                     } catch (e) {
-                        console.log("error TransactionDataBuilder", e);
+                        console.log('error TransactionDataBuilder', e);
                         try {
-                            transaction = IotaBcs.SenderSignedData.parse(
-                                fromB64(inputString),
-                            );
+                            value = IotaBcs.SenderSignedData.parse(fromB64(inputString));
                         } catch (e) {
-                            console.log("error SenderSignedData", e);
-                            transaction = e;
+                            console.log('error SenderSignedData', e);
+                            value = e;
                         }
                     }
                 }}
                 placeholder="base64 transaction bytes"
-            />
+            ></textarea>
         </div>
     </div>
 
-    <pre>{JSON.stringify(transaction, null, 2)}</pre>
+    <JsonToggleView {value} />
     <br />
     {error}
 </main>
@@ -307,11 +267,13 @@ const nanoToIota = (nano: string) => {
         display: grid;
         grid-template-columns: repeat(2, auto);
         text-align: left;
+        grid-template-columns: auto 1fr; /* label auto, input takes remaining space */
     }
     .box {
         padding: 2px;
     }
-    pre {
-        text-align: left;
+    textarea {
+        width: 100%;
+        height: 100px;
     }
 </style>

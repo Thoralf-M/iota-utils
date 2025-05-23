@@ -1,18 +1,16 @@
 <script lang="ts">
-    import {
-        Ed25519Keypair,
-        Ed25519PublicKey,
-    } from "@iota/iota-sdk/keypairs/ed25519";
-    import { derivePath } from "./ed25519-hd-key";
-    import { decodeIotaPrivateKey } from "@iota/iota-sdk/cryptography";
-    import { fromB64, fromHEX, toB64, toHEX } from "@iota/bcs";
+    import { fromB64, fromHEX, toB64, toHEX } from '@iota/bcs';
+    import { decodeIotaPrivateKey } from '@iota/iota-sdk/cryptography';
+    import { Ed25519Keypair, Ed25519PublicKey } from '@iota/iota-sdk/keypairs/ed25519';
     import {
         entropyToMnemonic,
         generateMnemonic,
         mnemonicToEntropy,
         mnemonicToSeedSync,
-    } from "@scure/bip39";
-    import { wordlist } from "@scure/bip39/wordlists/english";
+    } from '@scure/bip39';
+    import { wordlist } from '@scure/bip39/wordlists/english';
+
+    import { derivePath } from '../lib/ed25519-hd-key';
 
     const IOTA_BIP44_COIN_TYPE = 4218;
     const SHIMMER_BIP44_COIN_TYPE = 4219;
@@ -22,15 +20,15 @@
     let change = 0;
     let addressIndex = 0;
 
-    let mnemonic = "";
-    let mnemonicEntropy = "";
-    let seed = "";
-    let privateKeyBech32 = "";
-    let privateKeyHex = "";
-    let publicKeyBase64 = "";
-    let publicKey = "";
-    let address = "";
-    let error = "";
+    let mnemonic = '';
+    let mnemonicEntropy = '';
+    let seed = '';
+    let privateKeyBech32 = '';
+    let privateKeyHex = '';
+    let publicKeyBase64 = '';
+    let publicKey = '';
+    let address = '';
+    let error = '';
 
     const generate = () => {
         tryCatch(generateInner);
@@ -44,7 +42,7 @@
         tryCatch(generateShortInner);
     };
     const generateShortInner = () => {
-        mnemonic = "";
+        mnemonic = '';
         while (mnemonic.length == 0 || mnemonic.length > 129) {
             mnemonic = generateMnemonic(wordlist, 256);
         }
@@ -70,7 +68,7 @@
     };
     const generateSeedAndAddressInner = () => {
         // empty passphrase
-        seed = toHEX(mnemonicToSeedSync(mnemonic, ""));
+        seed = toHEX(mnemonicToSeedSync(mnemonic, ''));
         generateAddressFromSeed();
     };
 
@@ -102,8 +100,8 @@
     };
     const generateKeysFromBech32PrivateKeyInner = () => {
         const { schema, secretKey } = decodeIotaPrivateKey(privateKeyBech32);
-        if (schema != "ED25519") {
-            throw "unsupported schema: " + schema;
+        if (schema != 'ED25519') {
+            throw 'unsupported schema: ' + schema;
         }
         // use schema to choose the correct key pair
         const keyPair = Ed25519Keypair.fromSecretKey(secretKey);
@@ -113,7 +111,7 @@
     };
 
     const generatePublicKey = (keyPair: Ed25519Keypair) => {
-        error = "";
+        error = '';
         try {
             publicKeyBase64 = toB64(keyPair.getPublicKey().toRawBytes());
             publicKey = toHEX(keyPair.getPublicKey().toRawBytes());
@@ -149,7 +147,7 @@
     };
 
     const tryCatch = (fn: any) => {
-        error = "";
+        error = '';
         try {
             fn();
         } catch (err: any) {
@@ -162,10 +160,7 @@
     };
 
     // Workaround as `Ed25519Keypair.deriveKeypairFromSeed()` is limited to coin type 4218
-    function deriveKeypairFromSeed(
-        seedHex: string,
-        path: string,
-    ): Ed25519Keypair {
+    function deriveKeypairFromSeed(seedHex: string, path: string): Ed25519Keypair {
         const { key } = derivePath(path, seedHex);
         return Ed25519Keypair.fromSecretKey(key);
     }
@@ -175,9 +170,7 @@
     <div>For development purposes only, never use with real funds!</div>
     <br />
     <button on:click={() => generate()}>Generate new</button>
-    <button on:click={() => generateShort()}
-        >Generate new short (&#60;130 chars)</button
-    >
+    <button on:click={() => generateShort()}>Generate new short (&#60;130 chars)</button>
     <input
         type="string"
         size="140"
@@ -233,8 +226,7 @@
         />
     </div>
     <div>
-        Seed:
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input
+        Seed: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input
             type="string"
             size="130"
             bind:value={seed}
@@ -279,8 +271,7 @@
         />
     </div>
     <div>
-        Address:
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{address}
+        Address: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{address}
     </div>
     <br />
     {error}
@@ -291,7 +282,7 @@
         display: flex;
     }
 
-    input[type="number"] {
+    input[type='number'] {
         width: 5rem;
     }
 </style>
