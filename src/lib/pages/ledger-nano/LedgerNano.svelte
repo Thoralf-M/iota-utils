@@ -10,6 +10,7 @@
         IOTA_BIP44_COIN_TYPE,
         sendAllObjects,
         sendIotaAmount,
+        signTxBytes,
         TESTNET_BIP44_COIN_TYPE,
         type AccountEntry,
         type AddressWithIndex,
@@ -28,6 +29,7 @@
     let iotaAmountToSend = $state('1');
     let senderAddress = $state('');
     let recipientAddress = $state('');
+    let txBytesInput = $state('');
 
     // Will be updated with the result
     let value = $state({});
@@ -148,6 +150,22 @@
             console.error(err);
         }
     }
+
+    async function handleSignTxBytes() {
+        try {
+            value = await signTxBytes(
+                txBytesInput,
+                coinType,
+                accountIndex,
+                change,
+                addressIndex,
+                dryRun,
+            );
+        } catch (err: any) {
+            value = err.toString();
+            console.error(err);
+        }
+    }
 </script>
 
 <main>
@@ -212,6 +230,12 @@
     IOTA amount(in Nanos) to send:
     <input type="number" min="0" bind:value={iotaAmountToSend} placeholder="IOTA amount to send" />
     <button onclick={() => handleSendIotaAmount()}> send IOTA </button>
+
+    <hr />
+
+    <div>Tx bytes (base64), signed with the BIP 44 path selected above:</div>
+    <textarea bind:value={txBytesInput} placeholder="base64 transaction bytes"></textarea>
+    <button onclick={() => handleSignTxBytes()}> sign and submit tx bytes </button>
 
     <hr />
     <button
@@ -295,6 +319,10 @@
     }
     input {
         min-width: 6rem;
+    }
+    textarea {
+        width: 100%;
+        height: 100px;
     }
     .inner-table {
         width: 100%;

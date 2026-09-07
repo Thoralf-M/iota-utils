@@ -1,5 +1,5 @@
 // Ledger Nano service functions and types
-import { toHex } from '@iota/bcs';
+import { fromBase64, toHex } from '@iota/bcs';
 import type { IotaClient } from '@iota/iota-sdk/client';
 import { messageWithIntent, toSerializedSignature } from '@iota/iota-sdk/cryptography';
 import { Ed25519PublicKey } from '@iota/iota-sdk/keypairs/ed25519';
@@ -334,6 +334,75 @@ export async function sendIotaAmount(
 }
 
 /**
+ * Sign raw transaction bytes with the Ledger and dry run or submit them
+ */
+export async function signTxBytes(
+    txBytesBase64: string,
+    coinType: number,
+    accountIndex: number,
+    change: number,
+    addressIndex: number,
+    dryRun: boolean = true,
+): Promise<any> {
+    try {
+        const input = txBytesBase64.trim();
+        if (!input) {
+            throw new Error('no transaction bytes');
+        }
+
+        let txBytes: Uint8Array;
+        try {
+            txBytes = fromBase64(input);
+        } catch (err) {
+            throw new Error('invalid base64 transaction bytes');
+        }
+
+        const bip44Path = `m/44'/${coinType}'/${accountIndex}'/${change}'/${addressIndex}'`;
+        const client = getClient();
+
+        if (dryRun) {
+            const dryRunResult = await client.dryRunTransactionBlock({
+                transactionBlock: txBytes,
+            });
+            console.log(dryRunResult);
+            return dryRunResult;
+        }
+
+        const serializedSignature = await signBytesWithLedger(txBytes, bip44Path);
+        const result = await client.executeTransactionBlock({
+            transactionBlock: txBytes,
+            signature: serializedSignature,
+            options: {
+                showBalanceChanges: true,
+                showObjectChanges: true,
+                showEffects: true,
+                showInput: true,
+            },
+        });
+        console.log(result);
+        return result;
+    } catch (err: any) {
+        console.error(err);
+        throw err;
+    }
+}
+
+/**
+ * Sign transaction bytes with the Ledger at the given BIP44 path
+ */
+async function signBytesWithLedger(txBytes: Uint8Array, bip44Path: string): Promise<string> {
+    const ledgerClient = new IotaLedgerClient(ledgerTransport);
+    const txMessageIntent = messageWithIntent('TransactionData', txBytes);
+    const { signature } = await ledgerClient.signTransaction(bip44Path, txMessageIntent);
+    const { publicKey } = await ledgerClient.getPublicKey(bip44Path);
+    return toSerializedSignature({
+        signature,
+        signatureScheme: 'ED25519',
+        publicKey: new Ed25519PublicKey(publicKey),
+    });
+}
+
+/**
  * Finish and execute/sign a transaction
  */
 export async function finishTransaction(
@@ -353,15 +422,7 @@ export async function finishTransaction(
             console.log(dryRunResult);
             return dryRunResult;
         } else {
-            const ledgerClient = new IotaLedgerClient(ledgerTransport);
-            let txMessageIntent = messageWithIntent('TransactionData', txBytes);
-            const { signature } = await ledgerClient.signTransaction(bip44Path, txMessageIntent);
-            const { publicKey } = await ledgerClient.getPublicKey(bip44Path);
-            const serializedSignature = toSerializedSignature({
-                signature,
-                signatureScheme: 'ED25519',
-                publicKey: new Ed25519PublicKey(publicKey),
-            });
+            const serializedSignature = await signBytesWithLedger(txBytes, bip44Path);
             const result = await client.executeTransactionBlock({
                 transactionBlock: txBytes,
                 signature: serializedSignature,
