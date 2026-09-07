@@ -1,5 +1,5 @@
-const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/IotaSystemState-DdQw6YiO.js","assets/disclose-version-CpEJO7r1.js","assets/legacy-DxVWxrJw.js","assets/client-BTFoHz6u.js","assets/keypair-DsT3ivIR.js","assets/JsonToggleView-I_OHyvOi.js","assets/transaction-view-OeA30yKg.js","assets/transaction-view-QnfdbPMt.css","assets/JsonToggleView-fMnnpuwH.css","assets/IotaSystemState-BfNZQdbT.css","assets/Transaction-BNIFJ3qz.js","assets/client-CmDrt-ez.js","assets/page-query-params-DJbo4x4M.js","assets/Transaction-C3qqeLeC.css","assets/Object-Csl7I6rm.js","assets/explorer-links-hyzWVZGi.js","assets/dynamic-fields-huZLT6c7.js","assets/_u64-Dkyx1UQH.js","assets/blake2-O-wgjgc8.js","assets/2025.2-wBXoWMFy.js","assets/rolldown-runtime-D3Q5gio6.js","assets/iota-names-config-OaNo1Bz2.js","assets/Object-Cm2HqrT3.css","assets/PTBs-B0J9VJHZ.js","assets/auto-DlIbMOkz.js","assets/chartjs-plugin-zoom.esm-DAYqusPu.js","assets/programmable-transaction-block-DR8mHtC0.js","assets/PTBs-BR8oWVMI.css","assets/DynamicFields-Dqv0x7go.js","assets/StakingRewards-DP84fjzy.js","assets/signer-data-D1Egmbld.js","assets/exchange-rate-cache-CjNrz7E6.js","assets/StakingRewards-DLusDUtW.css","assets/Delegators-DnBGQy51.js","assets/Delegators-Bx4FWy7Y.css","assets/MultiAccountView-_dsP9_jF.js","assets/staking-utils-Bq8uBoCa.js","assets/MultiAccountView-CfPnW0HL.css","assets/AccountsList-BTh0dcos.js","assets/AccountsList-D_5TDH-k.css","assets/Keystone-Qnf2tIVa.js","assets/Keystone-MAtRA5__.css","assets/LedgerNano-D0RpNPrH.js","assets/browser-YKkc2bFt.js","assets/LedgerNano-DxMn_A-p.css","assets/Sign-CI3hwJZZ.js","assets/Sign-gBDkjJRU.css","assets/PublishData-Cmxd8MR5.js","assets/transaction-execution-Cg5fkaOd.js","assets/mainnet-transaction-confirmation-bplSEzLB.js","assets/PublishData-BUyY-awq.css","assets/SplitMergeCoins-CcAUPzZL.js","assets/IotaAmountInput-CMmBUWqA.js","assets/IotaAmountInput-Bij3EnSl.css","assets/SplitMergeCoins-CvE6aQEn.css","assets/ProgrammableTransactionBlock-C4taviLP.js","assets/ProgrammableTransactionBlock-Crg99Ooq.css","assets/BulkTransfer-CyWmVDp2.js","assets/BulkTransfer-TuDD_85L.css","assets/Stake-a4j3dqUy.js","assets/Stake-C1pWE9FU.css","assets/Faucet-d2a1BJWZ.js","assets/faucet-DG92jVSx.js","assets/Faucet-wqo-zmbr.css","assets/Converter-BHnLQ5Kt.js","assets/base-o_Fnpopv.js","assets/Converter-C6_fp2gw.css","assets/TextAnalyzer-wSQSHW76.js","assets/TextAnalyzer-DLUiTKjF.css","assets/Ed25519AddressGeneration-BUTRs3Yp.js","assets/Ed25519AddressGeneration-CG0-AGej.css","assets/IotaNames-Cclqw5IL.js","assets/IotaNames-DeEf_Tms.css","assets/CandidateStake-sQsw2tT6.js","assets/CandidateStake-4osXjqf7.css","assets/Settings-IPrydqCi.js","assets/Settings-C3eTkciY.css","assets/Txs-dKF18b00.js","assets/fetchTransactions-D9XVVz7p.js","assets/Txs-8Q5elMyh.css","assets/TxsVisualizer-H14LxfB2.js","assets/TxsVisualizer-DRjH37ny.css","assets/Impressum-8l1HLATd.js","assets/Datenschutz-Bd4742cF.js","assets/Disclaimer-gEOR4ZRh.js","assets/Disclaimer-MTqRAUq1.css","assets/OnChainApps-CpvY1_cY.js","assets/OnChainApps-BhEeh98N.css"])))=>i.map(i=>d[i]);
-import { t as __commonJSMin } from "./rolldown-runtime-D3Q5gio6.js";
+const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["assets/IotaSystemState-BUFZp8Bn.js","assets/disclose-version-CpEJO7r1.js","assets/legacy-DxVWxrJw.js","assets/client-BTFoHz6u.js","assets/keypair-DsT3ivIR.js","assets/JsonToggleView-I_OHyvOi.js","assets/transaction-view-OeA30yKg.js","assets/transaction-view-QnfdbPMt.css","assets/JsonToggleView-fMnnpuwH.css","assets/IotaSystemState-BfNZQdbT.css","assets/Transaction-rowBH-Yx.js","assets/client-CmDrt-ez.js","assets/page-query-params-CjYNCsn5.js","assets/Transaction-C3qqeLeC.css","assets/Object-BcVBs-gv.js","assets/explorer-links-hyzWVZGi.js","assets/dynamic-fields-huZLT6c7.js","assets/_u64-Dkyx1UQH.js","assets/blake2-O-wgjgc8.js","assets/2025.2-wBXoWMFy.js","assets/rolldown-runtime-D3Q5gio6.js","assets/iota-names-config-OaNo1Bz2.js","assets/Object-Cm2HqrT3.css","assets/PTBs-BbuUS__v.js","assets/auto-DlIbMOkz.js","assets/chartjs-plugin-zoom.esm-DAYqusPu.js","assets/programmable-transaction-block-DR8mHtC0.js","assets/PTBs-BR8oWVMI.css","assets/DynamicFields-DINqyrsV.js","assets/StakingRewards-D_eJMNHQ.js","assets/signer-data-D1Egmbld.js","assets/exchange-rate-cache-CjNrz7E6.js","assets/StakingRewards-DLusDUtW.css","assets/Delegators-DnBGQy51.js","assets/Delegators-Bx4FWy7Y.css","assets/MultiAccountView-CX-vVJ1N.js","assets/staking-utils-Bq8uBoCa.js","assets/MultiAccountView-CfPnW0HL.css","assets/AccountsList-BTh0dcos.js","assets/AccountsList-D_5TDH-k.css","assets/Keystone-DlYIPNmu.js","assets/Keystone-MAtRA5__.css","assets/LedgerNano-CNYfs4Q5.js","assets/browser-YKkc2bFt.js","assets/LedgerNano-tCB3IWwj.css","assets/Sign-BgTvcN9g.js","assets/Sign-gBDkjJRU.css","assets/PublishData-BBRYjBqe.js","assets/transaction-execution-Cg5fkaOd.js","assets/mainnet-transaction-confirmation-bplSEzLB.js","assets/PublishData-BUyY-awq.css","assets/SplitMergeCoins-CS1v15Fv.js","assets/IotaAmountInput-DI_vV0Mh.js","assets/IotaAmountInput-Bij3EnSl.css","assets/SplitMergeCoins-CvE6aQEn.css","assets/ProgrammableTransactionBlock-DOQG8vCF.js","assets/ProgrammableTransactionBlock-Crg99Ooq.css","assets/BulkTransfer-BP_pa231.js","assets/BulkTransfer-TuDD_85L.css","assets/Stake-RxOp0Emq.js","assets/Stake-C1pWE9FU.css","assets/Faucet-d2a1BJWZ.js","assets/faucet-DG92jVSx.js","assets/Faucet-wqo-zmbr.css","assets/Converter-B3QU0cvy.js","assets/base-o_Fnpopv.js","assets/Converter-C6_fp2gw.css","assets/TextAnalyzer-wSQSHW76.js","assets/TextAnalyzer-DLUiTKjF.css","assets/Ed25519AddressGeneration-BUTRs3Yp.js","assets/Ed25519AddressGeneration-CG0-AGej.css","assets/IotaNames-C5lSClk5.js","assets/IotaNames-DeEf_Tms.css","assets/CandidateStake-B4O7nxTn.js","assets/CandidateStake-4osXjqf7.css","assets/Settings-IPrydqCi.js","assets/Settings-C3eTkciY.css","assets/Txs-CiGSZCR1.js","assets/fetchTransactions-D9XVVz7p.js","assets/Txs-8Q5elMyh.css","assets/TxsVisualizer-DKGP08H-.js","assets/TxsVisualizer-DRjH37ny.css","assets/Impressum-8l1HLATd.js","assets/Datenschutz-Bd4742cF.js","assets/Disclaimer-gEOR4ZRh.js","assets/Disclaimer-MTqRAUq1.css","assets/OnChainApps-Dh-vdGzF.js","assets/OnChainApps-BhEeh98N.css"])))=>i.map(i=>d[i]);
+import { r as __toESM, t as __commonJSMin } from "./rolldown-runtime-D3Q5gio6.js";
 import { $ as untrack, A as component, B as comment, C as bind_select_value, Ct as get$1, D as set_class, Dt as pop, E as set_style, G as event, H as text, I as if_block, J as deep_read_state, L as mount, Mt as reset, N as each, Nt as noop, O as clsx, Ot as push, P as index, Pt as to_array, R as set_text, S as set_value, St as derived, T as select_option, Tt as writable, U as delegate, V as from_html, W as delegated, Y as get, at as user_effect, ct as sibling, dt as mutate, ft as set, gt as user_derived, h as bind_value, ht as derived_safe_equal, i as prop, it as template_effect, jt as next, lt as proxy, n as onDestroy, nt as legacy_pre_effect_reset, ot as child, p as bind_checked, pt as state, r as onMount, s as init, st as first_child, tt as legacy_pre_effect, u as bind_this, ut as mutable_source, v as remove_input_defaults, vt as setup_stores, w as init_select, xt as store_set, y as set_attribute, yt as store_get, z as append } from "./disclose-version-CpEJO7r1.js";
 import "./legacy-DxVWxrJw.js";
 import { A as Secp256k1PublicKey, M as toStore, S as sharedSignerType, d as SignerType, g as sharedClientConfig, k as Secp256r1PublicKey, m as isProMode, p as disclaimerAccepted, r as getSelectedNetworkConfig, s as TransactionDataBuilder, t as getClient } from "./client-BTFoHz6u.js";
@@ -3213,15 +3213,13 @@ var require_ieee754 = /* @__PURE__ */ __commonJSMin(((exports) => {
 		buffer[offset + i - d] |= s * 128;
 	};
 }));
-//#endregion
-//#region node_modules/.pnpm/buffer@6.0.3/node_modules/buffer/index.js
 /*!
 * The buffer module from node.js, for the browser.
 *
 * @author   Feross Aboukhadijeh <https://feross.org>
 * @license  MIT
 */
-var require_buffer = /* @__PURE__ */ __commonJSMin(((exports) => {
+var Buffer = (/* @__PURE__ */ __toESM((/* @__PURE__ */ __commonJSMin(((exports) => {
 	var base64 = require_base64_js();
 	var ieee754 = require_ieee754();
 	var customInspectSymbol = typeof Symbol === "function" && typeof Symbol["for"] === "function" ? Symbol["for"]("nodejs.util.inspect.custom") : null;
@@ -4499,7 +4497,7 @@ var require_buffer = /* @__PURE__ */ __commonJSMin(((exports) => {
 	function BufferBigIntNotDefined() {
 		throw new Error("BigInt not supported");
 	}
-}));
+})))(), 1)).Buffer;
 //#endregion
 //#region node_modules/.pnpm/@iota+iota-sdk@1.15.0_typescript@5.9.3/node_modules/@iota/iota-sdk/dist/esm/multisig/signer.js
 var __typeError = (msg) => {
@@ -4818,7 +4816,6 @@ function asIndices(bitmap) {
 }
 //#endregion
 //#region src/lib/utils/formatting.ts
-var import_buffer = require_buffer();
 /**
 * Format an address for display by showing first 8 and last 6 characters
 */
@@ -4954,12 +4951,12 @@ var keyDetails = ($$anchor, publicKey = noop, signature = noop) => {
 		() => publicKey().toBase64(),
 		() => publicKey().toIotaPublicKey(),
 		() => publicKey().toIotaAddress(),
-		() => import_buffer.Buffer.from(signature()).toString("base64")
+		() => Buffer.from(signature()).toString("base64")
 	]);
 	delegated("click", button, async () => await copyToClipboard(publicKey().toBase64()));
 	delegated("click", button_1, async () => await copyToClipboard(publicKey().toIotaPublicKey()));
 	delegated("click", button_2, async () => await copyToClipboard(publicKey().toIotaAddress()));
-	delegated("click", button_3, async () => await copyToClipboard(import_buffer.Buffer.from(signature()).toString("base64")));
+	delegated("click", button_3, async () => await copyToClipboard(Buffer.from(signature()).toString("base64")));
 	append($$anchor, fragment);
 };
 var root$10 = from_html(`<div class="detail-row svelte-bpsref"><span class="detail-label svelte-bpsref">Public Key:</span> <div class="detail-value-container svelte-bpsref"><span class="detail-value svelte-bpsref"> </span> <button class="copy-btn svelte-bpsref">Copy</button></div></div> <div class="detail-row svelte-bpsref"><span class="detail-label svelte-bpsref">Public Key (with flag):</span> <div class="detail-value-container svelte-bpsref"><span class="detail-value svelte-bpsref"> </span> <button class="copy-btn svelte-bpsref">Copy</button></div></div> <div class="detail-row svelte-bpsref"><span class="detail-label svelte-bpsref">Address:</span> <div class="detail-value-container svelte-bpsref"><span class="detail-value svelte-bpsref"> </span> <button class="copy-btn svelte-bpsref">Copy</button></div></div> <div class="detail-row svelte-bpsref"><span class="detail-label svelte-bpsref">Signature Bytes:</span> <div class="detail-value-container svelte-bpsref"><span class="detail-value svelte-bpsref"> </span> <button class="copy-btn svelte-bpsref">Copy</button></div></div>`, 1);
@@ -7429,36 +7426,36 @@ function App($$anchor, $$props) {
 	const [$$stores, $$cleanup] = setup_stores();
 	const items = mutable_source();
 	const pageImports = {
-		IotaSystemState: () => __vitePreload(() => import("./IotaSystemState-DdQw6YiO.js"), __vite__mapDeps([0,1,2,3,4,5,6,7,8,9])),
-		Transaction: () => __vitePreload(() => import("./Transaction-BNIFJ3qz.js"), __vite__mapDeps([10,1,2,3,4,6,7,11,12,13])),
-		Object: () => __vitePreload(() => import("./Object-Csl7I6rm.js"), __vite__mapDeps([14,1,3,4,15,11,12,16,17,18,19,20,21,22])),
-		PTBs: () => __vitePreload(() => import("./PTBs-B0J9VJHZ.js"), __vite__mapDeps([23,1,2,3,4,15,24,25,20,26,11,19,27])),
-		DynamicFields: () => __vitePreload(() => import("./DynamicFields-Dqv0x7go.js"), __vite__mapDeps([28,1,3,4,12,5,2,6,7,8,16,11,17,18,19,20])),
-		StakingRewards: () => __vitePreload(() => import("./StakingRewards-DP84fjzy.js"), __vite__mapDeps([29,1,2,3,4,30,20,12,24,5,6,7,8,31,11,16,17,18,19,25,26,32])),
+		IotaSystemState: () => __vitePreload(() => import("./IotaSystemState-BUFZp8Bn.js"), __vite__mapDeps([0,1,2,3,4,5,6,7,8,9])),
+		Transaction: () => __vitePreload(() => import("./Transaction-rowBH-Yx.js"), __vite__mapDeps([10,1,2,3,4,6,7,11,12,13])),
+		Object: () => __vitePreload(() => import("./Object-BcVBs-gv.js"), __vite__mapDeps([14,1,3,4,15,11,12,16,17,18,19,20,21,22])),
+		PTBs: () => __vitePreload(() => import("./PTBs-BbuUS__v.js"), __vite__mapDeps([23,1,2,3,4,15,24,25,20,26,11,19,27])),
+		DynamicFields: () => __vitePreload(() => import("./DynamicFields-DINqyrsV.js"), __vite__mapDeps([28,1,3,4,12,5,2,6,7,8,16,11,17,18,19,20])),
+		StakingRewards: () => __vitePreload(() => import("./StakingRewards-D_eJMNHQ.js"), __vite__mapDeps([29,1,2,3,4,30,20,12,24,5,6,7,8,31,11,16,17,18,19,25,26,32])),
 		Delegators: () => __vitePreload(() => import("./Delegators-DnBGQy51.js"), __vite__mapDeps([33,1,2,3,4,11,19,20,24,34])),
-		MultiAccountView: () => __vitePreload(() => import("./MultiAccountView-_dsP9_jF.js"), __vite__mapDeps([35,1,3,4,30,20,12,24,31,11,16,17,18,19,36,25,37])),
+		MultiAccountView: () => __vitePreload(() => import("./MultiAccountView-CX-vVJ1N.js"), __vite__mapDeps([35,1,3,4,30,20,12,24,31,11,16,17,18,19,36,25,37])),
 		AccountsList: () => __vitePreload(() => import("./AccountsList-BTh0dcos.js"), __vite__mapDeps([38,1,2,4,30,20,3,39])),
-		Keystone: () => __vitePreload(() => import("./Keystone-Qnf2tIVa.js"), __vite__mapDeps([40,20,1,2,3,4,41])),
-		LedgerNano: () => __vitePreload(() => import("./LedgerNano-D0RpNPrH.js"), __vite__mapDeps([42,20,1,3,4,43,5,2,6,7,8,44])),
-		Sign: () => __vitePreload(() => import("./Sign-CI3hwJZZ.js"), __vite__mapDeps([45,1,2,3,4,30,20,12,5,6,7,8,46])),
-		PublishData: () => __vitePreload(() => import("./PublishData-Cmxd8MR5.js"), __vite__mapDeps([47,1,2,3,4,48,49,30,20,50])),
-		SplitMergeCoins: () => __vitePreload(() => import("./SplitMergeCoins-CcAUPzZL.js"), __vite__mapDeps([51,1,3,4,30,20,5,2,6,7,8,52,53,54])),
-		ProgrammableTransactionBlock: () => __vitePreload(() => import("./ProgrammableTransactionBlock-C4taviLP.js"), __vite__mapDeps([55,20,1,3,4,43,49,30,56])),
-		BulkTransfer: () => __vitePreload(() => import("./BulkTransfer-CyWmVDp2.js"), __vite__mapDeps([57,1,2,3,4,30,20,58])),
-		Stake: () => __vitePreload(() => import("./Stake-a4j3dqUy.js"), __vite__mapDeps([59,1,2,3,4,30,20,52,53,36,60])),
+		Keystone: () => __vitePreload(() => import("./Keystone-DlYIPNmu.js"), __vite__mapDeps([40,20,1,2,3,4,41])),
+		LedgerNano: () => __vitePreload(() => import("./LedgerNano-CNYfs4Q5.js"), __vite__mapDeps([42,20,1,3,4,43,5,2,6,7,8,44])),
+		Sign: () => __vitePreload(() => import("./Sign-BgTvcN9g.js"), __vite__mapDeps([45,1,2,3,4,30,20,12,5,6,7,8,46])),
+		PublishData: () => __vitePreload(() => import("./PublishData-BBRYjBqe.js"), __vite__mapDeps([47,1,2,3,4,48,49,30,20,50])),
+		SplitMergeCoins: () => __vitePreload(() => import("./SplitMergeCoins-CS1v15Fv.js"), __vite__mapDeps([51,1,3,4,30,20,5,2,6,7,8,52,53,54])),
+		ProgrammableTransactionBlock: () => __vitePreload(() => import("./ProgrammableTransactionBlock-DOQG8vCF.js"), __vite__mapDeps([55,20,1,3,4,43,49,30,56])),
+		BulkTransfer: () => __vitePreload(() => import("./BulkTransfer-BP_pa231.js"), __vite__mapDeps([57,1,2,3,4,30,20,58])),
+		Stake: () => __vitePreload(() => import("./Stake-RxOp0Emq.js"), __vite__mapDeps([59,1,2,3,4,30,20,52,53,36,60])),
 		Faucet: () => __vitePreload(() => import("./Faucet-d2a1BJWZ.js"), __vite__mapDeps([61,1,2,3,4,30,20,5,6,7,8,62,63])),
-		Converter: () => __vitePreload(() => import("./Converter-BHnLQ5Kt.js"), __vite__mapDeps([64,1,2,3,4,12,18,17,65,66])),
+		Converter: () => __vitePreload(() => import("./Converter-B3QU0cvy.js"), __vite__mapDeps([64,1,2,3,4,12,18,17,65,66])),
 		TextAnalyzer: () => __vitePreload(() => import("./TextAnalyzer-wSQSHW76.js"), __vite__mapDeps([67,1,68])),
 		Ed25519AddressGeneration: () => __vitePreload(() => import("./Ed25519AddressGeneration-BUTRs3Yp.js"), __vite__mapDeps([69,1,2,4,17,65,70])),
-		IotaNames: () => __vitePreload(() => import("./IotaNames-Cclqw5IL.js"), __vite__mapDeps([71,1,3,4,11,48,49,30,20,19,52,53,21,72])),
-		CandidateStake: () => __vitePreload(() => import("./CandidateStake-sQsw2tT6.js"), __vite__mapDeps([73,1,3,4,15,48,49,30,20,74])),
+		IotaNames: () => __vitePreload(() => import("./IotaNames-C5lSClk5.js"), __vite__mapDeps([71,1,3,4,11,48,49,30,20,19,52,53,21,72])),
+		CandidateStake: () => __vitePreload(() => import("./CandidateStake-B4O7nxTn.js"), __vite__mapDeps([73,1,3,4,15,48,49,30,20,74])),
 		Settings: () => __vitePreload(() => import("./Settings-IPrydqCi.js"), __vite__mapDeps([75,1,2,3,4,30,20,76])),
-		Txs: () => __vitePreload(() => import("./Txs-dKF18b00.js"), __vite__mapDeps([77,1,3,4,6,2,7,15,11,12,19,20,16,17,18,78,79])),
-		TxsVisualizer: () => __vitePreload(() => import("./TxsVisualizer-H14LxfB2.js"), __vite__mapDeps([80,1,3,4,15,78,11,81])),
+		Txs: () => __vitePreload(() => import("./Txs-CiGSZCR1.js"), __vite__mapDeps([77,1,3,4,6,2,7,15,11,12,19,20,16,17,18,78,79])),
+		TxsVisualizer: () => __vitePreload(() => import("./TxsVisualizer-DKGP08H-.js"), __vite__mapDeps([80,1,3,4,15,78,11,81])),
 		Impressum: () => __vitePreload(() => import("./Impressum-8l1HLATd.js"), __vite__mapDeps([82,1,2])),
 		Datenschutz: () => __vitePreload(() => import("./Datenschutz-Bd4742cF.js"), __vite__mapDeps([83,1,2])),
 		Disclaimer: () => __vitePreload(() => import("./Disclaimer-gEOR4ZRh.js"), __vite__mapDeps([84,1,85])),
-		OnChainApps: () => __vitePreload(() => import("./OnChainApps-CpvY1_cY.js"), __vite__mapDeps([86,1,3,4,12,62,87]))
+		OnChainApps: () => __vitePreload(() => import("./OnChainApps-Dh-vdGzF.js"), __vite__mapDeps([86,1,3,4,12,62,87]))
 	};
 	wrap({ asyncComponent: pageImports["IotaSystemState"] }), wrap({ asyncComponent: pageImports["IotaSystemState"] }), wrap({ asyncComponent: pageImports["Transaction"] }), wrap({ asyncComponent: pageImports["Object"] }), wrap({ asyncComponent: pageImports["PTBs"] }), wrap({ asyncComponent: pageImports["DynamicFields"] }), wrap({ asyncComponent: pageImports["StakingRewards"] }), wrap({ asyncComponent: pageImports["Delegators"] }), wrap({ asyncComponent: pageImports["MultiAccountView"] }), wrap({ asyncComponent: pageImports["AccountsList"] }), wrap({ asyncComponent: pageImports["Keystone"] }), wrap({ asyncComponent: pageImports["LedgerNano"] }), wrap({ asyncComponent: pageImports["Sign"] }), wrap({ asyncComponent: pageImports["PublishData"] }), wrap({ asyncComponent: pageImports["SplitMergeCoins"] }), wrap({ asyncComponent: pageImports["ProgrammableTransactionBlock"] }), wrap({ asyncComponent: pageImports["BulkTransfer"] }), wrap({ asyncComponent: pageImports["Stake"] }), wrap({ asyncComponent: pageImports["Faucet"] }), wrap({ asyncComponent: pageImports["Converter"] }), wrap({ asyncComponent: pageImports["TextAnalyzer"] }), wrap({ asyncComponent: pageImports["Ed25519AddressGeneration"] }), wrap({ asyncComponent: pageImports["IotaNames"] }), wrap({ asyncComponent: pageImports["CandidateStake"] }), wrap({ asyncComponent: pageImports["Settings"] }), wrap({ asyncComponent: pageImports["Txs"] }), wrap({ asyncComponent: pageImports["TxsVisualizer"] }), wrap({ asyncComponent: pageImports["Impressum"] }), wrap({ asyncComponent: pageImports["Datenschutz"] }), wrap({ asyncComponent: pageImports["Disclaimer"] }), wrap({ asyncComponent: pageImports["OnChainApps"] });
 	const allItems = [
@@ -7717,4 +7714,4 @@ delegate(["click"]);
 initQueryParamHandling();
 mount(App, { target: document.getElementById("app") });
 //#endregion
-export { nanoToIotaFormatted as _, MoveAuthenticatorDetails as a, parsePartialSignatures as c, verifyTransactionSignature as d, require_buffer as f, nanoToIota as g, iotaToNano as h, TransactionView as i, publicKeyFromRawBytes as l, formatNumbersWithUnderscores as m, addAndRun as n, copyToClipboard as o, formatNumberWithUnderscores as p, queryParams as r, formatAddress as s, __vitePreload as t, verifyPersonalMessageSignature as u, TransactionCommands as v, router as y };
+export { nanoToIotaFormatted as _, MoveAuthenticatorDetails as a, parsePartialSignatures as c, verifyTransactionSignature as d, Buffer as f, nanoToIota as g, iotaToNano as h, TransactionView as i, publicKeyFromRawBytes as l, formatNumbersWithUnderscores as m, addAndRun as n, copyToClipboard as o, formatNumberWithUnderscores as p, queryParams as r, formatAddress as s, __vitePreload as t, verifyPersonalMessageSignature as u, TransactionCommands as v, router as y };
