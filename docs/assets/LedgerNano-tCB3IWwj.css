@@ -5,6 +5,10 @@
     input.svelte-1yhe0ga {
         min-width: 6rem;
     }
+    textarea.svelte-1yhe0ga {
+        width: 100%;
+        height: 100px;
+    }
     .inner-table.svelte-1yhe0ga {
         width: 100%;
         margin-top: 0.5rem;

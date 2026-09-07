@@ -1,3 +1,5 @@
+import { fileURLToPath } from 'node:url';
+
 import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill';
 import inject from '@rollup/plugin-inject';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
@@ -32,16 +34,21 @@ export default defineConfig({
         }),
     ],
     resolve: {
-        alias: {
-            buffer: 'buffer/',
-        },
+        alias: [
+            {
+                find: /^buffer\/?$/,
+                replacement: fileURLToPath(
+                    new URL('./src/lib/utils/buffer-shim.ts', import.meta.url),
+                ),
+            },
+        ],
     },
     define: {
         global: 'globalThis',
         'process.env.NODE_DEBUG': JSON.stringify(''), // or 'my-module'
     },
     optimizeDeps: {
-        include: ['process', 'buffer'],
+        include: ['process', 'buffer/index.js'],
     },
     build: {
         minify: false,

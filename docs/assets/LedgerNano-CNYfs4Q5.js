@@ -1,12 +1,13 @@
 import { r as __toESM, t as __commonJSMin } from "./rolldown-runtime-D3Q5gio6.js";
-import { C as bind_select_value, Dt as pop, I as if_block, Mt as reset, N as each, Ot as push, P as index, Pt as to_array, R as set_text, U as delegate, V as from_html, W as delegated, Y as get, ct as sibling, ft as set, gt as user_derived, h as bind_value, it as template_effect, lt as proxy, ot as child, pt as state, st as first_child, v as remove_input_defaults, z as append } from "./disclose-version-CpEJO7r1.js";
+import { C as bind_select_value, Dt as pop, I as if_block, Mt as reset, N as each, Ot as push, P as index, Pt as to_array, R as set_text, U as delegate, V as from_html, W as delegated, Y as get, _t as remove_textarea_child, ct as sibling, ft as set, gt as user_derived, h as bind_value, it as template_effect, lt as proxy, ot as child, pt as state, st as first_child, v as remove_input_defaults, z as append } from "./disclose-version-CpEJO7r1.js";
 import { o as Transaction, t as getClient } from "./client-BTFoHz6u.js";
-import { B as isValidIotaAddress, X as toHex, m as messageWithIntent, n as Ed25519PublicKey, u as toSerializedSignature } from "./keypair-DsT3ivIR.js";
+import { B as isValidIotaAddress, X as toHex, Z as fromBase64, m as messageWithIntent, n as Ed25519PublicKey, u as toSerializedSignature } from "./keypair-DsT3ivIR.js";
 import { t as require_browser } from "./browser-YKkc2bFt.js";
-import { f as require_buffer } from "./index-CZGDvpHL.js";
+import { f as Buffer } from "./index-115pSspU.js";
 import { t as JsonToggleView } from "./JsonToggleView-I_OHyvOi.js";
-//#region node_modules/.pnpm/fast-sha256@1.3.0/node_modules/fast-sha256/sha256.js
-var require_sha256 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+//#endregion
+//#region node_modules/.pnpm/@iota+ledgerjs-hw-app-iota@0.6.2/node_modules/@iota/ledgerjs-hw-app-iota/dist/esm/Iota.js
+var import_sha256 = /* @__PURE__ */ __toESM((/* @__PURE__ */ __commonJSMin(((exports, module) => {
 	(function(root, factory) {
 		var exports$1 = {};
 		factory(exports$1);
@@ -364,11 +365,7 @@ var require_sha256 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 		}
 		exports$2.pbkdf2 = pbkdf2;
 	});
-}));
-//#endregion
-//#region node_modules/.pnpm/@iota+ledgerjs-hw-app-iota@0.6.2/node_modules/@iota/ledgerjs-hw-app-iota/dist/esm/Iota.js
-var import_buffer = require_buffer();
-var import_sha256 = /* @__PURE__ */ __toESM(require_sha256());
+})))());
 var __typeError = (msg) => {
 	throw TypeError(msg);
 };
@@ -441,10 +438,10 @@ var Iota = class {
 		const p1 = 0;
 		const p2 = 0;
 		if (__privateGet(this, _verbose)) __privateMethod(this, _Iota_instances, log_fn).call(this, txn);
-		const rawTxn = import_buffer.Buffer.from(txn);
-		const hashSize = import_buffer.Buffer.alloc(4);
+		const rawTxn = Buffer.from(txn);
+		const hashSize = Buffer.alloc(4);
 		hashSize.writeUInt32LE(rawTxn.length, 0);
-		const payloadTxn = import_buffer.Buffer.concat([hashSize, rawTxn]);
+		const payloadTxn = Buffer.concat([hashSize, rawTxn]);
 		__privateMethod(this, _Iota_instances, log_fn).call(this, "Payload Txn", payloadTxn);
 		const payloads = [payloadTxn, buildBip32KeyPayload(path)];
 		const { major } = await __privateMethod(this, _Iota_instances, internalGetVersion_fn).call(this);
@@ -452,14 +449,14 @@ var Iota = class {
 		__privateMethod(this, _Iota_instances, log_fn).call(this, "Objects list length", bcsObjects.length);
 		__privateMethod(this, _Iota_instances, log_fn).call(this, "App version", major);
 		if (major > 0 && bcsObjects.length > 0) {
-			const numItems = import_buffer.Buffer.alloc(4);
+			const numItems = Buffer.alloc(4);
 			numItems.writeUInt32LE(bcsObjects.length, 0);
-			let listData = import_buffer.Buffer.from(numItems);
+			let listData = Buffer.from(numItems);
 			for (const item of bcsObjects) {
-				const rawItem = import_buffer.Buffer.from(item);
-				const itemLen = import_buffer.Buffer.alloc(4);
+				const rawItem = Buffer.from(item);
+				const itemLen = Buffer.alloc(4);
 				itemLen.writeUInt32LE(rawItem.length, 0);
-				listData = import_buffer.Buffer.concat([
+				listData = Buffer.concat([
 					listData,
 					itemLen,
 					rawItem
@@ -479,7 +476,7 @@ var Iota = class {
 _verbose = /* @__PURE__ */ new WeakMap();
 _Iota_instances = /* @__PURE__ */ new WeakSet();
 internalGetVersion_fn = async function() {
-	const [major, minor, patch] = await __privateMethod(this, _Iota_instances, sendChunks_fn).call(this, 0, 0, 0, 0, import_buffer.Buffer.alloc(1));
+	const [major, minor, patch] = await __privateMethod(this, _Iota_instances, sendChunks_fn).call(this, 0, 0, 0, 0, Buffer.alloc(1));
 	return {
 		major,
 		minor,
@@ -497,25 +494,25 @@ sendChunks_fn = async function(cla, ins, p1, p2, payload, extraData = /* @__PURE
 			const cur = payload[j].slice(i, i + chunkSize);
 			chunkList.push(cur);
 		}
-		let lastHash = import_buffer.Buffer.alloc(32);
+		let lastHash = Buffer.alloc(32);
 		__privateMethod(this, _Iota_instances, log_fn).call(this, lastHash);
 		data = chunkList.reduceRight((blocks, chunk) => {
-			const linkedChunk = import_buffer.Buffer.concat([lastHash, chunk]);
+			const linkedChunk = Buffer.concat([lastHash, chunk]);
 			__privateMethod(this, _Iota_instances, log_fn).call(this, "Chunk: ", chunk);
 			__privateMethod(this, _Iota_instances, log_fn).call(this, "linkedChunk: ", linkedChunk);
-			lastHash = import_buffer.Buffer.from((0, import_sha256.default)(linkedChunk));
+			lastHash = Buffer.from((0, import_sha256.default)(linkedChunk));
 			blocks.set(lastHash.toString("hex"), linkedChunk);
 			return blocks;
 		}, data);
 		parameterList.push(lastHash);
-		lastHash = import_buffer.Buffer.alloc(32);
+		lastHash = Buffer.alloc(32);
 	}
 	__privateMethod(this, _Iota_instances, log_fn).call(this, data);
-	return await __privateMethod(this, _Iota_instances, handleBlocksProtocol_fn).call(this, cla, ins, p1, p2, import_buffer.Buffer.concat([import_buffer.Buffer.from([0])].concat(parameterList)), data);
+	return await __privateMethod(this, _Iota_instances, handleBlocksProtocol_fn).call(this, cla, ins, p1, p2, Buffer.concat([Buffer.from([0])].concat(parameterList)), data);
 };
 handleBlocksProtocol_fn = async function(cla, ins, p1, p2, initialPayload, data) {
 	let payload = initialPayload;
-	let result = import_buffer.Buffer.alloc(0);
+	let result = Buffer.alloc(0);
 	let rv_instruction;
 	do {
 		__privateMethod(this, _Iota_instances, log_fn).call(this, "Sending payload to ledger: ", payload.toString("hex"));
@@ -527,19 +524,19 @@ handleBlocksProtocol_fn = async function(cla, ins, p1, p2, initialPayload, data)
 		switch (rv_instruction) {
 			case 0:
 			case 1:
-				result = import_buffer.Buffer.concat([result, rv_payload]);
-				payload = import_buffer.Buffer.from([4]);
+				result = Buffer.concat([result, rv_payload]);
+				payload = Buffer.from([4]);
 				break;
 			case 2:
 				const chunk = data.get(rv_payload.toString("hex"));
 				__privateMethod(this, _Iota_instances, log_fn).call(this, "Getting block ", rv_payload);
 				__privateMethod(this, _Iota_instances, log_fn).call(this, "Found block ", chunk);
-				if (chunk) payload = import_buffer.Buffer.concat([import_buffer.Buffer.from([1]), chunk]);
-				else payload = import_buffer.Buffer.from([2]);
+				if (chunk) payload = Buffer.concat([Buffer.from([1]), chunk]);
+				else payload = Buffer.from([2]);
 				break;
 			case 3:
-				data.set(import_buffer.Buffer.from((0, import_sha256.default)(rv_payload)).toString("hex"), rv_payload);
-				payload = import_buffer.Buffer.from([3]);
+				data.set(Buffer.from((0, import_sha256.default)(rv_payload)).toString("hex"), rv_payload);
+				payload = Buffer.from([3]);
 				break;
 		}
 	} while (rv_instruction !== 1);
@@ -550,7 +547,7 @@ log_fn = function(...args) {
 };
 function buildBip32KeyPayload(path) {
 	const paths = splitPath(path);
-	const payload = import_buffer.Buffer.alloc(1 + paths.length * 4);
+	const payload = Buffer.alloc(1 + paths.length * 4);
 	payload[0] = paths.length;
 	paths.forEach((element, index) => {
 		payload.writeUInt32LE(element, 1 + 4 * index);
@@ -1488,20 +1485,20 @@ var Transport = class {
 	*    to detect unresponsive device (see `unresponsiveTimeout`). This timeout aborts the exchange.
 	* @returns {Promise<Buffer>} A promise that resolves with the response data from the device.
 	*/
-	send = async (cla, ins, p1, p2, data = import_buffer.Buffer.alloc(0), statusList = [StatusCodes.OK], { abortTimeoutMs } = {}) => {
+	send = async (cla, ins, p1, p2, data = Buffer.alloc(0), statusList = [StatusCodes.OK], { abortTimeoutMs } = {}) => {
 		const tracer = this.tracer.withUpdatedContext({ function: "send" });
 		if (data.length >= 256) {
 			tracer.trace("data.length exceeded 256 bytes limit", { dataLength: data.length });
 			throw new TransportError("data.length exceed 256 bytes limit. Got: " + data.length, "DataLengthTooBig");
 		}
-		const response = await this.exchange(import_buffer.Buffer.concat([
-			import_buffer.Buffer.from([
+		const response = await this.exchange(Buffer.concat([
+			Buffer.from([
 				cla,
 				ins,
 				p1,
 				p2
 			]),
-			import_buffer.Buffer.from([data.length]),
+			Buffer.from([data.length]),
 			data
 		]), { abortTimeoutMs });
 		const sw = response.readUInt16BE(response.length - 2);
@@ -1634,12 +1631,12 @@ var Transport = class {
 //#region node_modules/.pnpm/@ledgerhq+hw-transport-webhid@6.36.0/node_modules/@ledgerhq/hw-transport-webhid/lib-es/hid-framing.js
 var Tag = 5;
 function asUInt16BE(value) {
-	const b = import_buffer.Buffer.alloc(2);
+	const b = Buffer.alloc(2);
 	b.writeUInt16BE(value, 0);
 	return b;
 }
 var initialAcc = {
-	data: import_buffer.Buffer.alloc(0),
+	data: Buffer.alloc(0),
 	dataLength: 0,
 	sequence: 0
 };
@@ -1658,18 +1655,18 @@ var createHIDframing = (channel, packetSize) => {
 		* @returns an array of HID USB frames ready to be sent
 		*/
 		makeBlocks(apdu) {
-			let data = import_buffer.Buffer.concat([asUInt16BE(apdu.length), apdu]);
+			let data = Buffer.concat([asUInt16BE(apdu.length), apdu]);
 			const blockSize = packetSize - 5;
 			const nbBlocks = Math.ceil(data.length / blockSize);
-			data = import_buffer.Buffer.concat([data, import_buffer.Buffer.alloc(nbBlocks * blockSize - data.length + 1).fill(0)]);
+			data = Buffer.concat([data, Buffer.alloc(nbBlocks * blockSize - data.length + 1).fill(0)]);
 			const blocks = [];
 			for (let i = 0; i < nbBlocks; i++) {
-				const head = import_buffer.Buffer.alloc(5);
+				const head = Buffer.alloc(5);
 				head.writeUInt16BE(channel, 0);
 				head.writeUInt8(Tag, 2);
 				head.writeUInt16BE(i, 3);
 				const chunk = data.slice(i * blockSize, (i + 1) * blockSize);
-				blocks.push(new Uint8Array(import_buffer.Buffer.concat([head, chunk])));
+				blocks.push(new Uint8Array(Buffer.concat([head, chunk])));
 			}
 			return blocks;
 		},
@@ -1689,7 +1686,7 @@ var createHIDframing = (channel, packetSize) => {
 			if (!acc) dataLength = chunk.readUInt16BE(5);
 			sequence++;
 			const chunkData = chunk.slice(acc ? 5 : 7);
-			data = import_buffer.Buffer.concat([data, chunkData]);
+			data = Buffer.concat([data, chunkData]);
 			if (data.length > dataLength) data = data.slice(0, dataLength);
 			return {
 				data,
@@ -3246,7 +3243,7 @@ var TransportWebHID = class TransportWebHID extends Transport {
 		});
 	};
 	onInputReport = (e) => {
-		const buffer = import_buffer.Buffer.from(e.data.buffer);
+		const buffer = Buffer.from(e.data.buffer);
 		if (this.inputCallback) {
 			this.inputCallback(buffer);
 			this.inputCallback = null;
@@ -3529,6 +3526,58 @@ async function sendIotaAmount(senderAddress, recipientAddress, iotaAmountToSend,
 	}
 }
 /**
+* Sign raw transaction bytes with the Ledger and dry run or submit them
+*/
+async function signTxBytes(txBytesBase64, coinType, accountIndex, change, addressIndex, dryRun = true) {
+	try {
+		const input = txBytesBase64.trim();
+		if (!input) throw new Error("no transaction bytes");
+		let txBytes;
+		try {
+			txBytes = fromBase64(input);
+		} catch (err) {
+			throw new Error("invalid base64 transaction bytes");
+		}
+		const bip44Path = `m/44'/${coinType}'/${accountIndex}'/${change}'/${addressIndex}'`;
+		const client = getClient();
+		if (dryRun) {
+			const dryRunResult = await client.dryRunTransactionBlock({ transactionBlock: txBytes });
+			console.log(dryRunResult);
+			return dryRunResult;
+		}
+		const serializedSignature = await signBytesWithLedger(txBytes, bip44Path);
+		const result = await client.executeTransactionBlock({
+			transactionBlock: txBytes,
+			signature: serializedSignature,
+			options: {
+				showBalanceChanges: true,
+				showObjectChanges: true,
+				showEffects: true,
+				showInput: true
+			}
+		});
+		console.log(result);
+		return result;
+	} catch (err) {
+		console.error(err);
+		throw err;
+	}
+}
+/**
+* Sign transaction bytes with the Ledger at the given BIP44 path
+*/
+async function signBytesWithLedger(txBytes, bip44Path) {
+	const ledgerClient = new Iota(ledgerTransport);
+	const txMessageIntent = messageWithIntent("TransactionData", txBytes);
+	const { signature } = await ledgerClient.signTransaction(bip44Path, txMessageIntent);
+	const { publicKey } = await ledgerClient.getPublicKey(bip44Path);
+	return toSerializedSignature({
+		signature,
+		signatureScheme: "ED25519",
+		publicKey: new Ed25519PublicKey(publicKey)
+	});
+}
+/**
 * Finish and execute/sign a transaction
 */
 async function finishTransaction(tx, bip44Path, senderAddress, client, dryRun = true) {
@@ -3540,15 +3589,7 @@ async function finishTransaction(tx, bip44Path, senderAddress, client, dryRun = 
 			console.log(dryRunResult);
 			return dryRunResult;
 		} else {
-			const ledgerClient = new Iota(ledgerTransport);
-			let txMessageIntent = messageWithIntent("TransactionData", txBytes);
-			const { signature } = await ledgerClient.signTransaction(bip44Path, txMessageIntent);
-			const { publicKey } = await ledgerClient.getPublicKey(bip44Path);
-			const serializedSignature = toSerializedSignature({
-				signature,
-				signatureScheme: "ED25519",
-				publicKey: new Ed25519PublicKey(publicKey)
-			});
+			const serializedSignature = await signBytesWithLedger(txBytes, bip44Path);
 			const result = await client.executeTransactionBlock({
 				transactionBlock: txBytes,
 				signature: serializedSignature,
@@ -3570,7 +3611,7 @@ async function finishTransaction(tx, bip44Path, senderAddress, client, dryRun = 
 var root = from_html(`<tr><td class="svelte-1yhe0ga"> </td><td class="svelte-1yhe0ga"> </td><td class="mono svelte-1yhe0ga"> </td><td class="mono svelte-1yhe0ga"> </td><td class="svelte-1yhe0ga"> </td><td class="svelte-1yhe0ga"> </td></tr>`);
 var root_1 = from_html(`<tr><td colspan="2" class="svelte-1yhe0ga"><table class="inner-table svelte-1yhe0ga"><thead><tr><th class="svelte-1yhe0ga">Index</th><th class="svelte-1yhe0ga">Internal</th><th class="svelte-1yhe0ga">Address</th><th class="svelte-1yhe0ga">PublicKey</th><th class="svelte-1yhe0ga">Balance</th><th class="svelte-1yhe0ga">Owned Objects</th></tr></thead><tbody></tbody></table></td></tr>`);
 var root_2 = from_html(`<tr class="clickable svelte-1yhe0ga"><td class="svelte-1yhe0ga"> </td><td class="svelte-1yhe0ga"> </td></tr> <!>`, 1);
-var root_3 = from_html(`<main><button class="svelte-1yhe0ga">connect</button> <br/> BIP 44 path: (m/44'/coinType'/accountIndex'/change'/addressIndex') <br/> <input type="number" list="coinTypes" placeholder="BIP-44 coin type" class="svelte-1yhe0ga"/> <datalist id="coinTypes"><option>IOTA</option><option>Testnet</option></datalist> <input type="number" min="0" placeholder="account index" class="svelte-1yhe0ga"/> <select><option>0</option><option>1</option></select> <input type="number" width="1" min="0" placeholder="address index" class="svelte-1yhe0ga"/> <button class="svelte-1yhe0ga">generate address</button> <br/> increase <select><option>account</option><option>address</option></select> index by: <input type="number" min="1" placeholder="number to generate" class="svelte-1yhe0ga"/> <button class="svelte-1yhe0ga">generate multiple addresses</button> <hr/> <button class="svelte-1yhe0ga">get unknown balances</button> <button class="svelte-1yhe0ga">get all balances</button> <button class="svelte-1yhe0ga">get unknown objects</button> <button class="svelte-1yhe0ga">get all objects</button> <hr/> <div>Sender address: <input type="string" size="70" placeholder="sender address" class="svelte-1yhe0ga"/></div> <div>Recipient address: <input type="string" size="70" placeholder="recipient address" class="svelte-1yhe0ga"/></div> <select><option>dry run</option><option>send</option></select> <button class="svelte-1yhe0ga">send all objects</button> IOTA amount(in Nanos) to send: <input type="number" min="0" placeholder="IOTA amount to send" class="svelte-1yhe0ga"/> <button class="svelte-1yhe0ga">send IOTA</button> <hr/> <button class="svelte-1yhe0ga">clear address list</button> <button class="svelte-1yhe0ga">expand all</button> <button class="svelte-1yhe0ga">collapse all</button> <!> <table class="svelte-1yhe0ga"><thead><tr><th class="svelte-1yhe0ga">Account</th><th class="svelte-1yhe0ga">Addresses</th></tr></thead><tbody></tbody></table></main>`);
+var root_3 = from_html(`<main><button class="svelte-1yhe0ga">connect</button> <br/> BIP 44 path: (m/44'/coinType'/accountIndex'/change'/addressIndex') <br/> <input type="number" list="coinTypes" placeholder="BIP-44 coin type" class="svelte-1yhe0ga"/> <datalist id="coinTypes"><option>IOTA</option><option>Testnet</option></datalist> <input type="number" min="0" placeholder="account index" class="svelte-1yhe0ga"/> <select><option>0</option><option>1</option></select> <input type="number" width="1" min="0" placeholder="address index" class="svelte-1yhe0ga"/> <button class="svelte-1yhe0ga">generate address</button> <br/> increase <select><option>account</option><option>address</option></select> index by: <input type="number" min="1" placeholder="number to generate" class="svelte-1yhe0ga"/> <button class="svelte-1yhe0ga">generate multiple addresses</button> <hr/> <button class="svelte-1yhe0ga">get unknown balances</button> <button class="svelte-1yhe0ga">get all balances</button> <button class="svelte-1yhe0ga">get unknown objects</button> <button class="svelte-1yhe0ga">get all objects</button> <hr/> <div>Sender address: <input type="string" size="70" placeholder="sender address" class="svelte-1yhe0ga"/></div> <div>Recipient address: <input type="string" size="70" placeholder="recipient address" class="svelte-1yhe0ga"/></div> <select><option>dry run</option><option>send</option></select> <button class="svelte-1yhe0ga">send all objects</button> IOTA amount(in Nanos) to send: <input type="number" min="0" placeholder="IOTA amount to send" class="svelte-1yhe0ga"/> <button class="svelte-1yhe0ga">send IOTA</button> <hr/> <div>Tx bytes (base64), signed with the BIP 44 path selected above:</div> <textarea placeholder="base64 transaction bytes" class="svelte-1yhe0ga"></textarea> <button class="svelte-1yhe0ga">sign and submit tx bytes</button> <hr/> <button class="svelte-1yhe0ga">clear address list</button> <button class="svelte-1yhe0ga">expand all</button> <button class="svelte-1yhe0ga">collapse all</button> <!> <table class="svelte-1yhe0ga"><thead><tr><th class="svelte-1yhe0ga">Account</th><th class="svelte-1yhe0ga">Addresses</th></tr></thead><tbody></tbody></table></main>`);
 function LedgerNano($$anchor, $$props) {
 	push($$props, true);
 	let coinType = state(proxy(1));
@@ -3583,6 +3624,7 @@ function LedgerNano($$anchor, $$props) {
 	let iotaAmountToSend = state("1");
 	let senderAddress = state("");
 	let recipientAddress = state("");
+	let txBytesInput = state("");
 	let value = state(proxy({}));
 	let accountEntries = state(proxy([]));
 	async function connect() {
@@ -3659,6 +3701,14 @@ function LedgerNano($$anchor, $$props) {
 			console.error(err);
 		}
 	}
+	async function handleSignTxBytes() {
+		try {
+			set(value, await signTxBytes(get(txBytesInput), get(coinType), get(accountIndex), get(change), get(addressIndex), get(dryRun)), true);
+		} catch (err) {
+			set(value, err.toString(), true);
+			console.error(err);
+		}
+	}
 	var main = root_3();
 	var button = child(main);
 	var input = sibling(button, 6);
@@ -3711,10 +3761,13 @@ function LedgerNano($$anchor, $$props) {
 	var input_6 = sibling(button_7, 2);
 	remove_input_defaults(input_6);
 	var button_8 = sibling(input_6, 2);
-	var button_9 = sibling(button_8, 4);
-	var button_10 = sibling(button_9, 2);
+	var textarea = sibling(button_8, 6);
+	remove_textarea_child(textarea);
+	var button_9 = sibling(textarea, 2);
+	var button_10 = sibling(button_9, 4);
 	var button_11 = sibling(button_10, 2);
-	var node = sibling(button_11, 2);
+	var button_12 = sibling(button_11, 2);
+	var node = sibling(button_12, 2);
 	JsonToggleView(node, { get value() {
 		return get(value);
 	} });
@@ -3813,15 +3866,17 @@ function LedgerNano($$anchor, $$props) {
 	delegated("click", button_7, () => handleSendAllObjects());
 	bind_value(input_6, () => get(iotaAmountToSend), ($$value) => set(iotaAmountToSend, $$value));
 	delegated("click", button_8, () => handleSendIotaAmount());
-	delegated("click", button_9, () => {
+	bind_value(textarea, () => get(txBytesInput), ($$value) => set(txBytesInput, $$value));
+	delegated("click", button_9, () => handleSignTxBytes());
+	delegated("click", button_10, () => {
 		set(accountEntries, [], true);
 		set(tableAccounts, [], true);
 		set(value, "");
 	});
-	delegated("click", button_10, () => {
+	delegated("click", button_11, () => {
 		set(expanded, get(tableAccounts).map((e) => e[0]), true);
 	});
-	delegated("click", button_11, () => {
+	delegated("click", button_12, () => {
 		set(expanded, [], true);
 	});
 	append($$anchor, main);

@@ -3,11 +3,10 @@ import "./legacy-DxVWxrJw.js";
 import { n as getSelectedChain, o as Transaction, s as TransactionDataBuilder, t as getClient } from "./client-BTFoHz6u.js";
 import { L as iotaBcs, Q as toBase64, Z as fromBase64, l as parseSerializedSignature } from "./keypair-DsT3ivIR.js";
 import { f as getActiveWallet, t as activeAddress } from "./signer-data-D1Egmbld.js";
-import { a as MoveAuthenticatorDetails, c as parsePartialSignatures, d as verifyTransactionSignature, f as require_buffer, i as TransactionView, l as publicKeyFromRawBytes, o as copyToClipboard, u as verifyPersonalMessageSignature } from "./index-CZGDvpHL.js";
-import { n as updatePageQueryParams, r as usePageQueryParams } from "./page-query-params-DJbo4x4M.js";
+import { a as MoveAuthenticatorDetails, c as parsePartialSignatures, d as verifyTransactionSignature, f as Buffer, i as TransactionView, l as publicKeyFromRawBytes, o as copyToClipboard, u as verifyPersonalMessageSignature } from "./index-115pSspU.js";
+import { n as updatePageQueryParams, r as usePageQueryParams } from "./page-query-params-CjYNCsn5.js";
 import { t as JsonToggleView } from "./JsonToggleView-I_OHyvOi.js";
 //#region src/lib/pages/sign/sign-utils.ts
-var import_buffer = require_buffer();
 async function verifySignature(txBytesInput, signatureResult) {
 	let status = "checking";
 	let error = "";
@@ -596,12 +595,12 @@ function Sign($$anchor, $$props) {
 					() => (get(pair), untrack(() => get(pair).publicKey.toBase64())),
 					() => (get(pair), untrack(() => get(pair).publicKey.toIotaPublicKey())),
 					() => (get(pair), untrack(() => get(pair).publicKey.toIotaAddress())),
-					() => (get(pair), untrack(() => import_buffer.Buffer.from(get(pair).signature).toString("base64")))
+					() => (get(pair), untrack(() => Buffer.from(get(pair).signature).toString("base64")))
 				]);
 				delegated("click", button_7, async () => await copyToClipboard(get(pair).publicKey.toBase64()));
 				delegated("click", button_8, async () => await copyToClipboard(get(pair).publicKey.toIotaPublicKey()));
 				delegated("click", button_9, async () => await copyToClipboard(get(pair).publicKey.toIotaAddress()));
-				delegated("click", button_10, async () => await copyToClipboard(import_buffer.Buffer.from(get(pair).signature).toString("base64")));
+				delegated("click", button_10, async () => await copyToClipboard(Buffer.from(get(pair).signature).toString("base64")));
 				append($$anchor, div_18);
 			});
 			reset(div_17);

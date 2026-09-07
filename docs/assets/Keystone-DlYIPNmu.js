@@ -3,7 +3,7 @@ import { $ as untrack, C as bind_select_value, D as set_class, Dt as pop, E as s
 import "./legacy-DxVWxrJw.js";
 import { t as getClient } from "./client-BTFoHz6u.js";
 import { Q as toBase64, X as toHex, Y as fromHex, g as sha256, m as messageWithIntent, n as Ed25519PublicKey } from "./keypair-DsT3ivIR.js";
-import { f as require_buffer, i as TransactionView, t as __vitePreload } from "./index-CZGDvpHL.js";
+import { f as Buffer, i as TransactionView, t as __vitePreload } from "./index-115pSspU.js";
 //#region node_modules/.pnpm/bignumber.js@9.3.1/node_modules/bignumber.js/bignumber.mjs
 var isNumeric = /^-?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/i;
 var mathceil = Math.ceil;
@@ -1218,7 +1218,6 @@ function toFixedPoint(str, e, z) {
 var BigNumber = clone();
 //#endregion
 //#region node_modules/.pnpm/@gandlaf21+bc-ur@1.1.12/node_modules/@gandlaf21/bc-ur/dist/lib/es6/errors.js
-var import_buffer = require_buffer();
 var __extends = (function() {
 	var extendStatics = function(d, b) {
 		extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function(d, b) {
@@ -1299,7 +1298,7 @@ var crc32 = function(message) {
 	return (crc ^ -1) >>> 0;
 };
 var sha256Hash = function(data) {
-	return import_buffer.Buffer.from(sha256(data));
+	return Buffer.from(sha256(data));
 };
 var partition = function(s, n) {
 	return s.match(new RegExp(".{1," + n + "}", "g")) || [s];
@@ -1319,7 +1318,7 @@ var toUint32 = function(number) {
 var intToBytes = function(num) {
 	var arr = /* @__PURE__ */ new ArrayBuffer(4);
 	new DataView(arr).setUint32(0, num, false);
-	return import_buffer.Buffer.from(arr);
+	return Buffer.from(arr);
 };
 var isURType = function(type) {
 	return type.split("").every(function(_, index) {
@@ -1356,7 +1355,7 @@ var setDifference = function(ar1, ar2) {
 };
 var bufferXOR = function(a, b) {
 	var length = Math.max(a.length, b.length);
-	var buffer = import_buffer.Buffer.allocUnsafe(length);
+	var buffer = Buffer.allocUnsafe(length);
 	for (var i = 0; i < length; ++i) buffer[i] = a[i] ^ b[i];
 	return buffer;
 };
@@ -3445,10 +3444,10 @@ function decode$1(data, options) {
 //#endregion
 //#region node_modules/.pnpm/@gandlaf21+bc-ur@1.1.12/node_modules/@gandlaf21/bc-ur/dist/lib/es6/cbor.js
 var cborEncode = function(data) {
-	return import_buffer.Buffer.from(encode$2(data));
+	return Buffer.from(encode$2(data));
 };
 var cborDecode = function(data) {
-	return decode$1(import_buffer.Buffer.isBuffer(data) ? data : import_buffer.Buffer.from(data, "hex"));
+	return decode$1(Buffer.isBuffer(data) ? data : Buffer.from(data, "hex"));
 };
 //#endregion
 //#region node_modules/.pnpm/@gandlaf21+bc-ur@1.1.12/node_modules/@gandlaf21/bc-ur/dist/lib/es6/ur.js
@@ -3463,7 +3462,7 @@ var UR = function() {
 		return new UR(cborEncode(buf));
 	};
 	UR.from = function(value) {
-		return UR.fromBuffer(import_buffer.Buffer.from(value));
+		return UR.fromBuffer(Buffer.from(value));
 	};
 	UR.prototype.decodeCBOR = function() {
 		return cborDecode(this._cborPayload);
@@ -5120,7 +5119,7 @@ var shuffle = function(items, rng) {
 var chooseFragments = function(seqNum, seqLength, checksum) {
 	if (seqNum <= seqLength) return [seqNum - 1];
 	else {
-		var rng = new Xoshiro(import_buffer.Buffer.concat([intToBytes(seqNum), intToBytes(checksum)]));
+		var rng = new Xoshiro(Buffer.concat([intToBytes(seqNum), intToBytes(checksum)]));
 		var degree = chooseDegree(seqLength, rng);
 		return shuffle(__spreadArrays$3(new Array(seqLength)).map(function(_, index) {
 			return index;
@@ -5180,15 +5179,15 @@ var FountainEncoderPart = function() {
 			this._checksum,
 			this._fragment
 		]);
-		return import_buffer.Buffer.from(result);
+		return Buffer.from(result);
 	};
 	FountainEncoderPart.prototype.description = function() {
 		return "seqNum:" + this._seqNum + ", seqLen:" + this._seqLength + ", messageLen:" + this._messageLength + ", checksum:" + this._checksum + ", data:" + this._fragment.toString("hex");
 	};
 	FountainEncoderPart.fromCBOR = function(cborPayload) {
 		var _a = cborDecode(cborPayload), seqNum = _a[0], seqLength = _a[1], messageLength = _a[2], checksum = _a[3], fragment = _a[4];
-		if (typeof seqNum !== "number" || typeof seqLength !== "number" || typeof messageLength !== "number" || typeof checksum !== "number" || import_buffer.Buffer.isBuffer(fragment) && fragment.length <= 0) throw new Error("type error");
-		return new FountainEncoderPart(seqNum, seqLength, messageLength, checksum, import_buffer.Buffer.from(fragment));
+		if (typeof seqNum !== "number" || typeof seqLength !== "number" || typeof messageLength !== "number" || typeof checksum !== "number" || Buffer.isBuffer(fragment) && fragment.length <= 0) throw new Error("type error");
+		return new FountainEncoderPart(seqNum, seqLength, messageLength, checksum, Buffer.from(fragment));
 	};
 	return FountainEncoderPart;
 }();
@@ -5238,7 +5237,7 @@ var FountainEncoder = function() {
 		var _this = this;
 		return indexes.reduce(function(result, index) {
 			return bufferXOR(_this._fragments[index], result);
-		}, import_buffer.Buffer.alloc(this.fragmentLength, 0));
+		}, Buffer.alloc(this.fragmentLength, 0));
 	};
 	FountainEncoder.prototype.nextPart = function() {
 		this.seqNum = toUint32(this.seqNum + 1);
@@ -5258,12 +5257,12 @@ var FountainEncoder = function() {
 	};
 	FountainEncoder.partitionMessage = function(message, fragmentLength) {
 		var _a;
-		var remaining = import_buffer.Buffer.from(message);
+		var remaining = Buffer.from(message);
 		var fragment;
 		var _fragments = [];
 		while (remaining.length > 0) {
 			_a = split(remaining, -fragmentLength), fragment = _a[0], remaining = _a[1];
-			fragment = import_buffer.Buffer.alloc(fragmentLength, 0).fill(fragment, 0, fragment.length);
+			fragment = Buffer.alloc(fragmentLength, 0).fill(fragment, 0, fragment.length);
 			_fragments.push(fragment);
 		}
 		return _fragments;
@@ -5296,18 +5295,18 @@ var getMinimalWord = function(index) {
 	return "" + byteword[0] + byteword[BYTEWORD_LENGTH - 1];
 };
 var addCRC = function(string) {
-	var crc = getCRCHex(import_buffer.Buffer.from(string, "hex"));
+	var crc = getCRCHex(Buffer.from(string, "hex"));
 	return "" + string + crc;
 };
 var encodeWithSeparator = function(word, separator) {
 	var crcAppendedWord = addCRC(word);
-	return import_buffer.Buffer.from(crcAppendedWord, "hex").reduce(function(result, w) {
+	return Buffer.from(crcAppendedWord, "hex").reduce(function(result, w) {
 		return __spreadArrays$2(result, [getWord(w)]);
 	}, []).join(separator);
 };
 var encodeMinimal = function(word) {
 	var crcAppendedWord = addCRC(word);
-	return import_buffer.Buffer.from(crcAppendedWord, "hex").reduce(function(result, w) {
+	return Buffer.from(crcAppendedWord, "hex").reduce(function(result, w) {
 		return result + getMinimalWord(w);
 	}, "");
 };
@@ -5338,14 +5337,14 @@ var decodeWord = function(word, wordLength) {
 		var c2 = word[2].toLowerCase();
 		if (!(c1 === byteword[1] && c2 === byteword[2])) throw new Error("Invalid Bytewords: invalid middle letters of word");
 	}
-	return import_buffer.Buffer.from([value]).toString("hex");
+	return Buffer.from([value]).toString("hex");
 };
 var _decode = function(string, separator, wordLength) {
 	var decodedString = (wordLength == BYTEWORD_LENGTH ? string.split(separator) : partition(string, 2)).map(function(word) {
 		return decodeWord(word, wordLength);
 	}).join("");
 	if (decodedString.length < 5) throw new Error("Invalid Bytewords: invalid decoded string length");
-	var _a = split(import_buffer.Buffer.from(decodedString, "hex"), 4), body = _a[0], bodyChecksum = _a[1];
+	var _a = split(Buffer.from(decodedString, "hex"), 4), body = _a[0], bodyChecksum = _a[1];
 	if (getCRCHex(body) !== bodyChecksum.toString("hex")) throw new Error("Invalid Checksum");
 	return body.toString("hex");
 };
@@ -5597,7 +5596,7 @@ var FountainDecoder = function() {
 		return Boolean(this.error === void 0 && this.isComplete());
 	};
 	FountainDecoder.prototype.resultMessage = function() {
-		return this.isSuccess() ? this.result : import_buffer.Buffer.from([]);
+		return this.isSuccess() ? this.result : Buffer.from([]);
 	};
 	FountainDecoder.prototype.isFailure = function() {
 		return this.error !== void 0;
@@ -5630,7 +5629,7 @@ var FountainDecoder = function() {
 		return this.receivedPartIndexes.length / expectedPartCount;
 	};
 	FountainDecoder.joinFragments = function(fragments, messageLength) {
-		return import_buffer.Buffer.concat(fragments).slice(0, messageLength);
+		return Buffer.concat(fragments).slice(0, messageLength);
 	};
 	return FountainDecoder;
 }();
@@ -5647,7 +5646,7 @@ var URDecoder = function() {
 	}
 	URDecoder.decodeBody = function(type, message) {
 		var cbor = bytewords_default.decode(message, bytewords_default.STYLES.MINIMAL);
-		return new UR(import_buffer.Buffer.from(cbor, "hex"), type);
+		return new UR(Buffer.from(cbor, "hex"), type);
 	};
 	URDecoder.prototype.validatePart = function(type) {
 		if (this.expected_type) return this.expected_type === type;
@@ -5698,7 +5697,7 @@ var URDecoder = function() {
 		return true;
 	};
 	URDecoder.prototype.resultUR = function() {
-		return this.result ? this.result : new UR(import_buffer.Buffer.from([]));
+		return this.result ? this.result : new UR(Buffer.from([]));
 	};
 	URDecoder.prototype.isComplete = function() {
 		return this.result && this.result.cbor.length > 0 ? true : false;
@@ -8335,7 +8334,7 @@ function QrGenerator($$anchor, $$props) {
 	function createAnimatedQR(cborHex, type, maxCapacity) {
 		try {
 			stopQRAnimation();
-			urEncoder = new UREncoder(new UR(import_buffer.Buffer.from(cborHex, "hex"), type), maxCapacity);
+			urEncoder = new UREncoder(new UR(Buffer.from(cborHex, "hex"), type), maxCapacity);
 			const firstPart = urEncoder.nextPart().toUpperCase();
 			console.log("Generated QR part:", firstPart);
 			console.log("First part length:", firstPart.length);
@@ -9736,14 +9735,14 @@ BufferReader.prototype.readFloat64 = function() {
 	return result;
 };
 BufferReader.prototype.readChunk = function(length) {
-	var result = import_buffer.Buffer.alloc(length);
+	var result = Buffer.alloc(length);
 	this.buffer.copy(result, 0, this.pos, this.pos += length);
 	return result;
 };
 function BufferWriter(stringFormat) {
 	this.byteLength = 0;
 	this.defaultBufferLength = 16384;
-	this.latestBuffer = import_buffer.Buffer.alloc(this.defaultBufferLength);
+	this.latestBuffer = Buffer.alloc(this.defaultBufferLength);
 	this.latestBufferOffset = 0;
 	this.completeBuffers = [];
 	this.stringFormat = stringFormat;
@@ -9753,54 +9752,54 @@ BufferWriter.prototype.writeByte = function(value) {
 	this.latestBuffer[this.latestBufferOffset++] = value;
 	if (this.latestBufferOffset >= this.latestBuffer.length) {
 		this.completeBuffers.push(this.latestBuffer);
-		this.latestBuffer = import_buffer.Buffer.alloc(this.defaultBufferLength);
+		this.latestBuffer = Buffer.alloc(this.defaultBufferLength);
 		this.latestBufferOffset = 0;
 	}
 	this.byteLength++;
 };
 BufferWriter.prototype.writeFloat32 = function(value) {
-	var buffer = import_buffer.Buffer.alloc(4);
+	var buffer = Buffer.alloc(4);
 	buffer.writeFloatBE(value, 0);
 	this.writeBuffer(buffer);
 };
 BufferWriter.prototype.writeFloat64 = function(value) {
-	var buffer = import_buffer.Buffer.alloc(8);
+	var buffer = Buffer.alloc(8);
 	buffer.writeDoubleBE(value, 0);
 	this.writeBuffer(buffer);
 };
 BufferWriter.prototype.writeString = function(string, lengthFunc) {
-	var buffer = import_buffer.Buffer.from(string, "utf-8");
+	var buffer = Buffer.from(string, "utf-8");
 	lengthFunc(buffer.length);
 	this.writeBuffer(buffer);
 };
 BufferWriter.prototype.canWriteBinary = function(data) {
-	return data instanceof import_buffer.Buffer;
+	return data instanceof Buffer;
 };
 BufferWriter.prototype.writeBinary = function(buffer, lengthFunc) {
 	lengthFunc(buffer.length);
 	this.writeBuffer(buffer);
 };
 BufferWriter.prototype.writeBuffer = function(chunk) {
-	if (!(chunk instanceof import_buffer.Buffer)) throw new TypeError("BufferWriter only accepts Buffers");
+	if (!(chunk instanceof Buffer)) throw new TypeError("BufferWriter only accepts Buffers");
 	if (!this.latestBufferOffset) this.completeBuffers.push(chunk);
 	else if (this.latestBuffer.length - this.latestBufferOffset >= chunk.length) {
 		chunk.copy(this.latestBuffer, this.latestBufferOffset);
 		this.latestBufferOffset += chunk.length;
 		if (this.latestBufferOffset >= this.latestBuffer.length) {
 			this.completeBuffers.push(this.latestBuffer);
-			this.latestBuffer = import_buffer.Buffer.alloc(this.defaultBufferLength);
+			this.latestBuffer = Buffer.alloc(this.defaultBufferLength);
 			this.latestBufferOffset = 0;
 		}
 	} else {
 		this.completeBuffers.push(this.latestBuffer.slice(0, this.latestBufferOffset));
 		this.completeBuffers.push(chunk);
-		this.latestBuffer = import_buffer.Buffer.alloc(this.defaultBufferLength);
+		this.latestBuffer = Buffer.alloc(this.defaultBufferLength);
 		this.latestBufferOffset = 0;
 	}
 	this.byteLength += chunk.length;
 };
 BufferWriter.prototype.result = function() {
-	var result = import_buffer.Buffer.alloc(this.byteLength);
+	var result = Buffer.alloc(this.byteLength);
 	var offset = 0;
 	for (var i = 0; i < this.completeBuffers.length; i++) {
 		var buffer = this.completeBuffers[i];
@@ -9811,10 +9810,10 @@ BufferWriter.prototype.result = function() {
 	if (this.stringFormat) return result.toString(this.stringFormat);
 	return result;
 };
-if (typeof import_buffer.Buffer === "function") {
+if (typeof Buffer === "function") {
 	addReader(function(data, format) {
-		if (import_buffer.Buffer.isBuffer(data)) return new BufferReader(data);
-		if (format === "hex" || format === "base64") return new BufferReader(import_buffer.Buffer.from(data, format));
+		if (Buffer.isBuffer(data)) return new BufferReader(data);
+		if (format === "hex" || format === "base64") return new BufferReader(Buffer.from(data, format));
 	});
 	addWriter(function(format) {
 		if (!format || format === "buffer") return new BufferWriter();
@@ -9838,7 +9837,7 @@ HexReader.prototype.readByte = function() {
 HexReader.prototype.readChunk = function(length) {
 	var hex = this.hex.substring(this.pos, this.pos + length * 2);
 	this.pos += length * 2;
-	if (typeof import_buffer.Buffer === "function") return import_buffer.Buffer.from(hex, "hex");
+	if (typeof Buffer === "function") return Buffer.from(hex, "hex");
 	return new BinaryHex(hex);
 };
 function HexWriter(finalFormat) {
@@ -9853,19 +9852,19 @@ HexWriter.prototype.writeByte = function(value) {
 	this.$hex += hex;
 };
 HexWriter.prototype.canWriteBinary = function(chunk) {
-	return chunk instanceof BinaryHex || typeof import_buffer.Buffer === "function" && chunk instanceof import_buffer.Buffer;
+	return chunk instanceof BinaryHex || typeof Buffer === "function" && chunk instanceof Buffer;
 };
 HexWriter.prototype.writeBinary = function(chunk, lengthFunction) {
 	if (chunk instanceof BinaryHex) {
 		lengthFunction(chunk.length());
 		this.$hex += chunk.$hex;
-	} else if (typeof import_buffer.Buffer === "function" && chunk instanceof import_buffer.Buffer) {
+	} else if (typeof Buffer === "function" && chunk instanceof Buffer) {
 		lengthFunction(chunk.length);
 		this.$hex += chunk.toString("hex");
 	} else throw new TypeError("HexWriter only accepts BinaryHex or Buffers");
 };
 HexWriter.prototype.result = function() {
-	if (this.finalFormat === "buffer" && typeof import_buffer.Buffer === "function") return import_buffer.Buffer.from(this.$hex, "hex");
+	if (this.finalFormat === "buffer" && typeof Buffer === "function") return Buffer.from(this.$hex, "hex");
 	return new BinaryHex(this.$hex).toString(this.finalFormat);
 };
 HexWriter.prototype.writeString = function(string, lengthFunction) {
@@ -10159,7 +10158,7 @@ var CryptoKeypath = class CryptoKeypath extends RegistryItem {
 		const _sourceFingerprint = map[2];
 		let sourceFingerprint;
 		if (_sourceFingerprint) {
-			sourceFingerprint = import_buffer.Buffer.alloc(4);
+			sourceFingerprint = Buffer.alloc(4);
 			sourceFingerprint.writeUInt32BE(_sourceFingerprint, 0);
 		}
 		const depth = map[3];
@@ -10201,9 +10200,9 @@ var CryptoHDKey = class CryptoHDKey extends RegistryItem {
 		let version;
 		let depth;
 		let index = 0;
-		let parentFingerprint = import_buffer.Buffer.alloc(4).fill(0);
+		let parentFingerprint = Buffer.alloc(4).fill(0);
 		if (this.isMaster()) {
-			version = import_buffer.Buffer.from("0488ADE4", "hex");
+			version = Buffer.from("0488ADE4", "hex");
 			depth = 0;
 			index = 0;
 		} else {
@@ -10214,16 +10213,16 @@ var CryptoHDKey = class CryptoHDKey extends RegistryItem {
 				index = lastPath.isHardened() ? lastPath.getIndex() + 2147483648 : lastPath.getIndex();
 				if (this.getParentFingerprint()) parentFingerprint = this.getParentFingerprint();
 			}
-			if (this.isPrivateKey()) version = import_buffer.Buffer.from("0488ADE4", "hex");
-			else version = import_buffer.Buffer.from("0488B21E", "hex");
+			if (this.isPrivateKey()) version = Buffer.from("0488ADE4", "hex");
+			else version = Buffer.from("0488B21E", "hex");
 		}
-		const depthBuffer = import_buffer.Buffer.alloc(1);
+		const depthBuffer = Buffer.alloc(1);
 		depthBuffer.writeUInt8(depth, 0);
-		const indexBuffer = import_buffer.Buffer.alloc(4);
+		const indexBuffer = Buffer.alloc(4);
 		indexBuffer.writeUInt32BE(index, 0);
 		const chainCode = this.getChainCode();
 		const key = this.getKey();
-		return encode(import_buffer.Buffer.concat([
+		return encode(Buffer.concat([
 			version,
 			depthBuffer,
 			parentFingerprint,
@@ -10311,7 +10310,7 @@ var CryptoHDKey = class CryptoHDKey extends RegistryItem {
 		const _parentFingerprint = map[8];
 		let parentFingerprint = void 0;
 		if (_parentFingerprint) {
-			parentFingerprint = import_buffer.Buffer.alloc(4);
+			parentFingerprint = Buffer.alloc(4);
 			parentFingerprint.writeUInt32BE(_parentFingerprint, 0);
 		}
 		const name = map[9];
@@ -10371,7 +10370,7 @@ var CryptoMultiAccounts = class CryptoMultiAccounts extends RegistryItem {
 	};
 	static fromDataItem = (dataItem) => {
 		const map = dataItem.getData();
-		const masterFingerprint = import_buffer.Buffer.alloc(4);
+		const masterFingerprint = Buffer.alloc(4);
 		const _masterFingerprint = map[1];
 		if (_masterFingerprint) masterFingerprint.writeUInt32BE(_masterFingerprint, 0);
 		const cryptoHDKeys = map[2].map((item) => CryptoHDKey.fromDataItem(item));
@@ -10634,11 +10633,11 @@ var IotaSignRequest = class IotaSignRequest extends RegistryItem {
 				index,
 				hardened: isHardened
 			});
-		}), import_buffer.Buffer.from(xfp, "hex"));
+		}), Buffer.from(xfp, "hex"));
 	}
 	static constructIotaSignRequest(intentMessage, derivationPaths, xfp, uuidString, addresses, origin) {
 		return new IotaSignRequest({
-			requestId: uuidString ? import_buffer.Buffer.from(parse(uuidString)) : void 0,
+			requestId: uuidString ? Buffer.from(parse(uuidString)) : void 0,
 			intentMessage,
 			derivationPaths: derivationPaths.map((path) => IotaSignRequest.parsePath(path, xfp)),
 			addresses,
@@ -10764,10 +10763,10 @@ var TRANSACTION_EXAMPLES = {
 * Utility to extract Buffer from Buffer, {type: 'Buffer', data: [...]}, or array-like
 */
 function extractBuffer(val) {
-	if (!val) return import_buffer.Buffer.alloc(0);
-	if (import_buffer.Buffer.isBuffer(val)) return val;
-	if (typeof val === "object" && val.type === "Buffer" && Array.isArray(val.data)) return import_buffer.Buffer.from(val.data);
-	return import_buffer.Buffer.from(val);
+	if (!val) return Buffer.alloc(0);
+	if (Buffer.isBuffer(val)) return val;
+	if (typeof val === "object" && val.type === "Buffer" && Array.isArray(val.data)) return Buffer.from(val.data);
+	return Buffer.from(val);
 }
 /**
 * UUID utility functions
@@ -10898,11 +10897,11 @@ function processCompleteUR(type, cborHex, state) {
 		resetMultipartState(state);
 		console.log("Processing UR type:", type, "CBOR hex:", cborHex);
 		if (type === UR_TYPES.IOTA_SIGNATURE) {
-			const signature = IotaSignature.fromCBOR(import_buffer.Buffer.from(cborHex, "hex"));
+			const signature = IotaSignature.fromCBOR(Buffer.from(cborHex, "hex"));
 			const signatureBytes = signature.getSignature();
 			const publicKeyBytes = signature.getPublicKey();
-			let signatureBase64 = toBase64(import_buffer.Buffer.concat([
-				import_buffer.Buffer.from([0]),
+			let signatureBase64 = toBase64(Buffer.concat([
+				Buffer.from([0]),
 				signatureBytes,
 				publicKeyBytes
 			]));
@@ -10913,8 +10912,8 @@ function processCompleteUR(type, cborHex, state) {
 				specific: {
 					signatureBase64,
 					requestId: uuidStringify(signature.getRequestId() ?? /* @__PURE__ */ new Uint8Array()),
-					signature: import_buffer.Buffer.from(signature.getSignature() ?? /* @__PURE__ */ new Uint8Array()).toString("hex"),
-					publicKey: import_buffer.Buffer.from(signature.getPublicKey() ?? /* @__PURE__ */ new Uint8Array()).toString("hex")
+					signature: Buffer.from(signature.getSignature() ?? /* @__PURE__ */ new Uint8Array()).toString("hex"),
+					publicKey: Buffer.from(signature.getPublicKey() ?? /* @__PURE__ */ new Uint8Array()).toString("hex")
 				}
 			};
 			return {
@@ -10940,7 +10939,7 @@ function processAccountData(type, cborHex) {
 	const onSucceed = ({ cbor }) => {
 		try {
 			console.log("Attempting to parse as multi-accounts...");
-			const multiAccounts = CryptoMultiAccounts.fromCBOR(import_buffer.Buffer.from(cbor, "hex"));
+			const multiAccounts = CryptoMultiAccounts.fromCBOR(Buffer.from(cbor, "hex"));
 			console.log("MultiAccounts: ", multiAccounts);
 			const fullMultiAccountsData = JSON.stringify(multiAccounts, null, 2);
 			const keystoneAccountData = {
@@ -11001,7 +11000,7 @@ function processAccountData(type, cborHex) {
 		} catch (parseError) {
 			console.log("Multi-accounts parsing failed, trying as HD Key...");
 			try {
-				const hdKey = CryptoHDKey.fromCBOR(import_buffer.Buffer.from(cbor, "hex"));
+				const hdKey = CryptoHDKey.fromCBOR(Buffer.from(cbor, "hex"));
 				console.log("HD Key: ", hdKey);
 				const fullMultiAccountsData = JSON.stringify(hdKey, null, 2);
 				const connectedDevice = hdKey.name || "Keystone Device";
@@ -11177,20 +11176,20 @@ function Keystone($$anchor, $$props) {
 			}
 			const useMasterFingerprint = get(masterFingerprint) || "70ee3cac";
 			const useAccountAddress = get(accountAddress) || "0xb9cbe931d4569659e5235346a9361642be3c045112bdc2676dd1e74d14d7c0a2";
-			const txMessageIntent = messageWithIntent("TransactionData", new Uint8Array(import_buffer.Buffer.from(get(rawTransactionBytes), "base64")));
+			const txMessageIntent = messageWithIntent("TransactionData", new Uint8Array(Buffer.from(get(rawTransactionBytes), "base64")));
 			const signKeyPath = new CryptoKeypath(get(derivationPaths).trim().replace(/^m\//, "").split("/").filter((part) => part.trim() !== "").map((part) => {
 				const isHardened = part.includes("'");
 				return new PathComponent({
 					index: parseInt(part.replace("'", "")),
 					hardened: isHardened
 				});
-			}), import_buffer.Buffer.from(useMasterFingerprint, "hex"));
+			}), Buffer.from(useMasterFingerprint, "hex"));
 			const idBuffer = uuidParse(get(requestId));
 			const cborHex = new IotaSignRequest({
-				requestId: import_buffer.Buffer.from(idBuffer),
-				intentMessage: import_buffer.Buffer.from(txMessageIntent),
+				requestId: Buffer.from(idBuffer),
+				intentMessage: Buffer.from(txMessageIntent),
 				derivationPaths: [signKeyPath],
-				addresses: [import_buffer.Buffer.from(useAccountAddress.replace(ADDRESS_PREFIXES.HEX, "").replace(ADDRESS_PREFIXES.IOTA1Q, ""), "hex")],
+				addresses: [Buffer.from(useAccountAddress.replace(ADDRESS_PREFIXES.HEX, "").replace(ADDRESS_PREFIXES.IOTA1Q, ""), "hex")],
 				origin: get(walletOrigin)
 			}).toCBOR().toString("hex");
 			if (!get(keystoneAccountData)) set(scanError, "ℹ️ Using demo values - connect Keystone device for real account data");
@@ -11258,17 +11257,17 @@ function Keystone($$anchor, $$props) {
 					const signRequest = IotaSignRequest.fromCBOR(result.cbor);
 					decodedData.specific = {
 						requestId: uuidStringify(signRequest.getRequestId()),
-						intentMessage: import_buffer.Buffer.from(signRequest.getIntentMessage()).toString("hex"),
+						intentMessage: Buffer.from(signRequest.getIntentMessage()).toString("hex"),
 						derivationPaths: signRequest.getDerivationPaths().map((p) => p.getPath()),
-						addresses: signRequest.getAddresses()?.map((a) => import_buffer.Buffer.from(a).toString("hex")) || [],
+						addresses: signRequest.getAddresses()?.map((a) => Buffer.from(a).toString("hex")) || [],
 						origin: signRequest.getOrigin()
 					};
 				} else if (type === UR_TYPES.IOTA_SIGNATURE) {
 					const signature = IotaSignature.fromCBOR(result.cbor);
 					const signatureBytes = signature.getSignature();
 					const publicKeyBytes = signature.getPublicKey();
-					let signatureBase64 = toBase64(import_buffer.Buffer.concat([
-						import_buffer.Buffer.from([0]),
+					let signatureBase64 = toBase64(Buffer.concat([
+						Buffer.from([0]),
 						signatureBytes,
 						publicKeyBytes
 					]));
@@ -11276,8 +11275,8 @@ function Keystone($$anchor, $$props) {
 					decodedData.specific = {
 						signatureBase64,
 						requestId: uuidStringify(signature.getRequestId()),
-						signature: import_buffer.Buffer.from(signature.getSignature()).toString("hex"),
-						publicKey: import_buffer.Buffer.from(signature.getPublicKey()).toString("hex")
+						signature: Buffer.from(signature.getSignature()).toString("hex"),
+						publicKey: Buffer.from(signature.getPublicKey()).toString("hex")
 					};
 				}
 				set(decodedUrData, JSON.stringify(decodedData, null, 2));
@@ -11299,7 +11298,7 @@ function Keystone($$anchor, $$props) {
 		try {
 			const parsed = JSON.parse(get(scanResult));
 			console.log("rawTransactionBytes", get(rawTransactionBytes));
-			const txBytes = new Uint8Array(import_buffer.Buffer.from(get(rawTransactionBytes), "base64"));
+			const txBytes = new Uint8Array(Buffer.from(get(rawTransactionBytes), "base64"));
 			const signatureBase64 = parsed.specific.signatureBase64;
 			console.log("signatureBase64", signatureBase64);
 			const result = await getClient().executeTransactionBlock({
