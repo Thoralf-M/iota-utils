@@ -121,7 +121,7 @@ export default function CheckpointDetail() {
                 ["Epoch", <Link to={`/epoch/${cp.epoch()}`}>{fmtInt(cp.epoch())}</Link>],
                 ["Timestamp", `${fmtTimestamp(cp.timestampMs())} (${fmtInt(cp.timestampMs())} ms)`],
                 ["Network total transactions", fmtInt(cp.networkTotalTransactions())],
-                ["Content digest", <Hash value={cp.contentDigest().toBase58()} full />],
+                ["Content digest", <Hash value={cp.contentsDigest().toBase58()} full />],
                 [
                   "Previous digest",
                   cp.previousDigest() ? (
